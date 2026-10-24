@@ -39,9 +39,57 @@ export default function AdminPhotosPage() {
   const [user, setUser] = useState<AdminUser | null>(null);
   const [events, setEvents] = useState<EventRecord[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string>("");
+  const [eventNameInput, setEventNameInput] = useState<string>("");
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
   const [photos, setPhotos] = useState<EventPhotoRecord[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [loadingPhotos, setLoadingPhotos] = useState(false);
+
+  // Close suggestions on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Filtered events matching input
+  const filteredEvents = useMemo(() => {
+    const q = eventNameInput.trim().toLowerCase();
+    if (!q) return events.slice(0, 8);
+    return events.filter((e) => e.title.toLowerCase().includes(q));
+  }, [events, eventNameInput]);
+
+  const handleEventNameChange = (val: string) => {
+    setEventNameInput(val);
+    setShowSuggestions(true);
+    const trimmed = val.trim();
+    if (!trimmed) {
+      setSelectedEventId("");
+      return;
+    }
+    const exactMatch = events.find(
+      (e) => e.title.trim().toLowerCase() === trimmed.toLowerCase()
+    );
+    if (exactMatch) {
+      setSelectedEventId(exactMatch.id);
+    } else {
+      setSelectedEventId("");
+    }
+  };
+
+  const handleSelectSuggestion = (evt: EventRecord) => {
+    setEventNameInput(evt.title);
+    setSelectedEventId(evt.id);
+    setShowSuggestions(false);
+  };
 
   // Staging state
   const [stagedFiles, setStagedFiles] = useState<StagedFile[]>([]);
@@ -94,9 +142,6 @@ export default function AdminPhotosPage() {
           const eventsData = await eventsRes.json();
           const evts: EventRecord[] = eventsData.events || [];
           setEvents(evts);
-          if (evts.length > 0) {
-            setSelectedEventId(evts[0].id);
-          }
         }
       } catch (err) {
         console.error("Error loading events:", err);
@@ -137,6 +182,10 @@ export default function AdminPhotosPage() {
       // Clean up previous staged files previews
       stagedFiles.forEach((f) => URL.revokeObjectURL(f.previewUrl));
       setStagedFiles([]);
+    } else {
+      setPhotos([]);
+      stagedFiles.forEach((f) => URL.revokeObjectURL(f.previewUrl));
+      setStagedFiles([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEventId]);
@@ -148,6 +197,10 @@ export default function AdminPhotosPage() {
   // File staging handler
   const handleFilesSelected = (selectedList: FileList | null) => {
     if (!selectedList || selectedList.length === 0) return;
+    if (!selectedEventId) {
+      setErrorMessage("Please enter a valid event name before uploading photos.");
+      return;
+    }
     setErrorMessage(null);
 
     const allowed = ["image/jpeg", "image/png", "image/webp"];
@@ -457,18 +510,18 @@ export default function AdminPhotosPage() {
       )}
 
       {/* Event Selection & Context Header Card */}
-      <div className="bg-white rounded-2xl border border-[#D9E4F2] p-5 sm:p-6 shadow-xs space-y-4">
+      <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5 sm:p-6 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-blue-50 text-[#174789] border border-blue-100">
-                <Images className="w-5 h-5" />
+              <span className="p-1.5 rounded-lg bg-[#0A2047]/10 text-[#0A2047] border border-[#0A2047]/20">
+                <Images className="w-5 h-5 text-[#0A2047]" />
               </span>
-              <h2 className="text-lg sm:text-xl font-bold text-[#174789] tracking-tight">
+              <h2 className="text-lg sm:text-xl font-bold text-[#0A2047] tracking-tight">
                 Event Photos / Gallery Management
               </h2>
             </div>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-[#64748B]">
               Upload multiple photos, designate the official event cover photo, edit captions, and reorder photos for public exhibition.
             </p>
           </div>
@@ -478,7 +531,7 @@ export default function AdminPhotosPage() {
             <Link
               href={`/events/${selectedEvent.id}`}
               target="_blank"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-50 border border-teal-200 text-teal-800 text-xs font-semibold hover:bg-teal-100 transition-colors shrink-0"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#0A2047] text-xs font-semibold hover:bg-[#D4AF37]/25 transition-colors shrink-0"
               title="View on Public Website"
             >
               <span>View Public Gallery</span>
@@ -487,33 +540,67 @@ export default function AdminPhotosPage() {
           )}
         </div>
 
-        {/* Event Selector Dropdown and Event Summary Strip */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
-          <div className="lg:col-span-2 space-y-1.5">
+        {/* Event Search Input and Event Summary Strip */}
+        <div className={`grid grid-cols-1 ${selectedEvent ? "lg:grid-cols-3" : "lg:grid-cols-1"} gap-4 items-start`}>
+          <div className={`${selectedEvent ? "lg:col-span-2" : "lg:col-span-1"} space-y-1.5 relative`} ref={searchContainerRef}>
             <label
-              htmlFor="event-selector"
-              className="block text-xs font-bold text-slate-700 uppercase tracking-wider"
+              htmlFor="event-name-input"
+              className="block text-xs font-bold text-[#172033]"
             >
-              Select Event / Competition Track:
+              Event Name
             </label>
-            <select
-              id="event-selector"
-              value={selectedEventId}
-              onChange={(e) => setSelectedEventId(e.target.value)}
-              disabled={loadingEvents || events.length === 0}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all shadow-2xs"
-            >
-              {events.map((evt) => (
-                <option key={evt.id} value={evt.id}>
-                  {evt.title} ({evt.category} • {evt.status.toUpperCase()} • {evt.photoCount || 0} photos)
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <input
+                id="event-name-input"
+                type="text"
+                value={eventNameInput}
+                onChange={(e) => handleEventNameChange(e.target.value)}
+                onFocus={() => setShowSuggestions(true)}
+                disabled={loadingEvents}
+                placeholder="Enter event name..."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] bg-white text-sm font-medium text-[#172033] placeholder:text-[#64748B]/50 focus:outline-none focus:ring-2 focus:ring-[#0A2047] focus:border-transparent transition-all shadow-2xs"
+                autoComplete="off"
+              />
+              {selectedEvent && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                  <Check className="w-3 h-3 text-emerald-600" />
+                  <span>Matched</span>
+                </span>
+              )}
+            </div>
+
+            {/* Validation message if text typed but no matching event exists */}
+            {eventNameInput.trim().length > 0 && !selectedEvent && (
+              <p className="text-[11px] text-rose-600 font-medium mt-1">
+                No matching event found. Please enter a valid event name.
+              </p>
+            )}
+
+            {/* Suggestions Dropdown Popup */}
+            {showSuggestions && !selectedEvent && filteredEvents.length > 0 && (
+              <div className="absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-[#E2E8F0] rounded-xl shadow-lg z-30 py-1 divide-y divide-[#E2E8F0]/60">
+                {filteredEvents.map((evt) => (
+                  <button
+                    key={evt.id}
+                    type="button"
+                    onClick={() => handleSelectSuggestion(evt)}
+                    className="w-full text-left px-3.5 py-2 hover:bg-[#F0F3F8] transition-colors flex items-center justify-between text-xs cursor-pointer"
+                  >
+                    <span className="font-semibold text-[#172033] truncate mr-2">{evt.title}</span>
+                    <span className="text-[10px] text-[#64748B] flex items-center gap-1.5 shrink-0">
+                      <span>{evt.category}</span>
+                      <span>•</span>
+                      <span className="uppercase font-bold text-[#0A2047]">{evt.status}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Selected Event Context Pill Card */}
+          {/* Selected Event Context Pill Card (Hidden until a valid event is identified) */}
           {selectedEvent && (
-            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-3">
+            <div className="lg:col-span-1 p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
                   Selected Event Status
@@ -557,17 +644,14 @@ export default function AdminPhotosPage() {
       </div>
 
       {/* Multi-Photo Upload & Staging Card */}
-      <div className="bg-white rounded-2xl border border-[#D9E4F2] p-5 sm:p-6 shadow-xs space-y-5">
+      <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5 sm:p-6 shadow-xs space-y-5">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
-            <UploadCloud className="w-5 h-5 text-[#2563EB]" />
-            <h3 className="text-base font-bold text-slate-900">
-              Upload Photos for &quot;{selectedEvent?.title || "Selected Event"}&quot;
+            <UploadCloud className="w-5 h-5 text-[#0A2047]" />
+            <h3 className="text-base font-bold text-[#0A2047]">
+              Upload Photos
             </h3>
           </div>
-          <span className="text-xs text-slate-500 font-medium">
-            Formats: JPG, JPEG, PNG, WebP (Max 10 MB per image)
-          </span>
         </div>
 
         {/* Drag and Drop Zone */}
@@ -580,14 +664,24 @@ export default function AdminPhotosPage() {
           onDrop={(e) => {
             e.preventDefault();
             setIsDragging(false);
+            if (!selectedEventId) {
+              setErrorMessage("Please enter a valid event name before uploading photos.");
+              return;
+            }
             handleFilesSelected(e.dataTransfer.files);
           }}
           className={`border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center transition-all cursor-pointer ${
             isDragging
-              ? "border-[#2563EB] bg-blue-50/60 scale-[1.005]"
-              : "border-slate-300 hover:border-[#2563EB] hover:bg-slate-50/80"
+              ? "border-[#D4AF37] bg-[#D4AF37]/5 scale-[1.005]"
+              : "border-[#E2E8F0] hover:border-[#D4AF37] hover:bg-[#F0F3F8]"
           }`}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => {
+            if (!selectedEventId) {
+              setErrorMessage("Please enter a valid event name before uploading photos.");
+              return;
+            }
+            fileInputRef.current?.click();
+          }}
         >
           <input
             ref={fileInputRef}
@@ -599,20 +693,17 @@ export default function AdminPhotosPage() {
           />
 
           <div className="max-w-md mx-auto space-y-3">
-            <div className="w-12 h-12 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center mx-auto shadow-2xs">
-              <UploadCloud className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-full bg-[#0A2047]/10 text-[#0A2047] flex items-center justify-center mx-auto shadow-2xs">
+              <UploadCloud className="w-6 h-6 text-[#0A2047]" />
             </div>
             <div>
-              <p className="text-sm font-bold text-slate-800">
+              <p className="text-sm font-bold text-[#172033]">
                 Click to browse or drag and drop photos here
-              </p>
-              <p className="text-xs text-slate-500 mt-1">
-                You can select multiple photos in one operation. Batch upload supports up to 20 images.
               </p>
             </div>
             <button
               type="button"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0A2047] hover:bg-[#132E57] text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
             >
               <span>Select Photos from Computer</span>
             </button>
@@ -648,10 +739,10 @@ export default function AdminPhotosPage() {
               {stagedFiles.map((sf, idx) => (
                 <div
                   key={sf.id}
-                  className={`bg-slate-50 border rounded-xl p-3 flex flex-col justify-between space-y-2 relative transition-all ${
+                  className={`bg-[#F5F7FA] border rounded-xl p-3 flex flex-col justify-between space-y-2 relative transition-all ${
                     sf.isCover
-                      ? "border-[#2563EB] ring-2 ring-[#2563EB]/20 bg-blue-50/30"
-                      : "border-slate-200"
+                      ? "border-[#D4AF37] ring-2 ring-[#D4AF37]/30 bg-[#D4AF37]/5"
+                      : "border-[#E2E8F0]"
                   }`}
                 >
                   {/* Remove staged file button */}
@@ -665,7 +756,7 @@ export default function AdminPhotosPage() {
                   </button>
 
                   {/* Thumbnail Preview */}
-                  <div className="relative aspect-4/3 rounded-lg overflow-hidden bg-slate-200 border border-slate-200">
+                  <div className="relative aspect-4/3 rounded-lg overflow-hidden bg-slate-200 border border-[#E2E8F0]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={sf.previewUrl}
@@ -673,8 +764,8 @@ export default function AdminPhotosPage() {
                       className="w-full h-full object-cover"
                     />
                     {sf.isCover && (
-                      <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#174789] text-white shadow-xs">
-                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                      <span className="absolute bottom-1.5 left-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#0A2047] text-white shadow-xs">
+                        <Star className="w-3 h-3 fill-[#D4AF37] text-[#D4AF37]" />
                         Cover Image
                       </span>
                     )}
@@ -682,17 +773,17 @@ export default function AdminPhotosPage() {
 
                   {/* File Metadata */}
                   <div className="space-y-1">
-                    <p className="text-xs font-bold text-slate-800 truncate" title={sf.file.name}>
+                    <p className="text-xs font-bold text-[#172033] truncate" title={sf.file.name}>
                       {sf.file.name}
                     </p>
-                    <p className="text-[11px] text-slate-500 font-medium">
+                    <p className="text-[11px] text-[#64748B] font-medium">
                       {sf.sizeFormatted} • Photo #{idx + 1}
                     </p>
                   </div>
 
                   {/* Caption Input */}
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-slate-600 uppercase tracking-wide">
+                    <label className="text-[10px] font-semibold text-[#64748B] uppercase tracking-wide">
                       Caption (Optional):
                     </label>
                     <input
@@ -700,7 +791,7 @@ export default function AdminPhotosPage() {
                       placeholder="Add photo caption..."
                       value={sf.caption}
                       onChange={(e) => updateStagedCaption(sf.id, e.target.value)}
-                      className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] text-xs bg-white text-[#172033] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0A2047]"
                     />
                   </div>
 
@@ -710,13 +801,13 @@ export default function AdminPhotosPage() {
                     onClick={() => setStagedCover(sf.id)}
                     className={`w-full py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
                       sf.isCover
-                        ? "bg-[#174789] text-white"
-                        : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-100"
+                        ? "bg-[#0A2047] text-white"
+                        : "bg-white border border-[#E2E8F0] text-[#172033] hover:bg-[#F0F3F8]"
                     }`}
                   >
                     <Star
                       className={`w-3.5 h-3.5 ${
-                        sf.isCover ? "fill-amber-400 text-amber-400" : "text-slate-400"
+                        sf.isCover ? "fill-[#D4AF37] text-[#D4AF37]" : "text-slate-400"
                       }`}
                     />
                     <span>{sf.isCover ? "Selected as Cover" : "Make Cover Image"}</span>
@@ -726,8 +817,8 @@ export default function AdminPhotosPage() {
             </div>
 
             {/* Upload Action Bar & Progress */}
-            <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <span className="text-xs text-slate-600 font-medium">
+            <div className="pt-3 border-t border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <span className="text-xs text-[#64748B] font-medium">
                 Ready to upload {stagedFiles.length} photo{stagedFiles.length !== 1 ? "s" : ""} to &apos;
                 {selectedEvent?.title}&apos;
               </span>
@@ -736,7 +827,7 @@ export default function AdminPhotosPage() {
                 type="button"
                 onClick={handleBatchUpload}
                 disabled={uploading}
-                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold shadow-xs disabled:opacity-50 transition-all cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#0A2047] hover:bg-[#132E57] text-white text-sm font-bold shadow-xs disabled:opacity-50 transition-all cursor-pointer"
               >
                 {uploading ? (
                   <>
@@ -745,7 +836,7 @@ export default function AdminPhotosPage() {
                   </>
                 ) : (
                   <>
-                    <UploadCloud className="w-4 h-4" />
+                    <UploadCloud className="w-4 h-4 text-[#D4AF37]" />
                     <span>Upload All ({stagedFiles.length} Photos)</span>
                   </>
                 )}
@@ -754,9 +845,9 @@ export default function AdminPhotosPage() {
 
             {/* Progress Bar when uploading */}
             {uploading && (
-              <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-[#E2E8F0] rounded-full h-2 overflow-hidden">
                 <div
-                  className="bg-[#2563EB] h-full transition-all duration-300"
+                  className="bg-[#D4AF37] h-full transition-all duration-300"
                   style={{ width: `${uploadProgress}%` }}
                 />
               </div>
@@ -766,30 +857,22 @@ export default function AdminPhotosPage() {
       </div>
 
       {/* Existing Event Gallery Section */}
-      <div className="bg-white rounded-2xl border border-[#D9E4F2] p-5 sm:p-6 shadow-xs space-y-5">
+      <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5 sm:p-6 shadow-xs space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
           <div>
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <span>Gallery Photos ({photos.length})</span>
-              {selectedEvent && (
-                <span className="text-xs text-slate-500 font-normal">
-                  for &quot;{selectedEvent.title}&quot;
-                </span>
-              )}
+            <h3 className="text-base font-bold text-[#0A2047]">
+              Gallery Photos ({photos.length})
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Reorder photos using left/right arrows. The designated cover photo will represent this event across the portal and website.
-            </p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => fetchPhotos(selectedEventId)}
-              disabled={loadingPhotos}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
+              disabled={loadingPhotos || !selectedEventId}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-[#172033] text-xs font-semibold hover:bg-[#F0F3F8] transition-colors cursor-pointer disabled:opacity-50"
             >
-              <Loader2 className={`w-3.5 h-3.5 ${loadingPhotos ? "animate-spin" : ""}`} />
+              <Loader2 className={`w-3.5 h-3.5 ${loadingPhotos ? "animate-spin text-[#0A2047]" : ""}`} />
               <span>Refresh Gallery</span>
             </button>
           </div>
@@ -797,19 +880,31 @@ export default function AdminPhotosPage() {
 
         {/* Gallery Grid */}
         {loadingPhotos ? (
-          <div className="py-16 text-center text-slate-500 space-y-3">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#2563EB]" />
+          <div className="py-16 text-center text-[#64748B] space-y-3">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#0A2047]" />
             <p className="text-xs font-semibold">Loading event photos...</p>
           </div>
-        ) : photos.length === 0 ? (
-          <div className="text-center py-16 px-4 bg-slate-50 border border-dashed border-slate-300 rounded-2xl max-w-lg mx-auto space-y-3">
-            <div className="w-12 h-12 rounded-full bg-blue-50 text-[#174789] flex items-center justify-center mx-auto">
-              <Images className="w-6 h-6 text-[#174789]" />
+        ) : !selectedEventId ? (
+          <div className="text-center py-12 px-4 bg-[#F5F7FA] border border-dashed border-[#E2E8F0] rounded-2xl max-w-lg mx-auto space-y-2">
+            <div className="w-12 h-12 rounded-full bg-[#0A2047]/10 text-[#0A2047] flex items-center justify-center mx-auto">
+              <Images className="w-6 h-6 text-[#0A2047]" />
             </div>
-            <h4 className="text-sm font-bold text-slate-800">
+            <h4 className="text-sm font-bold text-[#172033]">
+              No event selected
+            </h4>
+            <p className="text-xs text-[#64748B] max-w-sm mx-auto">
+              Enter an event name above to view or upload photos for that event.
+            </p>
+          </div>
+        ) : photos.length === 0 ? (
+          <div className="text-center py-16 px-4 bg-[#F5F7FA] border border-dashed border-[#E2E8F0] rounded-2xl max-w-lg mx-auto space-y-3">
+            <div className="w-12 h-12 rounded-full bg-[#0A2047]/10 text-[#0A2047] flex items-center justify-center mx-auto">
+              <Images className="w-6 h-6 text-[#0A2047]" />
+            </div>
+            <h4 className="text-sm font-bold text-[#172033]">
               No photos uploaded for this event yet
             </h4>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+            <p className="text-xs text-[#64748B] max-w-sm mx-auto">
               Use the upload area above to select and upload photos. Once uploaded, they will be displayed in the public gallery when this event is published.
             </p>
           </div>
@@ -820,8 +915,8 @@ export default function AdminPhotosPage() {
                 key={photo.id}
                 className={`bg-white rounded-xl border flex flex-col justify-between overflow-hidden shadow-2xs transition-all hover:shadow-sm ${
                   photo.isCover
-                    ? "border-[#2563EB] ring-2 ring-[#2563EB]/20"
-                    : "border-slate-200"
+                    ? "border-[#D4AF37] ring-2 ring-[#D4AF37]/30"
+                    : "border-[#E2E8F0]"
                 }`}
               >
                 {/* Photo Thumbnail Container */}
@@ -838,14 +933,14 @@ export default function AdminPhotosPage() {
                   />
 
                   {/* Order Tag */}
-                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-900/80 text-white backdrop-blur-xs">
+                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#0A2047]/80 text-white backdrop-blur-xs">
                     #{index + 1}
                   </span>
 
                   {/* Cover Tag */}
                   {photo.isCover && (
-                    <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#174789] text-white shadow-xs">
-                      <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                    <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#0A2047] text-white shadow-xs">
+                      <Star className="w-3 h-3 fill-[#D4AF37] text-[#D4AF37]" />
                       <span>Cover Photo</span>
                     </span>
                   )}
@@ -856,7 +951,7 @@ export default function AdminPhotosPage() {
                     onClick={() => setPreviewPhoto(photo)}
                     className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-semibold transition-opacity gap-1 cursor-pointer"
                   >
-                    <Eye className="w-4 h-4" />
+                    <Eye className="w-4 h-4 text-[#D4AF37]" />
                     <span>View Large</span>
                   </button>
                 </div>
@@ -866,7 +961,7 @@ export default function AdminPhotosPage() {
                   <div className="space-y-1">
                     {editingPhotoId === photo.id ? (
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-slate-700 uppercase">
+                        <label className="text-[10px] font-bold text-[#172033] uppercase">
                           Edit Caption:
                         </label>
                         <input
@@ -874,14 +969,14 @@ export default function AdminPhotosPage() {
                           value={editingCaption}
                           onChange={(e) => setEditingCaption(e.target.value)}
                           placeholder="Enter caption..."
-                          className="w-full px-2 py-1 rounded border border-slate-300 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#2563EB]"
+                          className="w-full px-2 py-1 rounded border border-[#E2E8F0] text-xs text-[#172033] focus:outline-none focus:ring-1 focus:ring-[#0A2047]"
                         />
                         <div className="flex items-center gap-1.5 pt-1">
                           <button
                             type="button"
                             onClick={() => handleSaveCaption(photo.id)}
                             disabled={savingCaption}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#2563EB] text-white text-[11px] font-bold hover:bg-[#1D4ED8] cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#0A2047] text-white text-[11px] font-bold hover:bg-[#132E57] cursor-pointer"
                           >
                             <Check className="w-3 h-3" />
                             <span>Save</span>
@@ -889,7 +984,7 @@ export default function AdminPhotosPage() {
                           <button
                             type="button"
                             onClick={() => setEditingPhotoId(null)}
-                            className="px-2 py-1 rounded border border-slate-200 text-slate-600 text-[11px] font-medium hover:bg-slate-100 cursor-pointer"
+                            className="px-2 py-1 rounded border border-[#E2E8F0] text-[#64748B] text-[11px] font-medium hover:bg-[#F0F3F8] cursor-pointer"
                           >
                             Cancel
                           </button>
@@ -900,7 +995,7 @@ export default function AdminPhotosPage() {
                         <p
                           className={`text-xs leading-relaxed line-clamp-2 ${
                             photo.caption
-                              ? "text-slate-800 font-medium"
+                              ? "text-[#172033] font-medium"
                               : "text-slate-400 italic"
                           }`}
                         >
@@ -912,7 +1007,7 @@ export default function AdminPhotosPage() {
                             setEditingPhotoId(photo.id);
                             setEditingCaption(photo.caption || "");
                           }}
-                          className="text-slate-400 hover:text-[#2563EB] p-0.5 rounded cursor-pointer shrink-0"
+                          className="text-slate-400 hover:text-[#0A2047] p-0.5 rounded cursor-pointer shrink-0"
                           title="Edit Caption"
                         >
                           <Edit2 className="w-3.5 h-3.5" />

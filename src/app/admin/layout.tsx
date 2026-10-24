@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
@@ -35,6 +36,9 @@ export default function AdminLayout({
         const res = await fetch("/api/admin/auth/me");
         if (!res.ok) {
           if (mounted) {
+            // Portal selection page (/admin/dashboard) must remain accessible without active session
+            if (isDashboardPage) return;
+
             if (pathname?.startsWith("/admin/president")) {
               router.push("/admin/president/login");
             } else if (pathname?.startsWith("/admin/vice-president")) {
@@ -53,6 +57,8 @@ export default function AdminLayout({
         }
       } catch {
         if (mounted) {
+          if (isDashboardPage) return;
+
           if (pathname?.startsWith("/admin/president")) {
             router.push("/admin/president/login");
           } else if (pathname?.startsWith("/admin/vice-president")) {
@@ -70,48 +76,51 @@ export default function AdminLayout({
     return () => {
       mounted = false;
     };
-  }, [isLoginPage, pathname, router]);
+  }, [isLoginPage, isDashboardPage, pathname, router]);
 
   // Login page gets a clean standalone presentation without sidebar or public nav
   if (isLoginPage) {
-    return <div className="min-h-screen bg-slate-50">{children}</div>;
+    return <div className="min-h-screen bg-[#F5F7FA]" data-admin-portal="true">{children}</div>;
   }
 
   // Portal Selection landing page (/admin/dashboard): full width layout, no sidebar, compact header
   if (isDashboardPage) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col text-slate-800">
-        {/* Simple, compact top header with no sidebar controls */}
-        <header className="sticky top-0 z-20 w-full bg-white border-b border-slate-200 px-4 sm:px-8 py-3.5 shadow-xs flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Image
-              src="/images/avishkar-lotus-logo.png"
-              alt="AVISHKAR Lotus Logo"
-              width={32}
-              height={32}
-              priority
-              className="w-7 h-7 object-contain"
-            />
-            <h1 className="text-base sm:text-lg font-bold text-[#174789] tracking-tight">
-              AVISHKAR 2026 — Portal Selection
-            </h1>
-          </div>
+      <div className="min-h-screen bg-[#F5F7FA] flex flex-col text-[#172033]" data-admin-portal="true">
+        {/* Institutional Deep Navy Blue Portal Selection Header matching main AVISHKAR portal */}
+        <header className="sticky top-0 z-30 w-full bg-[#0A2047] border-b border-[#D4AF37]/30 shadow-[0_4px_16px_rgba(10,32,71,0.25)]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex items-center justify-between h-16 sm:h-[68px] lg:h-[72px]">
+            {/* Left: Official GD Goenka University + NAAC Grade A+ Logo Lockup */}
+            <div className="flex items-center shrink-0 py-1">
+              {/* Official GD Goenka University Logo Lockup */}
+              <Link
+                href="/"
+                className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] rounded-md transition-opacity duration-200 hover:opacity-95 shrink-0"
+                aria-label="GD Goenka University Homepage"
+              >
+                <div className="relative flex items-center justify-start shrink-0">
+                  <Image
+                    src="/images/home-logo.svg"
+                    alt="GD Goenka University | NAAC Grade A+ Accredited"
+                    width={280}
+                    height={40}
+                    priority
+                    className="h-7 sm:h-8 md:h-9 lg:h-10 w-auto max-w-[180px] sm:max-w-[240px] md:max-w-[280px] object-contain"
+                  />
+                </div>
+              </Link>
+            </div>
 
-          <div className="flex items-center gap-3">
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-blue-50 text-blue-800 border border-blue-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
-              <span>Admin</span>
-            </span>
-            <button
-              onClick={async () => {
-                await fetch("/api/admin/auth/logout", { method: "POST" });
-                router.push("/admin/management/login");
-                router.refresh();
-              }}
-              className="text-xs font-semibold text-slate-500 hover:text-rose-600 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
-            >
-              Sign Out
-            </button>
+            {/* Right: Return to Website navigation action */}
+            <div className="flex items-center font-navbar">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-md border border-white/40 hover:border-white bg-transparent hover:bg-white/10 text-white text-xs sm:text-[13px] font-medium tracking-[0.015em] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] whitespace-nowrap"
+                title="Return to AVISHKAR Main Website"
+              >
+                <span>&larr; Return to Website</span>
+              </Link>
+            </div>
           </div>
         </header>
 
@@ -124,103 +133,104 @@ export default function AdminLayout({
   }
 
   const getPageHeader = () => {
+    const p = pathname || "";
     if (pathname.startsWith("/admin/overview")) {
       return {
         title: "Administrative Overview",
         subtitle: "Operations hub, registration statistics, payment auditing, and live activity",
       };
     }
-    if (pathname === "/admin") {
+    if (p === "/admin") {
       return {
         title: "Admin Console",
         subtitle: "AVISHKAR 2026 • GD Goenka University",
       };
     }
-    if (pathname === "/admin/president") {
+    if (p === "/admin/president") {
       return {
         title: "Presidential Office",
         subtitle: "Executive Approvals & Committee Oversight",
       };
     }
-    if (pathname === "/admin/vice-president") {
+    if (p === "/admin/vice-president") {
       return {
         title: "Operations Directorate",
         subtitle: "Event Coordination & Task Tracking",
       };
     }
-    if (pathname === "/admin/dashboard") {
+    if (p === "/admin/dashboard") {
       return {
         title: "Portal Selection",
         subtitle: "AVISHKAR 2026 • Administrative Portals",
       };
     }
-    if (pathname === "/admin/member") {
+    if (p === "/admin/member") {
       return {
         title: "Council Workspace",
         subtitle: "Track Proposals & Assigned Activities",
       };
     }
-    if (pathname.startsWith("/admin/events")) {
+    if (p.startsWith("/admin/events")) {
       return {
         title: "Event & Proposal Management",
         subtitle: "Review, approve, configure and publish event competitions",
       };
     }
-    if (pathname.startsWith("/admin/forms")) {
+    if (p.startsWith("/admin/forms")) {
       return {
         title: "Dynamic Form Builder",
         subtitle: "Google Forms-Style dynamic questionnaire editor for approved events",
       };
     }
-    if (pathname.startsWith("/admin/resources")) {
+    if (p.startsWith("/admin/resources")) {
       return {
         title: "Event Resources & Media",
         subtitle: "Rulebooks, documents, and media categorized by competition",
       };
     }
-    if (pathname.startsWith("/admin/photos") || pathname.startsWith("/admin/gallery")) {
+    if (p.startsWith("/admin/photos") || p.startsWith("/admin/gallery")) {
       return {
         title: "Event Photos & Gallery Management",
         subtitle: "Batch uploads, cover image selection, captions, and event photo administration",
       };
     }
-    if (pathname.startsWith("/admin/registrations")) {
+    if (p.startsWith("/admin/registrations")) {
       return {
         title: "Registration Management",
         subtitle: "Student verification, academic credentials, and official submissions",
       };
     }
-    if (pathname.startsWith("/admin/members")) {
+    if (p.startsWith("/admin/members")) {
       return {
         title: "Council & Member Management",
         subtitle: "Organizing committee roster, role permissions, and track leads",
       };
     }
-    if (pathname.startsWith("/admin/settings")) {
+    if (p.startsWith("/admin/settings")) {
       return {
         title: "System Settings & Audit Logs",
         subtitle: "Role-based access matrix, security parameters, and action logs",
       };
     }
-    if (pathname.startsWith("/admin/payments")) {
+    if (p.startsWith("/admin/payments")) {
       return {
         title: "Payment Verification Queue",
         subtitle: "UTR transaction auditing and receipt verification",
       };
     }
-    if (pathname.startsWith("/admin/reports")) {
+    if (p.startsWith("/admin/reports")) {
       return {
         title: "Reports & Analytics",
         subtitle: "Financial metrics, event participation, and academic trends",
       };
     }
-    if (pathname.startsWith("/admin/audit-logs")) {
+    if (p.startsWith("/admin/audit-logs")) {
       return {
         title: "Security & Audit Logs",
         subtitle: "Append-only immutable trail of administrative actions and governance decisions",
       };
     }
-    if (pathname.startsWith("/admin/setup")) {
+    if (p.startsWith("/admin/setup")) {
       return {
         title: "Security & System Setup",
         subtitle: "Supabase connection and PostgreSQL RLS configuration",
@@ -235,7 +245,7 @@ export default function AdminLayout({
   const headerMeta = getPageHeader();
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col lg:flex-row text-slate-800">
+    <div className="min-h-screen bg-[#F5F7FA] flex flex-col lg:flex-row text-[#172033]" data-admin-portal="true">
       {/* Sidebar (Desktop persistent, Mobile off-canvas) */}
       <AdminSidebar
         user={user}

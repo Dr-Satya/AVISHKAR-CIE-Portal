@@ -23,7 +23,6 @@ import {
   Check,
   ExternalLink,
   Loader2,
-  Info,
   Users,
 } from "lucide-react";
 import {
@@ -560,26 +559,7 @@ export default function AdminFormsPage() {
       {/* Top Banner & Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-[#174789]">Dynamic Form Builder</h2>
-            <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs font-mono font-bold border border-blue-200">
-              v{currentVersion}
-            </span>
-            {savedForms.length > 0 && (
-              <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200">
-                {savedForms.length} Saved {savedForms.length === 1 ? "Form" : "Forms"}
-              </span>
-            )}
-            {aiProviderUsed && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 text-xs font-semibold border border-indigo-200">
-                <Sparkles className="w-3 h-3 text-indigo-600" />
-                AI Generated ({aiProviderUsed === "gemini" ? "Gemini" : aiProviderUsed === "openai" ? "OpenAI" : "Neural Engine"})
-              </span>
-            )}
-          </div>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Configure registration parameters and use AI to automatically generate the student questionnaire. Review, approve, and deploy.
-          </p>
+          <h2 className="text-xl font-bold text-[#0A2047]">Dynamic Form Builder</h2>
         </div>
 
         {/* Workflow Step Tracker */}
@@ -587,31 +567,31 @@ export default function AdminFormsPage() {
           <button
             type="button"
             onClick={handleResetForm}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F0F3F8] text-[#172033] text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
             title="Start configuring a new form"
           >
-            <Plus className="w-3.5 h-3.5 text-[#174789]" />
+            <Plus className="w-3.5 h-3.5 text-[#0A2047]" />
             <span>New Form</span>
           </button>
 
           {versionHistory.length > 0 && (
             <button
               onClick={() => setHistoryModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F0F3F8] text-[#172033] text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
             >
-              <History className="w-3.5 h-3.5" />
+              <History className="w-3.5 h-3.5 text-[#0A2047]" />
               <span>Version History ({versionHistory.length})</span>
             </button>
           )}
 
           {/* Quick jump between steps if form has fields */}
-          <div className="inline-flex p-1 bg-slate-100 rounded-lg border border-slate-200 text-xs font-semibold">
+          <div className="inline-flex p-1 bg-[#F5F7FA] rounded-lg border border-[#E2E8F0] text-xs font-semibold">
             <button
               onClick={() => setCurrentStep("config")}
               className={`px-3 py-1.5 rounded-md transition-colors cursor-pointer ${
                 currentStep === "config"
-                  ? "bg-white text-[#174789] shadow-xs font-bold"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-[#0A2047] text-white shadow-xs font-bold"
+                  : "text-[#64748B] hover:text-[#172033]"
               }`}
             >
               1. Configuration
@@ -623,8 +603,8 @@ export default function AdminFormsPage() {
               }}
               className={`px-3 py-1.5 rounded-md transition-colors cursor-pointer ${
                 currentStep === "review"
-                  ? "bg-white text-[#174789] shadow-xs font-bold"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-[#0A2047] text-white shadow-xs font-bold"
+                  : "text-[#64748B] hover:text-[#172033]"
               }`}
             >
               2. Review ({fields.length})
@@ -636,8 +616,8 @@ export default function AdminFormsPage() {
               }}
               className={`px-3 py-1.5 rounded-md transition-colors cursor-pointer ${
                 currentStep === "publish"
-                  ? "bg-white text-[#174789] shadow-xs font-bold"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-[#0A2047] text-white shadow-xs font-bold"
+                  : "text-[#64748B] hover:text-[#172033]"
               }`}
             >
               3. Publish & QR
@@ -683,34 +663,14 @@ export default function AdminFormsPage() {
       {currentStep === "config" && (
         <div className="space-y-6">
           {/* Event Registration Parameters Card */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4">
-            <div className="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div>
-                <h3 className="text-sm font-bold text-slate-800">Event Registration Parameters</h3>
-                <p className="text-[11px] text-slate-500">
-                  Type the event name and configure team capacity, registration fee, schedule dates, and activation status.
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-1 rounded bg-blue-50 text-[#174789] text-xs font-bold border border-blue-200 inline-flex items-center gap-1.5 shadow-2xs">
-                  <Users className="w-3.5 h-3.5 text-[#174789]" />
-                  <span>{getCapacityBadgeText(Number(teamSizeMin) || 1, Number(teamSizeMax) || 1)}</span>
-                </span>
-              </div>
-            </div>
-
+          <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] shadow-xs">
             {/* Form Fields Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* 1. Event Name * (Text Input) */}
               <div className="md:col-span-2 lg:col-span-2">
-                <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
-                  <span className="flex items-center gap-1">
-                    <FileText className="w-3.5 h-3.5 text-slate-400" />
-                    Event Name *
-                  </span>
-                  {eventName.trim() && (
-                    <span className="text-[10px] text-emerald-600 font-medium">Valid</span>
-                  )}
+                <label className="h-5 text-xs font-bold text-[#172033] mb-1 flex items-center gap-1">
+                  <FileText className="w-3.5 h-3.5 text-[#64748B]" />
+                  <span>Event Name *</span>
                 </label>
                 <input
                   type="text"
@@ -722,31 +682,27 @@ export default function AdminFormsPage() {
                     }
                   }}
                   placeholder="Enter the event name"
-                  className={`w-full px-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-[#174789] bg-white text-slate-900 font-semibold placeholder:text-slate-400 transition-colors ${
+                  className={`w-full px-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-[#0A2047] bg-white text-[#172033] font-semibold placeholder:text-[#64748B]/50 transition-colors ${
                     fieldErrors.eventName
                       ? "border-rose-400 bg-rose-50/30 focus:ring-rose-400"
-                      : "border-slate-300 focus:border-[#174789]"
+                      : "border-[#E2E8F0] focus:border-[#0A2047]"
                   }`}
                 />
-                {fieldErrors.eventName ? (
+                {fieldErrors.eventName && (
                   <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
                     {fieldErrors.eventName}
-                  </span>
-                ) : (
-                  <span className="text-[10px] text-slate-400 mt-0.5 block">
-                    Example: AI Autonomous Hackathon 2026
                   </span>
                 )}
               </div>
 
               {/* 2. Registration Fee (INR) */}
               <div className="md:col-span-1 lg:col-span-1">
-                <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                  <CreditCard className="w-3.5 h-3.5 text-slate-400" />
-                  Registration Fee (INR) *
+                <label className="h-5 text-xs font-bold text-[#172033] mb-1 flex items-center gap-1">
+                  <CreditCard className="w-3.5 h-3.5 text-[#64748B]" />
+                  <span>Registration Fee (INR) *</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B] font-bold text-xs">
                     ₹
                   </span>
                   <input
@@ -760,35 +716,31 @@ export default function AdminFormsPage() {
                       }
                     }}
                     placeholder="500"
-                    className={`w-full pl-7 pr-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-[#174789] font-mono font-bold ${
-                      fieldErrors.feeAmount ? "border-rose-400 bg-rose-50/30" : "border-slate-300 bg-white"
+                    className={`w-full pl-7 pr-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-[#0A2047] font-mono font-bold text-[#172033] ${
+                      fieldErrors.feeAmount ? "border-rose-400 bg-rose-50/30" : "border-[#E2E8F0] bg-white"
                     }`}
                   />
                 </div>
-                {fieldErrors.feeAmount ? (
+                {fieldErrors.feeAmount && (
                   <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
                     {fieldErrors.feeAmount}
-                  </span>
-                ) : (
-                  <span className="text-[10px] text-slate-400 mt-0.5 block">
-                    Enter 0 for free participation.
                   </span>
                 )}
               </div>
 
               {/* 3. Form Activation Status */}
               <div className="md:col-span-1 lg:col-span-1">
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Form Activation Status
+                <label className="h-5 text-xs font-bold text-[#172033] mb-1 flex items-center">
+                  <span>Form Activation Status</span>
                 </label>
-                <div className="flex items-center gap-3 pt-0.5">
+                <div className="flex items-center">
                   <button
                     type="button"
                     onClick={() => setIsActive(!isActive)}
                     className={`w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
                       isActive
                         ? "bg-emerald-50 text-emerald-800 border-emerald-300"
-                        : "bg-slate-100 text-slate-600 border-slate-300"
+                        : "bg-[#F0F3F8] text-[#64748B] border-[#E2E8F0]"
                     }`}
                   >
                     {isActive ? (
@@ -804,16 +756,13 @@ export default function AdminFormsPage() {
                     )}
                   </button>
                 </div>
-                <span className="text-[10px] text-slate-400 mt-0.5 block">
-                  Controls whether students can submit registrations.
-                </span>
               </div>
 
               {/* 4. Minimum Team Members */}
               <div className="md:col-span-1 lg:col-span-1">
-                <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                  <Users className="w-3.5 h-3.5 text-slate-400" />
-                  Minimum Team Members *
+                <label className="h-5 text-xs font-bold text-[#172033] mb-1 flex items-center gap-1">
+                  <Users className="w-3.5 h-3.5 text-[#64748B]" />
+                  <span>Minimum Team Members *</span>
                 </label>
                 <input
                   type="number"
@@ -827,26 +776,22 @@ export default function AdminFormsPage() {
                     }
                   }}
                   placeholder="2"
-                  className={`w-full px-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-[#174789] font-mono font-bold ${
-                    fieldErrors.teamSizeMin ? "border-rose-400 bg-rose-50/30" : "border-slate-300 bg-white"
+                  className={`w-full px-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-[#0A2047] font-mono font-bold text-[#172033] ${
+                    fieldErrors.teamSizeMin ? "border-rose-400 bg-rose-50/30" : "border-[#E2E8F0] bg-white"
                   }`}
                 />
-                {fieldErrors.teamSizeMin ? (
+                {fieldErrors.teamSizeMin && (
                   <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
                     {fieldErrors.teamSizeMin}
-                  </span>
-                ) : (
-                  <span className="text-[10px] text-slate-400 mt-0.5 block">
-                    Minimum 1 member.
                   </span>
                 )}
               </div>
 
               {/* 5. Maximum Team Members */}
               <div className="md:col-span-1 lg:col-span-1">
-                <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                  <Users className="w-3.5 h-3.5 text-slate-400" />
-                  Maximum Team Members *
+                <label className="h-5 text-xs font-bold text-[#172033] mb-1 flex items-center gap-1">
+                  <Users className="w-3.5 h-3.5 text-[#64748B]" />
+                  <span>Maximum Team Members *</span>
                 </label>
                 <input
                   type="number"
@@ -860,67 +805,63 @@ export default function AdminFormsPage() {
                     }
                   }}
                   placeholder="4"
-                  className={`w-full px-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-[#174789] font-mono font-bold ${
-                    fieldErrors.teamSizeMax ? "border-rose-400 bg-rose-50/30" : "border-slate-300 bg-white"
+                  className={`w-full px-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-[#0A2047] font-mono font-bold text-[#172033] ${
+                    fieldErrors.teamSizeMax ? "border-rose-400 bg-rose-50/30" : "border-[#E2E8F0] bg-white"
                   }`}
                 />
-                {fieldErrors.teamSizeMax ? (
+                {fieldErrors.teamSizeMax && (
                   <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
                     {fieldErrors.teamSizeMax}
-                  </span>
-                ) : (
-                  <span className="text-[10px] text-slate-400 mt-0.5 block">
-                    Must be &gt;= minimum.
                   </span>
                 )}
               </div>
 
               {/* 6. Registration Schedule: Opening Date */}
               <div className="md:col-span-1 lg:col-span-1">
-                <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  Opening Date
+                <label className="h-5 text-xs font-bold text-[#172033] mb-1 flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-[#64748B]" />
+                  <span>Opening Date</span>
                 </label>
                 <input
                   type="date"
+                  placeholder="dd-mm-yyyy"
                   value={registrationStartDate}
                   onChange={(e) => {
                     setRegistrationStartDate(e.target.value);
                     if (fieldErrors.dates) setFieldErrors((prev) => ({ ...prev, dates: undefined }));
                   }}
-                  className={`w-full px-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-[#174789] bg-white font-medium ${
-                    fieldErrors.dates ? "border-rose-400 bg-rose-50/30" : "border-slate-300"
+                  className={`w-full px-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-[#0A2047] bg-white font-medium text-[#172033] ${
+                    fieldErrors.dates ? "border-rose-400 bg-rose-50/30" : "border-[#E2E8F0]"
                   }`}
                 />
-                <span className="text-[10px] text-slate-400 mt-0.5 block">
-                  Optional. Immediate if blank.
-                </span>
+                {fieldErrors.dates && (
+                  <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
+                    {fieldErrors.dates}
+                  </span>
+                )}
               </div>
 
               {/* 7. Registration Schedule: Closing Date */}
               <div className="md:col-span-1 lg:col-span-1">
-                <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  Closing Date
+                <label className="h-5 text-xs font-bold text-[#172033] mb-1 flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-[#64748B]" />
+                  <span>Closing Date</span>
                 </label>
                 <input
                   type="date"
+                  placeholder="dd-mm-yyyy"
                   value={registrationEndDate}
                   onChange={(e) => {
                     setRegistrationEndDate(e.target.value);
                     if (fieldErrors.dates) setFieldErrors((prev) => ({ ...prev, dates: undefined }));
                   }}
-                  className={`w-full px-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-[#174789] bg-white font-medium ${
-                    fieldErrors.dates ? "border-rose-400 bg-rose-50/30" : "border-slate-300"
+                  className={`w-full px-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-[#0A2047] bg-white font-medium text-[#172033] ${
+                    fieldErrors.dates ? "border-rose-400 bg-rose-50/30" : "border-[#E2E8F0]"
                   }`}
                 />
-                {fieldErrors.dates ? (
+                {fieldErrors.dates && (
                   <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
                     {fieldErrors.dates}
-                  </span>
-                ) : (
-                  <span className="text-[10px] text-slate-400 mt-0.5 block">
-                    Closes at 23:59 on this date.
                   </span>
                 )}
               </div>
@@ -928,52 +869,34 @@ export default function AdminFormsPage() {
           </div>
 
           {/* AI Generator Integration Box */}
-          <div className="bg-gradient-to-br from-blue-50/80 via-indigo-50/40 to-white p-5 rounded-xl border border-blue-200/80 shadow-xs space-y-4">
+          <div className="bg-gradient-to-br from-[#0A2047]/5 via-[#D4AF37]/5 to-white p-5 rounded-xl border border-[#D4AF37]/30 shadow-xs space-y-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#174789] text-white flex items-center justify-center shrink-0 shadow-xs">
-                <Sparkles className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-lg bg-[#0A2047] text-white flex items-center justify-center shrink-0 shadow-xs">
+                <Sparkles className="w-4 h-4 text-[#D4AF37]" />
               </div>
-              <div>
-                <h3 className="text-sm font-bold text-slate-900">AI Registration Form Generator</h3>
-                <p className="text-xs text-slate-600">
-                  Click Continue to let AI automatically generate the student registration questionnaire based on{" "}
-                  <strong>{eventName.trim() || "the entered event"}</strong> (
-                  <span className="font-semibold text-[#174789]">
-                    {getCapacityBadgeText(Number(teamSizeMin) || 1, Number(teamSizeMax) || 1)}
-                  </span>
-                  ).
-                </p>
-              </div>
+              <h3 className="text-sm font-bold text-[#0A2047]">AI Registration Form Generator</h3>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-[#172033] mb-1">
                 Custom Requirements or Focus Areas (Optional)
               </label>
               <textarea
                 rows={2}
                 value={customPrompt}
                 onChange={(e) => setCustomPrompt(e.target.value)}
-                placeholder="e.g., Collect GitHub handle, t-shirt size, dietary preference, and prior hackathon experience..."
-                className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#174789] bg-white placeholder:text-slate-400"
+                placeholder="Enter any additional requirements (optional)..."
+                className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047] bg-white placeholder:text-[#64748B]/50 text-[#172033]"
               />
-              <span className="text-[10px] text-slate-500 mt-0.5 block">
-                If left empty, AI automatically derives questions from the event name, configured team capacity ({getCapacityBadgeText(Number(teamSizeMin) || 1, Number(teamSizeMax) || 1)}), and registration requirements.
-              </span>
             </div>
 
-            {/* Prominent Continue with AI Action Button */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-blue-100">
-              <div className="flex items-center gap-2 text-[11px] text-slate-500">
-                <Info className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                <span>Zero manual question entry required. You can review and tweak the generated form next.</span>
-              </div>
-
+            {/* Continue with AI Action Button */}
+            <div className="flex justify-end">
               <button
                 type="button"
                 onClick={handleContinueWithAi}
                 disabled={isAiGenerating}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-gradient-to-r from-[#174789] to-[#2563EB] hover:from-[#0E2A5C] hover:to-[#1D4ED8] text-white text-xs font-bold shadow-md hover:shadow-lg disabled:opacity-50 transition-all cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-gradient-to-r from-[#0A2047] to-[#132E57] hover:from-[#132E57] hover:to-[#19365F] text-white text-xs font-bold shadow-md hover:shadow-lg disabled:opacity-50 transition-all cursor-pointer border border-[#D4AF37]/40"
               >
                 {isAiGenerating ? (
                   <>
@@ -982,7 +905,7 @@ export default function AdminFormsPage() {
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4 text-amber-300" />
+                    <Sparkles className="w-4 h-4 text-[#D4AF37]" />
                     <span>Continue with AI</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
@@ -990,27 +913,6 @@ export default function AdminFormsPage() {
               </button>
             </div>
           </div>
-
-          {/* Quick jump to review if fields already exist */}
-          {fields.length > 0 && (
-            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-slate-800">
-                  A questionnaire is currently configured ({fields.length} questions for {eventName.trim() || "this event"}).
-                </span>
-                <p className="text-[11px] text-slate-500">
-                  You can proceed directly to the review step or click Continue with AI to re-synthesize.
-                </p>
-              </div>
-              <button
-                onClick={() => setCurrentStep("review")}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer"
-              >
-                <span>View Questionnaire</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
         </div>
       )}
 
@@ -1020,21 +922,21 @@ export default function AdminFormsPage() {
       {currentStep === "review" && (
         <div className="space-y-6">
           {/* Review Header with Required Actions */}
-          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="bg-white p-4 rounded-xl border border-[#E2E8F0] shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={handleBackToConfig}
-                className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold cursor-pointer"
+                className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F0F3F8] text-[#172033] text-xs font-bold cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Back to Configuration</span>
               </button>
               <div>
-                <h3 className="text-sm font-bold text-slate-900">Review Questionnaire</h3>
-                <p className="text-[11px] text-slate-500">
+                <h3 className="text-sm font-bold text-[#172033]">Review Questionnaire</h3>
+                <p className="text-[11px] text-[#64748B]">
                   {fields.length} AI-generated questions for <strong>{eventName.trim()}</strong> •{" "}
-                  <span className="text-[#174789] font-medium">
+                  <span className="text-[#0A2047] font-medium">
                     {getCapacityBadgeText(Number(teamSizeMin) || 1, Number(teamSizeMax) || 1)}
                   </span>
                 </p>
@@ -1047,12 +949,12 @@ export default function AdminFormsPage() {
                 type="button"
                 onClick={handleRegenerate}
                 disabled={isAiGenerating}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold disabled:opacity-50 cursor-pointer shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F0F3F8] text-[#172033] text-xs font-semibold disabled:opacity-50 cursor-pointer shadow-2xs"
               >
                 {isAiGenerating ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 ) : (
-                  <RefreshCw className="w-3.5 h-3.5 text-blue-600" />
+                  <RefreshCw className="w-3.5 h-3.5 text-[#0A2047]" />
                 )}
                 <span>Regenerate Form</span>
               </button>
@@ -1063,8 +965,8 @@ export default function AdminFormsPage() {
                 onClick={() => setPreviewMode(!previewMode)}
                 className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
                   previewMode
-                    ? "bg-slate-800 text-white border-slate-800"
-                    : "bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+                    ? "bg-[#0A2047] text-white border-[#0A2047]"
+                    : "bg-white text-[#172033] border-[#E2E8F0] hover:bg-[#F0F3F8]"
                 }`}
               >
                 <Eye className="w-3.5 h-3.5" />
@@ -1088,25 +990,25 @@ export default function AdminFormsPage() {
           {/* Interactive Google Forms-Style Questionnaire Display */}
           {previewMode ? (
             /* Student Mode Preview */
-            <div className="bg-white p-6 sm:p-8 rounded-xl border border-slate-200 shadow-md space-y-6 max-w-2xl mx-auto">
-              <div className="border-b border-slate-200 pb-4">
+            <div className="bg-white p-6 sm:p-8 rounded-xl border border-[#E2E8F0] shadow-md space-y-6 max-w-2xl mx-auto">
+              <div className="border-b border-[#E2E8F0] pb-4">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#B89125] bg-[#D4AF37]/10 px-2 py-0.5 rounded border border-[#D4AF37]/30">
                     Student Portal Registration Preview
                   </span>
-                  <span className="text-[10px] font-bold text-[#174789] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                  <span className="text-[10px] font-bold text-[#0A2047] bg-[#0A2047]/5 px-2 py-0.5 rounded border border-[#0A2047]/20">
                     {getCapacityBadgeText(Number(teamSizeMin) || 1, Number(teamSizeMax) || 1)}
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mt-2">{formTitle}</h3>
+                <h3 className="text-lg font-bold text-[#172033] mt-2">{formTitle}</h3>
                 {formDescription && (
-                  <p className="text-xs text-slate-600 mt-1 leading-relaxed">{formDescription}</p>
+                  <p className="text-xs text-[#64748B] mt-1 leading-relaxed">{formDescription}</p>
                 )}
-                <div className="mt-3 text-xs font-semibold text-slate-700 flex items-center gap-3 flex-wrap">
+                <div className="mt-3 text-xs font-semibold text-[#172033] flex items-center gap-3 flex-wrap">
                   <span>Event: {eventName}</span>
                   <span>• Registration Fee: ₹{feeAmount}</span>
                   {registrationEndDate && (
-                    <span className="text-slate-400">• Closes: {registrationEndDate}</span>
+                    <span className="text-[#64748B]">• Closes: {registrationEndDate}</span>
                   )}
                 </div>
               </div>
@@ -1177,8 +1079,8 @@ export default function AdminFormsPage() {
                                   disabled={!isTeamSizeField}
                                   className={`w-full px-3 py-2 text-xs border rounded-lg bg-white font-medium ${
                                     isTeamSizeField
-                                      ? "border-blue-400 text-blue-900 focus:ring-2 focus:ring-[#174789] cursor-pointer"
-                                      : "border-slate-300 text-slate-700"
+                                      ? "border-[#0A2047] text-[#0A2047] focus:ring-2 focus:ring-[#0A2047] cursor-pointer"
+                                      : "border-[#E2E8F0] text-[#172033]"
                                   }`}
                                 >
                                   {!isTeamSizeField && <option value="">Select an option...</option>}
@@ -1200,7 +1102,7 @@ export default function AdminFormsPage() {
                                       <label
                                         key={i}
                                         className={`flex items-center gap-2 text-xs ${
-                                          isTeamSizeField ? "cursor-pointer text-blue-950 font-medium" : "text-slate-700"
+                                          isTeamSizeField ? "cursor-pointer text-[#0A2047] font-medium" : "text-[#172033]"
                                         }`}
                                       >
                                         <input
@@ -1212,7 +1114,7 @@ export default function AdminFormsPage() {
                                               : undefined
                                           }
                                           disabled={!isTeamSizeField}
-                                          className="rounded text-[#174789]"
+                                          className="rounded text-[#0A2047]"
                                         />
                                         <span>{opt}</span>
                                       </label>
@@ -1225,7 +1127,7 @@ export default function AdminFormsPage() {
                                 <input
                                   type="date"
                                   disabled
-                                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white"
+                                  className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-lg bg-white"
                                 />
                               )}
 
@@ -1245,8 +1147,8 @@ export default function AdminFormsPage() {
                                   placeholder={f.placeholder || "0"}
                                   className={`w-full px-3 py-2 text-xs border rounded-lg bg-white ${
                                     isTeamSizeField
-                                      ? "border-blue-400 text-blue-900 font-bold focus:ring-2 focus:ring-[#174789]"
-                                      : "border-slate-300 text-slate-700"
+                                      ? "border-[#0A2047] text-[#0A2047] font-bold focus:ring-2 focus:ring-[#0A2047]"
+                                      : "border-[#E2E8F0] text-[#172033]"
                                   }`}
                                 />
                               )}
@@ -1254,18 +1156,18 @@ export default function AdminFormsPage() {
 
                             {/* Dynamic Member Cards in Preview Mode when Team Size is answered */}
                             {isTeamSizeField && previewTeamSize >= 1 && (
-                              <div className="bg-white p-5 rounded-xl border-2 border-blue-200 shadow-xs space-y-4">
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                              <div className="bg-white p-5 rounded-xl border border-[#0A2047]/20 shadow-xs space-y-4">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E2E8F0] pb-3">
                                   <div>
-                                    <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                                      <Users className="w-4 h-4 text-blue-600" />
+                                    <h4 className="text-xs font-bold text-[#172033] uppercase tracking-wider flex items-center gap-2">
+                                      <Users className="w-4 h-4 text-[#0A2047]" />
                                       <span>Team Members Information ({previewTeamSize} Members)</span>
                                     </h4>
-                                    <p className="text-[11px] text-slate-500 mt-0.5">
+                                    <p className="text-[11px] text-[#64748B] mt-0.5">
                                       Dynamic preview: Selecting {previewTeamSize} members automatically renders dedicated Member 1 to Member {previewTeamSize} inputs.
                                     </p>
                                   </div>
-                                  <span className="self-start sm:self-auto px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold border border-blue-200">
+                                  <span className="self-start sm:self-auto px-2.5 py-1 rounded-full bg-[#0A2047]/5 text-[#0A2047] text-[10px] font-bold border border-[#0A2047]/20">
                                     {previewTeamSize} Members Selected
                                   </span>
                                 </div>
@@ -1277,11 +1179,11 @@ export default function AdminFormsPage() {
                                     return (
                                       <div
                                         key={memberNum}
-                                        className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2.5"
+                                        className="p-3.5 rounded-xl border border-[#E2E8F0] bg-[#F5F7FA] space-y-2.5"
                                       >
                                         <div className="flex items-center justify-between">
-                                          <span className="text-xs font-bold text-slate-800 flex items-center gap-2">
-                                            <span className="w-5 h-5 rounded-full bg-[#174789] text-white flex items-center justify-center text-[10px] font-bold">
+                                          <span className="text-xs font-bold text-[#172033] flex items-center gap-2">
+                                            <span className="w-5 h-5 rounded-full bg-[#0A2047] text-white flex items-center justify-center text-[10px] font-bold">
                                               {memberNum}
                                             </span>
                                             <span>Member {memberNum} {isLeader ? "(Team Leader / Primary)" : ""}</span>
@@ -1291,7 +1193,7 @@ export default function AdminFormsPage() {
                                               Team Leader / Primary Registrant
                                             </span>
                                           ) : (
-                                            <span className="text-[10px] font-semibold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+                                            <span className="text-[10px] font-semibold text-[#64748B] bg-white px-2 py-0.5 rounded border border-[#E2E8F0]">
                                               Squad Participant
                                             </span>
                                           )}
@@ -1299,38 +1201,38 @@ export default function AdminFormsPage() {
 
                                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                                           <div className="space-y-1">
-                                            <label className="block text-[11px] font-semibold text-slate-700">
+                                            <label className="block text-[11px] font-semibold text-[#172033]">
                                               Member {memberNum} Name <span className="text-rose-500">*</span>
                                             </label>
                                             <input
                                               type="text"
                                               placeholder={isLeader ? "e.g., Jane Doe (Syncs with Primary)" : `Member ${memberNum} Full Name`}
                                               disabled
-                                              className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                                              className="w-full px-2.5 py-1.5 text-xs border border-[#E2E8F0] rounded-lg bg-white text-[#172033]"
                                             />
                                           </div>
 
                                           <div className="space-y-1">
-                                            <label className="block text-[11px] font-semibold text-slate-700">
+                                            <label className="block text-[11px] font-semibold text-[#172033]">
                                               Member {memberNum} Mail ID <span className="text-rose-500">*</span>
                                             </label>
                                             <input
                                               type="email"
                                               placeholder={isLeader ? "e.g., jane@gdgu.org (Syncs with Primary)" : `member${memberNum}@gdgu.org`}
                                               disabled
-                                              className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                                              className="w-full px-2.5 py-1.5 text-xs border border-[#E2E8F0] rounded-lg bg-white text-[#172033]"
                                             />
                                           </div>
 
                                           <div className="space-y-1">
-                                            <label className="block text-[11px] font-semibold text-slate-700">
+                                            <label className="block text-[11px] font-semibold text-[#172033]">
                                               Member {memberNum} Enrollment <span className="text-rose-500">*</span>
                                             </label>
                                             <input
                                               type="text"
                                               placeholder={isLeader ? "e.g., 2026GDGU1001 (Syncs with Primary)" : `Roll / Enrolment No`}
                                               disabled
-                                              className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                                              className="w-full px-2.5 py-1.5 text-xs border border-[#E2E8F0] rounded-lg bg-white text-[#172033]"
                                             />
                                           </div>
                                         </div>
@@ -1346,23 +1248,23 @@ export default function AdminFormsPage() {
 
                       {/* If team event but no specific team size question was generated, show dynamic team members card */}
                       {isTeamEvent && !hasTeamSizeQuestion && (
-                        <div className="bg-white p-5 rounded-xl border-2 border-blue-200 shadow-xs space-y-4">
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                        <div className="bg-white p-5 rounded-xl border border-[#0A2047]/20 shadow-xs space-y-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E2E8F0] pb-3">
                             <div>
-                              <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                                <Users className="w-4 h-4 text-blue-600" />
+                              <h4 className="text-xs font-bold text-[#172033] uppercase tracking-wider flex items-center gap-2">
+                                <Users className="w-4 h-4 text-[#0A2047]" />
                                 <span>Team Members Information ({previewTeamSize} Members)</span>
                               </h4>
-                              <p className="text-[11px] text-slate-500 mt-0.5">
+                              <p className="text-[11px] text-[#64748B] mt-0.5">
                                 Select team size to preview generated Member 1 to Member {previewTeamSize} input fields.
                               </p>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-semibold text-slate-600">Simulate squad:</span>
+                              <span className="text-xs font-semibold text-[#64748B]">Simulate squad:</span>
                               <select
                                 value={previewTeamSize}
                                 onChange={(e) => setPreviewTeamSize(Number(e.target.value) || 2)}
-                                className="px-2.5 py-1 text-xs border border-blue-300 rounded-lg bg-white font-bold text-blue-700"
+                                className="px-2.5 py-1 text-xs border border-[#0A2047]/30 rounded-lg bg-white font-bold text-[#0A2047]"
                               >
                                 {Array.from({
                                   length: Math.max(1, (Number(teamSizeMax) || 4) - (Number(teamSizeMin) || 1) + 1),
@@ -1385,11 +1287,11 @@ export default function AdminFormsPage() {
                               return (
                                 <div
                                   key={memberNum}
-                                  className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2.5"
+                                  className="p-3.5 rounded-xl border border-[#E2E8F0] bg-[#F5F7FA] space-y-2.5"
                                 >
                                   <div className="flex items-center justify-between">
-                                    <span className="text-xs font-bold text-slate-800 flex items-center gap-2">
-                                      <span className="w-5 h-5 rounded-full bg-[#174789] text-white flex items-center justify-center text-[10px] font-bold">
+                                    <span className="text-xs font-bold text-[#172033] flex items-center gap-2">
+                                      <span className="w-5 h-5 rounded-full bg-[#0A2047] text-white flex items-center justify-center text-[10px] font-bold">
                                         {memberNum}
                                       </span>
                                       <span>Member {memberNum} {isLeader ? "(Team Leader / Primary)" : ""}</span>
@@ -1400,19 +1302,19 @@ export default function AdminFormsPage() {
                                       type="text"
                                       placeholder={`Member ${memberNum} Full Name`}
                                       disabled
-                                      className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                                      className="w-full px-2.5 py-1.5 text-xs border border-[#E2E8F0] rounded-lg bg-white text-[#172033]"
                                     />
                                     <input
                                       type="email"
                                       placeholder={`member${memberNum}@gdgu.org`}
                                       disabled
-                                      className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                                      className="w-full px-2.5 py-1.5 text-xs border border-[#E2E8F0] rounded-lg bg-white text-[#172033]"
                                     />
                                     <input
                                       type="text"
                                       placeholder={`Roll / Enrolment No`}
                                       disabled
-                                      className="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                                      className="w-full px-2.5 py-1.5 text-xs border border-[#E2E8F0] rounded-lg bg-white text-[#172033]"
                                     />
                                   </div>
                                 </div>
@@ -1431,25 +1333,25 @@ export default function AdminFormsPage() {
             <div className="space-y-4">
               {/* Dynamic Per-Member Notice for Team Events */}
               {((Number(teamSizeMax) || 1) > 1 || (Number(teamSizeMin) || 1) > 1) && (
-                <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl flex items-start gap-3">
-                  <Users className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
-                  <div className="space-y-1 text-xs text-blue-900">
+                <div className="bg-[#0A2047]/5 border border-[#0A2047]/20 p-4 rounded-xl flex items-start gap-3">
+                  <Users className="w-5 h-5 text-[#0A2047] shrink-0 mt-0.5" />
+                  <div className="space-y-1 text-xs text-[#172033]">
                     <div className="font-bold flex items-center gap-2">
                       <span>Dynamic Per-Member Input Fields Active</span>
-                      <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-[10px] font-mono">
+                      <span className="px-2 py-0.5 rounded bg-[#0A2047]/10 text-[#0A2047] text-[10px] font-mono">
                         Auto-Managed
                       </span>
                     </div>
-                    <p className="text-blue-800 leading-relaxed">
+                    <p className="text-[#64748B] leading-relaxed">
                       When a student indicates their declared squad size (e.g. 3 members), the registration portal dynamically renders separate, dedicated input cards for <strong>Member 1</strong>, <strong>Member 2</strong>, and <strong>Member 3</strong> with Name, University Mail ID, and Student ID / Enrolment. Click <strong>Interactive Preview (ON)</strong> to test.
                     </p>
                   </div>
                 </div>
               )}
 
-              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-3">
+              <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] shadow-xs space-y-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-[#172033] mb-1">
                     Form Title *
                   </label>
                   <input
@@ -1457,12 +1359,12 @@ export default function AdminFormsPage() {
                     value={formTitle}
                     onChange={(e) => setFormTitle(e.target.value)}
                     placeholder="e.g., Hack-a-Sol 2026 — Team & Track Registration"
-                    className="w-full px-3 py-2 text-sm font-bold border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#174789]"
+                    className="w-full px-3 py-2 text-sm font-bold border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047] text-[#172033]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-[#172033] mb-1">
                     Form Description & Instructions
                   </label>
                   <textarea
@@ -1470,7 +1372,7 @@ export default function AdminFormsPage() {
                     value={formDescription}
                     onChange={(e) => setFormDescription(e.target.value)}
                     placeholder="Provide directions or eligibility criteria for applicants..."
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#174789]"
+                    className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047] text-[#172033]"
                   />
                 </div>
               </div>
@@ -1480,7 +1382,7 @@ export default function AdminFormsPage() {
                 {fields.map((field, index) => (
                   <div
                     key={field.id}
-                    className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-xs space-y-3 hover:border-blue-200 transition-colors"
+                    className="bg-white p-4 sm:p-5 rounded-xl border border-[#E2E8F0] shadow-xs space-y-3 hover:border-[#D4AF37]/50 transition-colors"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex-1">
@@ -1489,7 +1391,7 @@ export default function AdminFormsPage() {
                           value={field.label}
                           onChange={(e) => handleUpdateField(field.id, { label: e.target.value })}
                           placeholder="Question prompt..."
-                          className="w-full px-3 py-2 text-xs font-bold text-slate-900 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#174789]"
+                          className="w-full px-3 py-2 text-xs font-bold text-[#172033] border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047]"
                         />
                       </div>
 
@@ -1507,7 +1409,7 @@ export default function AdminFormsPage() {
                                   : undefined,
                             })
                           }
-                          className="px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white font-medium"
+                          className="px-2.5 py-1.5 text-xs border border-[#E2E8F0] rounded-lg bg-white font-medium text-[#172033]"
                         >
                           <option value="text">Short Answer</option>
                           <option value="textarea">Paragraph</option>
@@ -1522,7 +1424,7 @@ export default function AdminFormsPage() {
                           type="button"
                           onClick={() => handleMoveField(index, "up")}
                           disabled={index === 0}
-                          className="p-1.5 rounded border border-slate-200 hover:bg-slate-100 disabled:opacity-30 cursor-pointer"
+                          className="p-1.5 rounded border border-[#E2E8F0] hover:bg-[#F0F3F8] text-[#172033] disabled:opacity-30 cursor-pointer"
                           title="Move Up"
                         >
                           <ChevronUp className="w-3.5 h-3.5" />
@@ -1532,7 +1434,7 @@ export default function AdminFormsPage() {
                           type="button"
                           onClick={() => handleMoveField(index, "down")}
                           disabled={index === fields.length - 1}
-                          className="p-1.5 rounded border border-slate-200 hover:bg-slate-100 disabled:opacity-30 cursor-pointer"
+                          className="p-1.5 rounded border border-[#E2E8F0] hover:bg-[#F0F3F8] text-[#172033] disabled:opacity-30 cursor-pointer"
                           title="Move Down"
                         >
                           <ChevronDown className="w-3.5 h-3.5" />
@@ -1551,23 +1453,23 @@ export default function AdminFormsPage() {
 
                     {/* Choice Options Editor */}
                     {(field.type === "select" || field.type === "radio" || field.type === "checkbox") && (
-                      <div className="pl-3 border-l-2 border-slate-200 space-y-2 pt-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      <div className="pl-3 border-l-2 border-[#D4AF37]/40 space-y-2 pt-2">
+                        <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
                           Choice Options
                         </span>
                         {field.options?.map((opt, optIdx) => (
                           <div key={optIdx} className="flex items-center gap-2">
-                            <span className="text-slate-400 text-xs font-mono">{optIdx + 1}.</span>
+                            <span className="text-[#64748B] text-xs font-mono">{optIdx + 1}.</span>
                             <input
                               type="text"
                               value={opt}
                               onChange={(e) => handleUpdateOption(field.id, optIdx, e.target.value)}
-                              className="px-2.5 py-1 text-xs border border-slate-300 rounded-lg flex-1"
+                              className="px-2.5 py-1 text-xs border border-[#E2E8F0] rounded-lg flex-1 text-[#172033]"
                             />
                             <button
                               type="button"
                               onClick={() => handleRemoveOption(field.id, optIdx)}
-                              className="text-slate-400 hover:text-rose-600 text-sm px-1 cursor-pointer"
+                              className="text-[#64748B] hover:text-rose-600 text-sm px-1 cursor-pointer"
                             >
                               &times;
                             </button>
@@ -1576,7 +1478,7 @@ export default function AdminFormsPage() {
                         <button
                           type="button"
                           onClick={() => handleAddOption(field.id)}
-                          className="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 cursor-pointer pt-1"
+                          className="text-xs text-[#0A2047] hover:text-[#132E57] font-semibold flex items-center gap-1 cursor-pointer pt-1"
                         >
                           <Plus className="w-3 h-3" /> Add Choice Option
                         </button>
@@ -1584,22 +1486,22 @@ export default function AdminFormsPage() {
                     )}
 
                     {/* Settings bar */}
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                    <div className="flex items-center justify-between pt-2 border-t border-[#E2E8F0] text-xs">
                       <input
                         type="text"
                         value={field.placeholder || ""}
                         onChange={(e) => handleUpdateField(field.id, { placeholder: e.target.value })}
                         placeholder="Helper placeholder text..."
-                        className="px-2.5 py-1 text-xs border border-slate-200 rounded-lg max-w-xs"
+                        className="px-2.5 py-1 text-xs border border-[#E2E8F0] rounded-lg max-w-xs text-[#172033]"
                       />
 
-                      <label className="flex items-center gap-2 cursor-pointer font-semibold text-slate-700">
+                      <label className="flex items-center gap-2 cursor-pointer font-semibold text-[#172033]">
                         <span>Required Question</span>
                         <input
                           type="checkbox"
                           checked={field.required}
                           onChange={(e) => handleUpdateField(field.id, { required: e.target.checked })}
-                          className="rounded text-[#174789] focus:ring-[#174789]"
+                          className="rounded text-[#0A2047] focus:ring-[#0A2047]"
                         />
                       </label>
                     </div>
@@ -1609,7 +1511,7 @@ export default function AdminFormsPage() {
                 <button
                   type="button"
                   onClick={handleAddField}
-                  className="w-full py-3 rounded-xl border-2 border-dashed border-slate-300 hover:border-[#174789] hover:bg-slate-50 text-slate-600 hover:text-[#174789] text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-3 rounded-xl border-2 border-dashed border-[#E2E8F0] hover:border-[#0A2047] hover:bg-[#F0F3F8] text-[#64748B] hover:text-[#0A2047] text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Add Additional Question</span>
@@ -1617,11 +1519,11 @@ export default function AdminFormsPage() {
               </div>
 
               {/* Bottom Sticky Action Bar */}
-              <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
+              <div className="p-4 bg-white rounded-xl border border-[#E2E8F0] shadow-xs flex items-center justify-between">
                 <button
                   type="button"
                   onClick={handleBackToConfig}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F0F3F8] text-[#172033] text-xs font-semibold cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>Back to Configuration</span>
@@ -1632,9 +1534,9 @@ export default function AdminFormsPage() {
                     type="button"
                     onClick={handleRegenerate}
                     disabled={isAiGenerating}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F0F3F8] text-[#172033] text-xs font-semibold cursor-pointer"
                   >
-                    <RefreshCw className="w-3.5 h-3.5 text-blue-600" />
+                    <RefreshCw className="w-3.5 h-3.5 text-[#0A2047]" />
                     <span>Regenerate Form</span>
                   </button>
 
@@ -1685,45 +1587,45 @@ export default function AdminFormsPage() {
           {/* Form Overview & Registration Link & QR */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left Column: Form Details & Student Registration Link */}
-            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4">
-              <h4 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-2">
+            <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] shadow-xs space-y-4">
+              <h4 className="text-sm font-bold text-[#172033] border-b border-[#E2E8F0] pb-2">
                 Active Student Registration Channel
               </h4>
 
               <div className="space-y-2 text-xs">
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Event Name</span>
-                  <span className="font-bold text-slate-800">{eventName}</span>
+                <div className="flex justify-between py-1 border-b border-[#E2E8F0]">
+                  <span className="text-[#64748B]">Event Name</span>
+                  <span className="font-bold text-[#172033]">{eventName}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Team Capacity</span>
-                  <span className="font-bold text-[#174789]">
+                <div className="flex justify-between py-1 border-b border-[#E2E8F0]">
+                  <span className="text-[#64748B]">Team Capacity</span>
+                  <span className="font-bold text-[#0A2047]">
                     {getCapacityBadgeText(Number(teamSizeMin) || 1, Number(teamSizeMax) || 1)}
                   </span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Registration Fee</span>
-                  <span className="font-bold text-slate-800">₹{feeAmount}</span>
+                <div className="flex justify-between py-1 border-b border-[#E2E8F0]">
+                  <span className="text-[#64748B]">Registration Fee</span>
+                  <span className="font-bold text-[#172033]">₹{feeAmount}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Schedule</span>
-                  <span className="font-bold text-slate-800">
+                <div className="flex justify-between py-1 border-b border-[#E2E8F0]">
+                  <span className="text-[#64748B]">Schedule</span>
+                  <span className="font-bold text-[#172033]">
                     {registrationStartDate || "Open immediately"} to {registrationEndDate || "Open throughout"}
                   </span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Configured Questions</span>
-                  <span className="font-bold text-slate-800">{fields.length} Questions</span>
+                <div className="flex justify-between py-1 border-b border-[#E2E8F0]">
+                  <span className="text-[#64748B]">Configured Questions</span>
+                  <span className="font-bold text-[#172033]">{fields.length} Questions</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Form Status</span>
+                <div className="flex justify-between py-1 border-b border-[#E2E8F0]">
+                  <span className="text-[#64748B]">Form Status</span>
                   <span className="font-bold text-emerald-600">Active (Accepting Submissions)</span>
                 </div>
               </div>
 
               {/* Portal Registration URL */}
               <div className="pt-2 space-y-2">
-                <label className="block text-xs font-bold text-slate-700">
+                <label className="block text-xs font-bold text-[#172033]">
                   Live Registration URL
                 </label>
                 <div className="flex items-center gap-2">
@@ -1731,7 +1633,7 @@ export default function AdminFormsPage() {
                     type="text"
                     readOnly
                     value={`${typeof window !== "undefined" ? window.location.origin : ""}/events/${savedEventId}/register`}
-                    className="flex-1 px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-700 font-mono"
+                    className="flex-1 px-3 py-2 text-xs bg-[#F5F7FA] border border-[#E2E8F0] rounded-lg text-[#172033] font-mono"
                   />
                   <button
                     onClick={() =>
@@ -1739,16 +1641,16 @@ export default function AdminFormsPage() {
                         `${typeof window !== "undefined" ? window.location.origin : ""}/events/${savedEventId}/register`
                       )
                     }
-                    className="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg flex items-center gap-1 cursor-pointer"
+                    className="px-3 py-2 bg-[#0A2047] hover:bg-[#132E57] text-white text-xs font-semibold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
                   >
-                    {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-[#D4AF37]" />}
                     <span>{copiedLink ? "Copied" : "Copy"}</span>
                   </button>
                   <a
                     href={`/events/${savedEventId}/register`}
                     target="_blank"
                     rel="noreferrer"
-                    className="p-2 border border-slate-300 hover:bg-slate-100 rounded-lg text-slate-700"
+                    className="p-2 border border-[#E2E8F0] hover:bg-[#F0F3F8] rounded-lg text-[#172033]"
                     title="Open Registration Page"
                   >
                     <ExternalLink className="w-4 h-4" />
@@ -1758,16 +1660,16 @@ export default function AdminFormsPage() {
             </div>
 
             {/* Right Column: QR Code Display & Download */}
-            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col items-center justify-center text-center space-y-3">
-              <h4 className="text-sm font-bold text-slate-800">
+            <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] shadow-xs flex flex-col items-center justify-center text-center space-y-3">
+              <h4 className="text-sm font-bold text-[#172033]">
                 Official Registration QR Code
               </h4>
-              <p className="text-[11px] text-slate-500 max-w-xs">
+              <p className="text-[11px] text-[#64748B] max-w-xs">
                 Scan to open the participant registration questionnaire on mobile devices.
               </p>
 
               {qrCodeDataUrl ? (
-                <div className="p-3 bg-white border border-slate-200 rounded-xl shadow-xs">
+                <div className="p-3 bg-white border border-[#E2E8F0] rounded-xl shadow-xs">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={qrCodeDataUrl}
@@ -1776,7 +1678,7 @@ export default function AdminFormsPage() {
                   />
                 </div>
               ) : (
-                <div className="w-44 h-44 rounded-xl border border-dashed border-slate-300 flex items-center justify-center text-slate-400 text-xs">
+                <div className="w-44 h-44 rounded-xl border border-dashed border-[#E2E8F0] flex items-center justify-center text-[#64748B] text-xs">
                   Generating QR...
                 </div>
               )}
@@ -1786,9 +1688,9 @@ export default function AdminFormsPage() {
                   <a
                     href={qrCodeDataUrl}
                     download={`${eventName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-") || "event"}-registration-qr.png`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#174789] hover:bg-[#0E2A5C] text-white text-xs font-bold shadow-xs cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#0A2047] hover:bg-[#132E57] text-white text-xs font-bold shadow-xs cursor-pointer border border-[#D4AF37]/30 transition-colors"
                   >
-                    <Download className="w-3.5 h-3.5" />
+                    <Download className="w-3.5 h-3.5 text-[#D4AF37]" />
                     <span>Download QR Code (PNG)</span>
                   </a>
                 </div>
@@ -1797,9 +1699,9 @@ export default function AdminFormsPage() {
           </div>
 
           {/* Native AVISHKAR Website Publication */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-white p-5 rounded-xl border border-[#E2E8F0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-2.5">
-              <h4 className="text-sm font-bold text-slate-900">Event Publication</h4>
+              <h4 className="text-sm font-bold text-[#172033]">Event Publication</h4>
               {eventStatus === "published" ? (
                 <span className="px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 flex items-center gap-1">
                   <CheckCircle2 className="w-3.5 h-3.5" />
@@ -1820,7 +1722,7 @@ export default function AdminFormsPage() {
                     href={`/events/${savedEventId}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F0F3F8] text-[#172033] text-xs font-semibold cursor-pointer"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     <span>View Public Page</span>
@@ -1843,7 +1745,7 @@ export default function AdminFormsPage() {
                   type="button"
                   onClick={handlePublishEvent}
                   disabled={isPublishingEvent || !savedEventId}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#174789] hover:bg-[#0E2A5C] text-white text-xs font-bold shadow-xs cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#0A2047] hover:bg-[#132E57] text-white text-xs font-bold shadow-xs cursor-pointer disabled:opacity-50 border border-[#D4AF37]/30 transition-colors"
                 >
                   {isPublishingEvent ? (
                     <>
@@ -1852,7 +1754,7 @@ export default function AdminFormsPage() {
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="w-4 h-4" />
+                      <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />
                       <span>Publish Event to Public Website</span>
                     </>
                   )}
@@ -1865,30 +1767,30 @@ export default function AdminFormsPage() {
 
       {/* Confirmation Modal when saving active forms */}
       {confirmSaveModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-xl border border-slate-200">
+        <div className="fixed inset-0 z-50 bg-[#0A2047]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-xl border border-[#E2E8F0]">
             <div className="flex items-center gap-3 text-amber-600">
               <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
                 <AlertTriangle className="w-5 h-5 text-amber-600" />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 text-base">Confirm Form Modification</h3>
-                <p className="text-xs text-slate-500">
+                <h3 className="font-bold text-[#172033] text-base">Confirm Form Modification</h3>
+                <p className="text-xs text-[#64748B]">
                   This registration form is currently ACTIVE.
                 </p>
               </div>
             </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-[#64748B] leading-relaxed">
               Saving updates will automatically snapshot previous question definitions into
               version history (advancing to <strong>v{currentVersion + 1}</strong>). Existing student
               submissions will retain their original question mappings without corruption.
             </p>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#E2E8F0]">
               <button
                 onClick={() => setConfirmSaveModalOpen(false)}
-                className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-100 text-xs font-semibold cursor-pointer"
+                className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F0F3F8] text-[#172033] text-xs font-semibold cursor-pointer"
               >
                 Cancel
               </button>
@@ -1897,7 +1799,7 @@ export default function AdminFormsPage() {
                   setConfirmSaveModalOpen(false);
                   await executeSaveInternal();
                 }}
-                className="px-4 py-2 rounded-lg bg-[#174789] hover:bg-[#0E2A5C] text-white text-xs font-semibold shadow-xs cursor-pointer"
+                className="px-4 py-2 rounded-lg bg-[#0A2047] hover:bg-[#132E57] text-white text-xs font-semibold shadow-xs cursor-pointer border border-[#D4AF37]/30 transition-colors"
               >
                 Confirm & Snapshot Version
               </button>
@@ -1908,16 +1810,16 @@ export default function AdminFormsPage() {
 
       {/* Version History Modal (Preserved) */}
       {historyModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-lg w-full p-6 space-y-4 shadow-xl border border-slate-200">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="fixed inset-0 z-50 bg-[#0A2047]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 space-y-4 shadow-xl border border-[#E2E8F0]">
+            <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
               <div className="flex items-center gap-2">
-                <History className="w-4 h-4 text-[#174789]" />
-                <h3 className="font-bold text-slate-900 text-base">Configuration Snapshots</h3>
+                <History className="w-4 h-4 text-[#0A2047]" />
+                <h3 className="font-bold text-[#172033] text-base">Configuration Snapshots</h3>
               </div>
               <button
                 onClick={() => setHistoryModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 font-bold text-lg cursor-pointer"
+                className="text-[#64748B] hover:text-[#172033] font-bold text-lg cursor-pointer"
               >
                 &times;
               </button>
@@ -1925,15 +1827,15 @@ export default function AdminFormsPage() {
 
             <div className="space-y-3 max-h-[340px] overflow-y-auto">
               {versionHistory.map((snap, idx) => (
-                <div key={idx} className="p-3 rounded-lg border border-slate-200 bg-slate-50 space-y-1.5 text-xs">
+                <div key={idx} className="p-3 rounded-lg border border-[#E2E8F0] bg-[#F5F7FA] space-y-1.5 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-[#174789]">Version {snap.version}</span>
-                    <span className="text-[10px] text-slate-400">
+                    <span className="font-bold text-[#0A2047]">Version {snap.version}</span>
+                    <span className="text-[10px] text-[#64748B]">
                       {new Date(snap.updatedAt).toLocaleString()}
                     </span>
                   </div>
-                  <div className="text-slate-800 font-medium">{snap.formTitle}</div>
-                  <div className="text-slate-500 text-[11px] flex gap-3 flex-wrap">
+                  <div className="text-[#172033] font-medium">{snap.formTitle}</div>
+                  <div className="text-[#64748B] text-[11px] flex gap-3 flex-wrap">
                     {snap.eventTitle && <span>Event: {snap.eventTitle}</span>}
                     {snap.teamSizeMin !== undefined && snap.teamSizeMax !== undefined && (
                       <span>Capacity: {snap.teamSizeMin}–{snap.teamSizeMax} members</span>
@@ -1957,7 +1859,7 @@ export default function AdminFormsPage() {
                       setMessage(`Restored configuration snapshot from Version ${snap.version}.`);
                       setTimeout(() => setMessage(null), 3000);
                     }}
-                    className="mt-1 text-[11px] text-[#174789] hover:underline font-semibold cursor-pointer block"
+                    className="mt-1 text-[11px] text-[#0A2047] hover:text-[#B89125] font-semibold cursor-pointer block underline"
                   >
                     Restore this version
                   </button>
@@ -1965,10 +1867,10 @@ export default function AdminFormsPage() {
               ))}
             </div>
 
-            <div className="flex items-center justify-end pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end pt-2 border-t border-[#E2E8F0]">
               <button
                 onClick={() => setHistoryModalOpen(false)}
-                className="px-4 py-2 rounded-lg bg-[#174789] text-white text-xs font-semibold cursor-pointer"
+                className="px-4 py-2 rounded-lg bg-[#0A2047] hover:bg-[#132E57] text-white text-xs font-semibold cursor-pointer transition-colors"
               >
                 Close History
               </button>

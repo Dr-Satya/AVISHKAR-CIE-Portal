@@ -10,15 +10,15 @@ import {
 import {
   validatePersonalInfo,
   validateAcademicInfo,
-  validatePreviousWork,
   validateClubEngagement,
   validatePaymentInfo,
+  validateStartupDetails,
 } from "@/lib/validations/registration";
 import { isOfficialPaymentConfigured } from "@/config/payment";
 import { StepIndicator } from "./StepIndicator";
 import { PersonalInfoStep } from "./PersonalInfoStep";
 import { AcademicInfoStep } from "./AcademicInfoStep";
-import { PreviousWorkStep } from "./PreviousWorkStep";
+import { StartupInnovationStep } from "./StartupInnovationStep";
 import { ReviewStep } from "./ReviewStep";
 import { PaymentStep } from "./PaymentStep";
 import { SubmissionSuccess } from "./SubmissionSuccess";
@@ -50,11 +50,29 @@ export function RegistrationWizard() {
     course: "",
     branch: "",
     academicYear: "",
+
+    // Startup & Innovation Details (Optional)
+    hasStartupOrProject: "",
+    teamLeaderName: "",
+    teamLeaderEnrollment: "",
+    teamLeaderEmail: "",
+    teamLeaderContact: "",
+    studentRole: "",
+    teamStructure: "",
+    teamMembers: [],
+    startupTitle: "",
+    startupDetails: "",
+    startupStage: "",
+    technologiesUsed: "",
+    supportNeeded: [],
+    otherSupportDetails: "",
+    projectLink: "",
+
+    // Legacy mirrors
     previousWorkDescription: "",
     projectName: "",
     projectRole: "",
-    technologiesUsed: "",
-    projectLink: "",
+
     reasonForJoining: "",
     leadershipInterest: "",
     transactionId: "",
@@ -97,6 +115,22 @@ export function RegistrationWizard() {
               projectRole: parsed.projectRole || "",
               technologiesUsed: parsed.technologiesUsed || "",
               projectLink: parsed.projectLink || "",
+
+              // Startup & Innovation Details
+              hasStartupOrProject: parsed.hasStartupOrProject || "",
+              teamLeaderName: parsed.teamLeaderName || "",
+              teamLeaderEnrollment: parsed.teamLeaderEnrollment || "",
+              teamLeaderEmail: parsed.teamLeaderEmail || "",
+              teamLeaderContact: parsed.teamLeaderContact || "",
+              studentRole: parsed.studentRole || parsed.projectRole || "",
+              teamStructure: parsed.teamStructure || "",
+              teamMembers: Array.isArray(parsed.teamMembers) ? parsed.teamMembers : [],
+              startupTitle: parsed.startupTitle || parsed.projectName || "",
+              startupDetails: parsed.startupDetails || parsed.previousWorkDescription || "",
+              startupStage: parsed.startupStage || "",
+              supportNeeded: Array.isArray(parsed.supportNeeded) ? parsed.supportNeeded : [],
+              otherSupportDetails: parsed.otherSupportDetails || "",
+
               reasonForJoining: parsed.reasonForJoining || "",
               leadershipInterest: parsed.leadershipInterest || "",
               transactionId: parsed.transactionId || "",
@@ -115,7 +149,7 @@ export function RegistrationWizard() {
   const saveDraft = (data: StudentRegistrationInput) => {
     try {
       if (typeof window !== "undefined") {
-        const { receiptFile, ...serializable } = data;
+        const { receiptFile: _receiptFile, ...serializable } = data;
         localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(serializable));
       }
     } catch {
@@ -174,14 +208,14 @@ export function RegistrationWizard() {
 
     const personalErrors = validatePersonalInfo(formData);
     const academicErrors = validateAcademicInfo(formData);
-    const previousWorkErrors = validatePreviousWork(formData);
+    const startupErrors = validateStartupDetails(formData);
     const clubErrors = validateClubEngagement(formData);
     const paymentErrors = validatePaymentInfo(formData);
 
     const allErrors = {
       ...personalErrors,
       ...academicErrors,
-      ...previousWorkErrors,
+      ...startupErrors,
       ...clubErrors,
       ...paymentErrors,
     };
@@ -193,7 +227,26 @@ export function RegistrationWizard() {
         setCurrentStep(1);
       } else if (allErrors.studentId || allErrors.school || allErrors.program || allErrors.yearOfJoining) {
         setCurrentStep(2);
-      } else if (allErrors.previousWorkDescription || allErrors.projectName || allErrors.projectRole || allErrors.technologiesUsed || allErrors.projectLink) {
+      } else if (
+        allErrors.hasStartupOrProject ||
+        allErrors.teamLeaderName ||
+        allErrors.teamLeaderEnrollment ||
+        allErrors.teamLeaderEmail ||
+        allErrors.teamLeaderContact ||
+        allErrors.studentRole ||
+        allErrors.teamStructure ||
+        allErrors.teamMembers ||
+        allErrors.startupTitle ||
+        allErrors.startupDetails ||
+        allErrors.startupStage ||
+        allErrors.technologiesUsed ||
+        allErrors.supportNeeded ||
+        allErrors.otherSupportDetails ||
+        allErrors.projectLink ||
+        allErrors.previousWorkDescription ||
+        allErrors.projectName ||
+        allErrors.projectRole
+      ) {
         setCurrentStep(3);
       } else if (allErrors.reasonForJoining || allErrors.leadershipInterest) {
         setCurrentStep(4);
@@ -216,10 +269,25 @@ export function RegistrationWizard() {
       payload.append("program", formData.program);
       payload.append("yearOfJoining", formData.yearOfJoining);
 
-      // Previous Work / Startup Details (Optional)
-      payload.append("previousWorkDescription", (formData.previousWorkDescription || "").trim());
-      payload.append("projectName", (formData.projectName || "").trim());
-      payload.append("projectRole", (formData.projectRole || "").trim());
+      // Startup & Innovation Details (Optional)
+      payload.append("hasStartupOrProject", formData.hasStartupOrProject || "");
+      payload.append("teamLeaderName", (formData.teamLeaderName || "").trim());
+      payload.append("teamLeaderEnrollment", (formData.teamLeaderEnrollment || "").trim());
+      payload.append("teamLeaderEmail", (formData.teamLeaderEmail || "").trim());
+      payload.append("teamLeaderContact", (formData.teamLeaderContact || "").trim());
+      payload.append("studentRole", formData.studentRole || formData.projectRole || "");
+      payload.append("teamStructure", formData.teamStructure || "");
+      payload.append("teamMembers", JSON.stringify(formData.teamMembers || []));
+      payload.append("startupTitle", (formData.startupTitle || formData.projectName || "").trim());
+      payload.append("startupDetails", (formData.startupDetails || formData.previousWorkDescription || "").trim());
+      payload.append("startupStage", formData.startupStage || "");
+      payload.append("supportNeeded", JSON.stringify(formData.supportNeeded || []));
+      payload.append("otherSupportDetails", (formData.otherSupportDetails || "").trim());
+
+      // Legacy mirrors for full backward compatibility
+      payload.append("previousWorkDescription", (formData.startupDetails || formData.previousWorkDescription || "").trim());
+      payload.append("projectName", (formData.startupTitle || formData.projectName || "").trim());
+      payload.append("projectRole", (formData.studentRole || formData.projectRole || "").trim());
       payload.append("technologiesUsed", (formData.technologiesUsed || "").trim());
       payload.append("projectLink", (formData.projectLink || "").trim());
 
@@ -294,7 +362,7 @@ export function RegistrationWizard() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else if (currentStep === 3) {
       // Step 3 is optional: validate bounds and URL format only if provided
-      const stepErrors = validatePreviousWork(formData);
+      const stepErrors = validateStartupDetails(formData);
       if (Object.keys(stepErrors).length > 0) {
         setErrors(stepErrors);
         return;
@@ -306,12 +374,12 @@ export function RegistrationWizard() {
       const clubErrors = validateClubEngagement(formData);
       const personalErrors = validatePersonalInfo(formData);
       const academicErrors = validateAcademicInfo(formData);
-      const previousWorkErrors = validatePreviousWork(formData);
+      const startupErrors = validateStartupDetails(formData);
 
       const combinedErrors = {
         ...personalErrors,
         ...academicErrors,
-        ...previousWorkErrors,
+        ...startupErrors,
         ...clubErrors,
       };
 
@@ -321,7 +389,26 @@ export function RegistrationWizard() {
           setCurrentStep(1);
         } else if (combinedErrors.studentId || combinedErrors.school || combinedErrors.program || combinedErrors.yearOfJoining) {
           setCurrentStep(2);
-        } else if (combinedErrors.previousWorkDescription || combinedErrors.projectName || combinedErrors.projectRole || combinedErrors.technologiesUsed || combinedErrors.projectLink) {
+        } else if (
+          combinedErrors.hasStartupOrProject ||
+          combinedErrors.teamLeaderName ||
+          combinedErrors.teamLeaderEnrollment ||
+          combinedErrors.teamLeaderEmail ||
+          combinedErrors.teamLeaderContact ||
+          combinedErrors.studentRole ||
+          combinedErrors.teamStructure ||
+          combinedErrors.teamMembers ||
+          combinedErrors.startupTitle ||
+          combinedErrors.startupDetails ||
+          combinedErrors.startupStage ||
+          combinedErrors.technologiesUsed ||
+          combinedErrors.supportNeeded ||
+          combinedErrors.otherSupportDetails ||
+          combinedErrors.projectLink ||
+          combinedErrors.previousWorkDescription ||
+          combinedErrors.projectName ||
+          combinedErrors.projectRole
+        ) {
           setCurrentStep(3);
         }
         return;
@@ -393,12 +480,18 @@ export function RegistrationWizard() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Check if student has entered any previous work details
+  // Check if student has entered any startup or previous work details
   const hasPreviousWorkDetails = Boolean(
-    (formData.previousWorkDescription && formData.previousWorkDescription.trim()) ||
+    (formData.hasStartupOrProject && formData.hasStartupOrProject !== "No, not yet.") ||
+    (formData.startupTitle && formData.startupTitle.trim()) ||
     (formData.projectName && formData.projectName.trim()) ||
+    (formData.startupDetails && formData.startupDetails.trim()) ||
+    (formData.previousWorkDescription && formData.previousWorkDescription.trim()) ||
+    (formData.studentRole && formData.studentRole.trim()) ||
     (formData.projectRole && formData.projectRole.trim()) ||
     (formData.technologiesUsed && formData.technologiesUsed.trim()) ||
+    (formData.supportNeeded && formData.supportNeeded.length > 0) ||
+    (formData.teamLeaderName && formData.teamLeaderName.trim()) ||
     (formData.projectLink && formData.projectLink.trim())
   );
 
@@ -444,7 +537,7 @@ export function RegistrationWizard() {
       )}
 
       {/* Main Form Card */}
-      <div className="bg-white rounded-xl border border-[#D9E4F2] p-6 sm:p-8 shadow-xs">
+      <div className="bg-white rounded-xl border border-[#E2E8F0] p-6 sm:p-8 shadow-sm">
         {/* Top Server Error Alert */}
         {submissionError && (
           <div
@@ -476,10 +569,18 @@ export function RegistrationWizard() {
         )}
 
         {currentStep === 3 && (
-          <PreviousWorkStep
+          <StartupInnovationStep
             formData={formData}
             errors={errors}
             onChange={handleFieldChange}
+            onSkip={() => {
+              if (!formData.hasStartupOrProject) {
+                handleFieldChange("hasStartupOrProject", "No, not yet.");
+              }
+              setErrors({});
+              setCurrentStep(4);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
           />
         )}
 
@@ -503,16 +604,16 @@ export function RegistrationWizard() {
         )}
 
         {/* Action Controls Bar */}
-        <div className="mt-8 pt-6 border-t border-[#D9E4F2] flex items-center justify-between gap-4">
+        <div className="mt-8 pt-6 border-t border-[#E2E8F0] flex items-center justify-between gap-4">
           <div>
             {currentStep > 1 && (
               <button
                 type="button"
                 disabled={isSubmitting}
                 onClick={handleBack}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-[#D9E4F2] hover:bg-slate-50 text-[#174789] font-medium text-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-100 disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-[#E2E8F0] hover:bg-[#F5F7FA] text-[#0A2047] font-semibold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#0A2047]/20 disabled:opacity-50 cursor-pointer"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-4 h-4 text-[#64748B]" />
                 <span>Back</span>
               </button>
             )}
@@ -523,10 +624,10 @@ export function RegistrationWizard() {
               <button
                 type="button"
                 onClick={handleContinue}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-sm shadow-xs hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#0A2047] hover:bg-[#132E57] active:bg-[#19365F] text-white font-semibold text-sm shadow-xs hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-[#0A2047] focus:ring-offset-2 cursor-pointer"
               >
                 <span>Continue to Academic Info</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
               </button>
             )}
 
@@ -534,35 +635,53 @@ export function RegistrationWizard() {
               <button
                 type="button"
                 onClick={handleContinue}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-sm shadow-xs hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#0A2047] hover:bg-[#132E57] active:bg-[#19365F] text-white font-semibold text-sm shadow-xs hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-[#0A2047] focus:ring-offset-2 cursor-pointer"
               >
-                <span>Continue to Previous Work</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>Continue to Startup &amp; Innovation</span>
+                <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
               </button>
             )}
 
             {currentStep === 3 && (
-              <button
-                type="button"
-                onClick={handleContinue}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-sm shadow-xs hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2"
-              >
-                <span>
-                  {hasPreviousWorkDetails
-                    ? "Continue to Club & Review"
-                    : "Skip or Continue to Club & Review"}
-                </span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-2.5">
+                {(!formData.hasStartupOrProject ||
+                  formData.hasStartupOrProject === "No, not yet.") && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleFieldChange("hasStartupOrProject", "No, not yet.");
+                      setErrors({});
+                      setCurrentStep(4);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[#E2E8F0] hover:bg-[#F5F7FA] text-[#0A2047] font-semibold text-sm transition-all cursor-pointer"
+                  >
+                    <span>Skip for Now</span>
+                    <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleContinue}
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#0A2047] hover:bg-[#132E57] active:bg-[#19365F] text-white font-semibold text-sm shadow-xs hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-[#0A2047] focus:ring-offset-2 cursor-pointer"
+                >
+                  <span>
+                    {hasPreviousWorkDetails
+                      ? "Continue to Club & Review"
+                      : "Continue to Club & Review"}
+                  </span>
+                  <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
+                </button>
+              </div>
             )}
 
             {currentStep === 4 && (
               <button
                 type="button"
                 onClick={handleContinue}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-sm shadow-xs hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:ring-offset-2"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#0A2047] hover:bg-[#132E57] active:bg-[#19365F] text-white font-semibold text-sm shadow-xs hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-[#0A2047] focus:ring-offset-2 cursor-pointer"
               >
-                <CreditCard className="w-4 h-4" />
+                <CreditCard className="w-4 h-4 text-[#D4AF37]" />
                 <span>Proceed to Payment Status</span>
               </button>
             )}
@@ -572,16 +691,16 @@ export function RegistrationWizard() {
                 type="button"
                 disabled={isSubmitting || !isPaymentOpen}
                 onClick={handleSubmit}
-                className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-medium text-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer ${
                   isPaymentOpen
-                    ? "bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-xs hover:shadow focus:ring-[#2563EB] disabled:opacity-50"
+                    ? "bg-[#0A2047] hover:bg-[#132E57] active:bg-[#19365F] text-white shadow-xs hover:shadow focus:ring-[#0A2047] disabled:opacity-50"
                     : "bg-slate-200 text-slate-500 cursor-not-allowed border border-slate-300"
                 }`}
                 title={!isPaymentOpen ? "Registration opening soon" : undefined}
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin text-[#D4AF37]" />
                     <span>Submitting Registration...</span>
                   </>
                 ) : !isPaymentOpen ? (
@@ -591,7 +710,7 @@ export function RegistrationWizard() {
                   </>
                 ) : (
                   <>
-                    <Send className="w-4 h-4" />
+                    <Send className="w-4 h-4 text-[#D4AF37]" />
                     <span>Submit Registration &amp; Proof</span>
                   </>
                 )}

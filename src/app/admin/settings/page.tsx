@@ -73,20 +73,20 @@ export default function AdminSettingsPage() {
     <div className="space-y-6">
       {/* Top Header */}
       <div>
-        <h2 className="text-xl font-bold text-[#174789]">Security & System Administration</h2>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <h2 className="text-xl font-bold text-[#0A2047]">Security & System Administration</h2>
+        <p className="text-xs text-[#64748B] mt-0.5">
           Role-Based Access Control (RBAC) governance and immutable audit logs.
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-1 text-xs">
+      <div className="flex items-center gap-2 border-b border-[#E2E8F0] pb-1 text-xs">
         <button
           onClick={() => setActiveTab("roles")}
-          className={`px-3 py-1.5 rounded-md font-semibold transition-colors ${
+          className={`px-3 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer ${
             activeTab === "roles"
-              ? "bg-[#174789] text-white"
-              : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              ? "bg-[#0A2047] text-white shadow-xs border border-[#D4AF37]/30"
+              : "text-[#64748B] hover:text-[#172033] hover:bg-[#F0F3F8]"
           }`}
         >
           Role Permissions Matrix
@@ -94,10 +94,10 @@ export default function AdminSettingsPage() {
 
         <button
           onClick={() => setActiveTab("audit")}
-          className={`px-3 py-1.5 rounded-md font-semibold transition-colors ${
+          className={`px-3 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer ${
             activeTab === "audit"
-              ? "bg-[#174789] text-white"
-              : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              ? "bg-[#0A2047] text-white shadow-xs border border-[#D4AF37]/30"
+              : "text-[#64748B] hover:text-[#172033] hover:bg-[#F0F3F8]"
           }`}
         >
           Security Audit Trail
@@ -108,10 +108,10 @@ export default function AdminSettingsPage() {
       {/* TAB 1: ROLE PERMISSIONS MATRIX */}
       {/* ------------------------------------------------------------------ */}
       {activeTab === "roles" && (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden space-y-4 p-5">
+        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden space-y-4 p-5">
           <div>
-            <h3 className="font-bold text-slate-900 text-sm">Role-Based Access Control (RBAC) Matrix</h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <h3 className="font-bold text-[#172033] text-sm">Role-Based Access Control (RBAC) Matrix</h3>
+            <p className="text-xs text-[#64748B] mt-0.5">
               Strict capabilities enforced on both server API handlers and database Row-Level Security policies.
             </p>
           </div>
@@ -119,44 +119,44 @@ export default function AdminSettingsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-700">
+                <tr className="bg-[#F5F7FA] border-b border-[#E2E8F0] text-[#172033]">
                   <th className="py-2.5 px-3 font-bold">Operational Permission</th>
-                  <th className="py-2.5 px-3 font-bold text-center text-purple-800 bg-purple-50/50">President</th>
-                  <th className="py-2.5 px-3 font-bold text-center text-blue-800 bg-blue-50/50">Admin</th>
-                  <th className="py-2.5 px-3 font-bold text-center text-teal-800 bg-teal-50/50">AVISHKAR Member</th>
-                  <th className="py-2.5 px-3 font-bold text-center text-slate-700 bg-slate-100/50">Student (Public)</th>
+                  <th className="py-2.5 px-3 font-bold text-center text-[#B89125] bg-[#D4AF37]/10">President</th>
+                  <th className="py-2.5 px-3 font-bold text-center text-[#0A2047] bg-[#0A2047]/5">Admin</th>
+                  <th className="py-2.5 px-3 font-bold text-center text-[#172033] bg-[#F0F3F8]">AVISHKAR Member</th>
+                  <th className="py-2.5 px-3 font-bold text-center text-[#64748B] bg-[#F5F7FA]">Student (Public)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[#E2E8F0]">
                 {permissionKeys.map((item) => (
-                  <tr key={item.key} className="hover:bg-slate-50/40">
-                    <td className="py-2.5 px-3 font-medium text-slate-800">{item.label}</td>
-                    <td className="py-2.5 px-3 text-center bg-purple-50/20">
+                  <tr key={item.key} className="hover:bg-[#F0F3F8]">
+                    <td className="py-2.5 px-3 font-medium text-[#172033]">{item.label}</td>
+                    <td className="py-2.5 px-3 text-center bg-[#D4AF37]/5">
                       {ROLE_PERMISSIONS.President[item.key] ? (
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 mx-auto" />
                       ) : (
                         <span className="text-slate-300">&mdash;</span>
                       )}
                     </td>
-                    <td className="py-2.5 px-3 text-center bg-blue-50/20">
+                    <td className="py-2.5 px-3 text-center bg-[#0A2047]/5">
                       {ROLE_PERMISSIONS.Admin[item.key] ? (
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 mx-auto" />
                       ) : (
                         <span className="text-slate-300">&mdash;</span>
                       )}
                     </td>
-                    <td className="py-2.5 px-3 text-center bg-teal-50/20">
+                    <td className="py-2.5 px-3 text-center bg-[#F0F3F8]/50">
                       {ROLE_PERMISSIONS["AVISHKAR Member"][item.key] ? (
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 mx-auto" />
                       ) : (
                         <span className="text-slate-300">&mdash;</span>
                       )}
                     </td>
-                    <td className="py-2.5 px-3 text-center bg-slate-50/40">
+                    <td className="py-2.5 px-3 text-center bg-[#F5F7FA]">
                       {ROLE_PERMISSIONS.Student[item.key] ? (
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 mx-auto" />
                       ) : (
-                        <span className="text-rose-400 font-bold text-[11px]">Denied</span>
+                        <span className="text-rose-500 font-bold text-[11px]">Denied</span>
                       )}
                     </td>
                   </tr>
@@ -171,11 +171,11 @@ export default function AdminSettingsPage() {
       {/* TAB 2: AUDIT LOG TRAIL */}
       {/* ------------------------------------------------------------------ */}
       {activeTab === "audit" && (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs p-5 space-y-4">
+          <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
             <div>
-              <h3 className="font-bold text-slate-900 text-sm">Immutable Administrative Audit Log</h3>
-              <p className="text-xs text-slate-500">
+              <h3 className="font-bold text-[#172033] text-sm">Immutable Administrative Audit Log</h3>
+              <p className="text-xs text-[#64748B]">
                 Audits all approvals, publishing decisions, role changes, and verification actions.
               </p>
             </div>
@@ -183,7 +183,7 @@ export default function AdminSettingsPage() {
             {userRole === "President" && (
               <button
                 onClick={fetchAuditLogs}
-                className="text-xs text-blue-600 hover:text-blue-700 font-semibold"
+                className="text-xs text-[#0A2047] hover:text-[#B89125] font-semibold cursor-pointer"
               >
                 Refresh Log
               </button>
@@ -191,9 +191,9 @@ export default function AdminSettingsPage() {
           </div>
 
           {userRole !== "President" ? (
-            <div className="p-8 text-center text-slate-500 text-xs">
-              <Lock className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-              <p className="font-bold text-slate-700">Restricted to President Council</p>
+            <div className="p-8 text-center text-[#64748B] text-xs">
+              <Lock className="w-8 h-8 text-[#64748B]/50 mx-auto mb-2" />
+              <p className="font-bold text-[#172033]">Restricted to President Council</p>
               <p className="mt-1">
                 Security policy: Audit trail viewing requires authenticated President permissions.
               </p>
@@ -203,23 +203,23 @@ export default function AdminSettingsPage() {
               {auditLogs.map((log) => (
                 <div
                   key={log.id}
-                  className="p-3 rounded-lg border border-slate-200/80 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+                  className="p-3 rounded-lg border border-[#E2E8F0] bg-[#F5F7FA] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
                 >
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold font-mono px-2 py-0.5 rounded bg-[#174789] text-white text-[10px]">
+                      <span className="font-bold font-mono px-2 py-0.5 rounded bg-[#0A2047] text-white text-[10px] border border-[#D4AF37]/30">
                         {log.action}
                       </span>
-                      <span className="font-semibold text-slate-800">
+                      <span className="font-semibold text-[#172033]">
                         Target: {log.targetType} ({log.targetId})
                       </span>
                     </div>
-                    <div className="text-slate-500 text-[11px]">
-                      Actor: <span className="font-mono text-slate-700">{log.actorEmail}</span> ({log.actorRole})
+                    <div className="text-[#64748B] text-[11px]">
+                      Actor: <span className="font-mono text-[#172033]">{log.actorEmail}</span> ({log.actorRole})
                     </div>
                   </div>
 
-                  <div className="text-[11px] text-slate-400 font-mono shrink-0">
+                  <div className="text-[11px] text-[#64748B] font-mono shrink-0">
                     {new Date(log.timestamp).toLocaleString()}
                   </div>
                 </div>

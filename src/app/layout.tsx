@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Inter, Libre_Baskerville, Montserrat } from "next/font/google";
-import { Header } from "@/components/layout/Header";
+import { Header, HeaderFallback } from "@/components/layout/Header";
+import { Footer, FooterFallback } from "@/components/layout/Footer";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
 
@@ -47,11 +48,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${inter.variable} ${libreBaskerville.variable} ${montserrat.variable} min-h-screen flex flex-col bg-white text-[#334155] font-sans antialiased selection:bg-[#2563EB] selection:text-white`}>
-        <Suspense fallback={null}>
+      <body className={`${inter.variable} ${libreBaskerville.variable} ${montserrat.variable} min-h-screen flex flex-col bg-[#F5F7FA] text-[#172033] font-sans antialiased selection:bg-[#0A2047] selection:text-white`}>
+        <Suspense fallback={<HeaderFallback />}>
           <Header />
         </Suspense>
         <main className="flex-1">{children}</main>
+        <Suspense fallback={<FooterFallback />}>
+          <Footer />
+        </Suspense>
       </body>
     </html>
   );

@@ -10,12 +10,21 @@ export const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 const PHOTOS_DATA_DIR = path.join(process.cwd(), ".data", "event-photos");
 
+declare global {
+  // eslint-disable-next-line no-var
+  var __avishkar_photo_buffer_cache: Map<string, Buffer> | undefined;
+}
+
 /**
  * Ensures the persistent event photos directory exists on disk.
  */
 export function ensurePhotosDir(): string {
-  if (!fs.existsSync(PHOTOS_DATA_DIR)) {
-    fs.mkdirSync(PHOTOS_DATA_DIR, { recursive: true });
+  try {
+    if (!fs.existsSync(PHOTOS_DATA_DIR)) {
+      fs.mkdirSync(PHOTOS_DATA_DIR, { recursive: true });
+    }
+  } catch {
+    // Ignore in read-only / bundle environments
   }
   return PHOTOS_DATA_DIR;
 }
@@ -128,8 +137,18 @@ export async function persistPhotoFile(params: {
   const safeFilename = `${eventId}_${photoId}_${randomHex}.${normalizedExt}`;
   const localFilePath = path.join(PHOTOS_DATA_DIR, safeFilename);
 
-  // Write synchronously to disk to guarantee persistence across restarts
-  fs.writeFileSync(localFilePath, buffer);
+  // Write to disk if available
+  try {
+    fs.writeFileSync(localFilePath, buffer);
+  } catch {
+    // Read-only filesystem in Cloudflare Workers / workerd environment
+  }
+
+  if (!globalThis.__avishkar_photo_buffer_cache) {
+    globalThis.__avishkar_photo_buffer_cache = new Map();
+  }
+  globalThis.__avishkar_photo_buffer_cache.set(safeFilename, buffer);
+  globalThis.__avishkar_photo_buffer_cache.set(photoId, buffer);
 
   const storagePath = `local:photos/${safeFilename}`;
   const accessUrl = `/api/photos/${photoId}`;
@@ -184,10 +203,40 @@ export function resolvePhotoDiskPath(storagePath: string): string | null {
 }
 
 /**
+ * Retrieves the raw binary buffer of a photo from disk or in-memory fallback.
+ */
+export function getPhotoBuffer(storagePath?: string, photoId?: string): Buffer | null {
+  if (photoId && globalThis.__avishkar_photo_buffer_cache?.has(photoId)) {
+    return globalThis.__avishkar_photo_buffer_cache.get(photoId)!;
+  }
+  if (!storagePath) return null;
+  const filename = path.basename(storagePath.replace(/^local:photos\//, ""));
+  if (filename && globalThis.__avishkar_photo_buffer_cache?.has(filename)) {
+    return globalThis.__avishkar_photo_buffer_cache.get(filename)!;
+  }
+  const diskPath = resolvePhotoDiskPath(storagePath);
+  if (diskPath && fs.existsSync(diskPath)) {
+    try {
+      return fs.readFileSync(diskPath);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+/**
  * Deletes a stored photo from disk and remote storage.
  */
 export async function deletePhotoFromStorage(storagePath: string): Promise<boolean> {
   let deleted = false;
+  if (storagePath) {
+    const filename = path.basename(storagePath.replace(/^local:photos\//, ""));
+    if (globalThis.__avishkar_photo_buffer_cache?.has(filename)) {
+      globalThis.__avishkar_photo_buffer_cache.delete(filename);
+      deleted = true;
+    }
+  }
 
   const diskPath = resolvePhotoDiskPath(storagePath);
   if (diskPath && fs.existsSync(diskPath)) {

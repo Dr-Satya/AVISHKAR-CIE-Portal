@@ -274,8 +274,8 @@ async function runTests() {
       "Admin Portal Selection page completely removes left sidebar, sidebar logo, and navigation links"
     );
     assert(
-      dashHtml.includes("AVISHKAR 2026 — Portal Selection"),
-      "Admin Portal Selection page includes compact header 'AVISHKAR 2026 — Portal Selection'"
+      dashHtml.includes("AVISHKAR Portal Selection"),
+      "Admin Portal Selection page includes header 'AVISHKAR Portal Selection'"
     );
     const eventsRes = await fetch(`${baseUrl}/admin/events`);
     const eventsHtml = await eventsRes.text();

@@ -11,10 +11,9 @@ export default function MemberLoginPage() {
     <RoleLoginForm
       expectedRole="AVISHKAR Member"
       roleHeading="Member Login"
-      roleSubtitle="Authorized access for AVISHKAR Council Members. Draft and submit technical event proposals, track review outcomes, and report assigned duty progress."
       roleBadge="Technical Committee"
       targetDashboard="/admin/member"
-      accentColorClass="text-teal-600 bg-teal-50 border-teal-100"
+      accentColorClass="text-[#0A2047] bg-[#0A2047]/10 border-[#0A2047]/20"
     />
   );
 }

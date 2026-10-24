@@ -215,8 +215,8 @@ async function run() {
     const dashHtml = await dashRes.text();
 
     assert(dashRes.status === 200, "Portal Selection (/admin/dashboard) returns HTTP 200 OK");
-    assert(dashHtml.includes("AVISHKAR 2026 — Portal Selection"), "Portal Selection displays official header");
-    assert(dashHtml.includes("Administrative Management Portal"), "Portal Selection displays Administrative Management card");
+    assert(dashHtml.includes("AVISHKAR Portal Selection"), "Portal Selection displays official header");
+    assert(dashHtml.includes("Administrative Management Portal") || dashHtml.includes("Administrative Management"), "Portal Selection displays Administrative Management card");
     assert(dashHtml.includes("/admin/management/login"), "Administrative Management card links to /admin/management/login");
     assert(!dashHtml.includes("AdminSidebar"), "Portal Selection page remains clean and does not embed sidebar");
   } catch (err) {

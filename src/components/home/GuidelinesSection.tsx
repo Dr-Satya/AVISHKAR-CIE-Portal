@@ -1,6 +1,6 @@
 import React from "react";
 import { Container } from "@/components/ui/Container";
-import { UserCheck, FileCheck, ShieldCheck, Scale, CheckCircle2 } from "lucide-react";
+import { UserCheck, FileCheck, ShieldCheck, Scale } from "lucide-react";
 
 export function GuidelinesSection() {
   const policySections = [
@@ -52,17 +52,22 @@ export function GuidelinesSection() {
   ];
 
   return (
-    <section id="guidelines" className="py-14 sm:py-16 lg:py-20 bg-[#F8FAFC]/70 border-b border-[#D9E4F2]">
+    <section id="guidelines" className="py-14 sm:py-16 lg:py-20 bg-[#F5F7FA] border-b border-[#E2E8F0]">
       <Container>
+        {/* Centered Section Label (Minimal, No Container, Section-relative) */}
+        <div className="w-full flex items-center justify-center mb-4 sm:mb-5">
+          <div className="inline-flex items-center gap-2 text-[#0A2047] text-xs font-semibold uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] shrink-0" aria-hidden="true" />
+            <span>OFFICIAL EVENT POLICY</span>
+          </div>
+        </div>
+
         {/* Section Header */}
         <div className="max-w-4xl mx-auto text-center space-y-3 mb-12 sm:mb-14">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-[#EFF6FF] text-[#174789] text-xs font-semibold uppercase tracking-wider border border-[#D9E4F2]">
-            OFFICIAL EVENT POLICY
-          </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-[#174789] tracking-tight leading-snug">
+          <h2 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-[#0A2047] tracking-tight leading-snug font-institutional">
             Event Guidelines &amp; Participation Policies
           </h2>
-          <p className="text-[14px] sm:text-[15px] text-[#475569] leading-relaxed max-w-3xl mx-auto">
+          <p className="text-[14px] sm:text-[15px] text-[#64748B] leading-relaxed max-w-3xl mx-auto">
             These guidelines establish the requirements for participant eligibility, registration, verification, academic integrity, and professional conduct for AVISHKAR events organized by GD Goenka University. All participants are expected to review and comply with the applicable event requirements.
           </p>
         </div>
@@ -74,23 +79,23 @@ export function GuidelinesSection() {
             return (
               <div
                 key={idx}
-                className="flex flex-col text-left bg-white border border-[#D9E4F2] rounded-xl p-6 sm:p-7 shadow-2xs hover:shadow-xs hover:border-blue-200 transition-all duration-200"
+                className="flex flex-col text-left bg-white border border-[#E2E8F0] rounded-xl p-6 sm:p-7 shadow-xs hover:shadow-sm hover:border-[#D4AF37]/50 transition-all duration-200"
               >
                 {/* Header with Icon & Title */}
                 <div className="flex items-center gap-3.5 mb-4">
-                  <div className="w-11 h-11 rounded-lg bg-[#EFF6FF] text-[#174789] flex items-center justify-center border border-[#D9E4F2] shrink-0">
-                    <Icon className="w-5 h-5 text-[#0D9488]" />
+                  <div className="w-11 h-11 rounded-lg bg-[#0A2047]/5 text-[#B89125] flex items-center justify-center border border-[#E2E8F0] shrink-0">
+                    <Icon className="w-5 h-5 text-[#B89125]" />
                   </div>
-                  <h3 className="text-lg sm:text-[19px] font-bold text-[#174789] leading-snug">
+                  <h3 className="text-lg sm:text-[19px] font-bold text-[#0A2047] leading-snug font-institutional">
                     {section.title}
                   </h3>
                 </div>
 
                 {/* Bullet Points */}
-                <ul className="space-y-3 text-[13.5px] text-[#475569] leading-relaxed flex-1">
+                <ul className="space-y-3 text-[13.5px] text-[#64748B] leading-relaxed flex-1">
                   {section.points.map((point, pIdx) => (
                     <li key={pIdx} className="flex items-start gap-2.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#0D9488] mt-2 shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] mt-2 shrink-0" />
                       <span>{point}</span>
                     </li>
                   ))}
@@ -98,23 +103,6 @@ export function GuidelinesSection() {
               </div>
             );
           })}
-        </div>
-
-        {/* Participant Acknowledgement Notice */}
-        <div className="mt-8 sm:mt-10 bg-white border border-[#D9E4F2] rounded-xl p-6 sm:p-7 shadow-2xs">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="w-11 h-11 rounded-lg bg-[#EFF6FF] border border-[#D9E4F2] flex items-center justify-center shrink-0">
-              <CheckCircle2 className="w-5 h-5 text-[#0D9488]" />
-            </div>
-            <div className="space-y-1.5 flex-1">
-              <h4 className="text-base font-bold text-[#174789]">
-                Participant Acknowledgement
-              </h4>
-              <p className="text-[13.5px] text-[#475569] leading-relaxed">
-                By registering for an AVISHKAR event, participants acknowledge that they have reviewed the applicable event guidelines and agree to comply with the published requirements. Participants are responsible for ensuring the accuracy of their submitted information and meeting all applicable deadlines and participation conditions.
-              </p>
-            </div>
-          </div>
         </div>
       </Container>
     </section>

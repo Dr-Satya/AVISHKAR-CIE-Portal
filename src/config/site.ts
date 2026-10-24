@@ -12,8 +12,12 @@ export interface SiteConfig {
   year: number;
   branding: {
     primaryNavy: string;
-    secondaryBlue: string;
-    accentTeal: string;
+    secondaryNavy: string;
+    interactiveNavy: string;
+    elegantGold: string;
+    darkGold: string;
+    secondaryBlue?: string;
+    accentTeal?: string;
     logoAvishkar: string;
     logoUniversity: string;
   };
@@ -33,9 +37,13 @@ export const siteConfig: SiteConfig = {
   supportEmailNote: "Official contact email and helpline will be announced upon confirmation.",
   year: 2026,
   branding: {
-    primaryNavy: "#0B1F3A",
-    secondaryBlue: "#2563EB",
-    accentTeal: "#0D9488",
+    primaryNavy: "#0A2047",
+    secondaryNavy: "#132E57",
+    interactiveNavy: "#19365F",
+    elegantGold: "#D4AF37",
+    darkGold: "#B89125",
+    secondaryBlue: "#0A2047",
+    accentTeal: "#D4AF37",
     logoAvishkar: "/images/avishkar-logo.png",
     logoUniversity: "/images/gd-goenka-logo.png",
   },

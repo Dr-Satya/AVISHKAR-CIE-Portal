@@ -7,11 +7,13 @@ import {
   validatePreviousWork,
   validateClubEngagement,
   validatePaymentInfo,
+  validateStartupDetails,
 } from "@/lib/validations/registration";
 import { getSupabaseConfigStatus } from "@/lib/supabase";
 import { paymentConfig, isOfficialPaymentConfigured } from "@/config/payment";
 import { getStoredRegistrations, saveStoredRegistration, saveStoredNotification } from "@/lib/dataStore";
 import { RegistrationRecord } from "@/types/admin";
+import { TeamMemberEntry } from "@/types/registration";
 
 export async function POST(request: NextRequest) {
   try {
@@ -53,6 +55,46 @@ export async function POST(request: NextRequest) {
     const technologiesUsed = (formData.get("technologiesUsed") as string) || "";
     const projectLink = (formData.get("projectLink") as string) || "";
 
+    // Optional Startup & Innovation Details (Mentor incubation form)
+    const hasStartupOrProject = (formData.get("hasStartupOrProject") as string) || "";
+    const teamLeaderName = (formData.get("teamLeaderName") as string) || "";
+    const teamLeaderEnrollment = (formData.get("teamLeaderEnrollment") as string) || "";
+    const teamLeaderEmail = (formData.get("teamLeaderEmail") as string) || "";
+    const teamLeaderContact = (formData.get("teamLeaderContact") as string) || "";
+    const studentRole = (formData.get("studentRole") as string) || "";
+    const teamStructure = (formData.get("teamStructure") as string) || "";
+
+    let teamMembers: TeamMemberEntry[] = [];
+    const rawTeamMembers = formData.get("teamMembers");
+    if (typeof rawTeamMembers === "string" && rawTeamMembers.trim()) {
+      try {
+        const parsed = JSON.parse(rawTeamMembers);
+        if (Array.isArray(parsed)) teamMembers = parsed;
+      } catch {
+        // invalid JSON
+      }
+    }
+
+    const startupTitle = (formData.get("startupTitle") as string) || "";
+    const startupDetails = (formData.get("startupDetails") as string) || "";
+    const startupStage = (formData.get("startupStage") as string) || "";
+
+    let supportNeeded: string[] = [];
+    const rawSupportNeeded = formData.get("supportNeeded");
+    if (typeof rawSupportNeeded === "string" && rawSupportNeeded.trim()) {
+      try {
+        const parsed = JSON.parse(rawSupportNeeded);
+        if (Array.isArray(parsed)) {
+          supportNeeded = parsed;
+        } else {
+          supportNeeded = rawSupportNeeded.split(",").map((s) => s.trim()).filter(Boolean);
+        }
+      } catch {
+        supportNeeded = rawSupportNeeded.split(",").map((s) => s.trim()).filter(Boolean);
+      }
+    }
+    const otherSupportDetails = (formData.get("otherSupportDetails") as string) || "";
+
     const reasonForJoining = (formData.get("reasonForJoining") as string) || "";
     const leadershipInterest = (formData.get("leadershipInterest") as string) || "";
 
@@ -85,6 +127,22 @@ export async function POST(request: NextRequest) {
       projectLink,
     });
 
+    const startupErrors = validateStartupDetails({
+      hasStartupOrProject: (hasStartupOrProject as any) || undefined,
+      teamLeaderName,
+      teamLeaderEnrollment,
+      teamLeaderEmail,
+      teamLeaderContact,
+      studentRole: (studentRole as any) || undefined,
+      teamStructure: (teamStructure as any) || undefined,
+      teamMembers,
+      startupTitle,
+      startupDetails,
+      startupStage: (startupStage as any) || undefined,
+      supportNeeded,
+      otherSupportDetails,
+    });
+
     const clubErrors = validateClubEngagement({
       reasonForJoining,
       leadershipInterest: leadershipInterest as any,
@@ -100,6 +158,7 @@ export async function POST(request: NextRequest) {
       ...personalErrors,
       ...academicErrors,
       ...previousWorkErrors,
+      ...startupErrors,
       ...clubErrors,
       ...paymentErrors,
     };
@@ -281,12 +340,27 @@ export async function POST(request: NextRequest) {
       branch: program.trim(),
       academic_year: null,
 
-      // Previous Work / Startup Details (Optional)
-      previous_work_description: previousWorkDescription.trim() || null,
-      project_name: projectName.trim() || null,
-      project_role: projectRole.trim() || null,
+      // Previous Work / Startup Details (Optional & backward compatible)
+      previous_work_description: (previousWorkDescription.trim() || startupDetails.trim()) || null,
+      project_name: (projectName.trim() || startupTitle.trim()) || null,
+      project_role: (projectRole.trim() || studentRole.trim()) || null,
       technologies_used: technologiesUsed.trim() || null,
       project_link: projectLink.trim() || null,
+
+      // Startup & Innovation Details (Mentor incubation form)
+      has_startup_or_project: hasStartupOrProject.trim() || null,
+      team_leader_name: teamLeaderName.trim() || null,
+      team_leader_enrollment: teamLeaderEnrollment.trim() || null,
+      team_leader_email: teamLeaderEmail.trim() || null,
+      team_leader_contact: teamLeaderContact.trim() || null,
+      student_role: studentRole.trim() || null,
+      team_structure: teamStructure.trim() || null,
+      team_members: teamMembers.length > 0 ? teamMembers : null,
+      startup_title: startupTitle.trim() || null,
+      startup_details: startupDetails.trim() || null,
+      startup_stage: startupStage.trim() || null,
+      support_needed: supportNeeded.length > 0 ? supportNeeded : null,
+      other_support_details: otherSupportDetails.trim() || null,
 
       reason_for_joining: reasonForJoining.trim(),
       leadership_interest: leadershipInterest.trim(),
@@ -328,7 +402,67 @@ export async function POST(request: NextRequest) {
 
     // 3. Insert record into Supabase registrations table
     const insertUrl = `${supabaseUrl}/rest/v1/registrations`;
-    const insertRes = await fetch(insertUrl, {
+    const basePayload = {
+      registration_number: regNumber,
+      student_name: studentName.trim(),
+      email: email.trim().toLowerCase(),
+      contact_number: contactNumber.trim(),
+      gender: gender.trim() || null,
+      dob: dob.trim() || null,
+      student_id: normalizedStudentId,
+
+      // Official Academic Taxonomy
+      school: school.trim(),
+      program: program.trim(),
+      year_of_joining: yearOfJoining.trim(),
+
+      // Previous Work / Startup Details (Optional)
+      previous_work_description: (previousWorkDescription.trim() || startupDetails.trim()) || null,
+      project_name: (projectName.trim() || startupTitle.trim()) || null,
+      project_role: (projectRole.trim() || studentRole.trim()) || null,
+      technologies_used: technologiesUsed.trim() || null,
+      project_link: projectLink.trim() || null,
+
+      // Startup & Innovation Details
+      has_startup_or_project: hasStartupOrProject.trim() || null,
+      team_leader_name: teamLeaderName.trim() || null,
+      team_leader_enrollment: teamLeaderEnrollment.trim() || null,
+      team_leader_email: teamLeaderEmail.trim() || null,
+      team_leader_contact: teamLeaderContact.trim() || null,
+      student_role: studentRole.trim() || null,
+      team_structure: teamStructure.trim() || null,
+      team_members: teamMembers.length > 0 ? teamMembers : null,
+      startup_title: startupTitle.trim() || null,
+      startup_details: startupDetails.trim() || null,
+      startup_stage: startupStage.trim() || null,
+      support_needed: supportNeeded.length > 0 ? supportNeeded : null,
+      other_support_details: otherSupportDetails.trim() || null,
+
+      // Club Engagement
+      reason_for_joining: reasonForJoining.trim(),
+      leadership_interest: leadershipInterest.trim(),
+
+      // Form Version Tracking (explicitly marks new registrations)
+      form_version: "v2-official",
+
+      // Backward-compatible legacy column mirrors (academic_year explicitly NULL)
+      course: program.trim(),
+      branch: program.trim(),
+      academic_year: null,
+
+      // Payment info
+      transaction_id: normalizedTransactionId,
+      payment_date: paymentDate.trim(),
+      fee_amount: paymentConfig.feeAmount ?? 500,
+      receipt_file_path: receiptFilePath,
+      receipt_file_name: receiptFile?.name || "receipt",
+      receipt_file_size: receiptFile?.size || 0,
+      receipt_mime_type: receiptFile?.type || "application/octet-stream",
+      remarks: remarks.trim() || null,
+      payment_status: "pending_verification",
+    };
+
+    let insertRes = await fetch(insertUrl, {
       method: "POST",
       headers: {
         apikey: supabaseKey,
@@ -336,50 +470,7 @@ export async function POST(request: NextRequest) {
         "Content-Type": "application/json",
         Prefer: "return=minimal",
       },
-      body: JSON.stringify({
-        registration_number: regNumber,
-        student_name: studentName.trim(),
-        email: email.trim().toLowerCase(),
-        contact_number: contactNumber.trim(),
-        gender: gender.trim() || null,
-        dob: dob.trim() || null,
-        student_id: normalizedStudentId,
-
-        // Official Academic Taxonomy
-        school: school.trim(),
-        program: program.trim(),
-        year_of_joining: yearOfJoining.trim(),
-
-        // Previous Work / Startup Details (Optional)
-        previous_work_description: previousWorkDescription.trim() || null,
-        project_name: projectName.trim() || null,
-        project_role: projectRole.trim() || null,
-        technologies_used: technologiesUsed.trim() || null,
-        project_link: projectLink.trim() || null,
-
-        // Club Engagement
-        reason_for_joining: reasonForJoining.trim(),
-        leadership_interest: leadershipInterest.trim(),
-
-        // Form Version Tracking (explicitly marks new registrations)
-        form_version: "v2-official",
-
-        // Backward-compatible legacy column mirrors (academic_year explicitly NULL)
-        course: program.trim(),
-        branch: program.trim(),
-        academic_year: null,
-
-        // Payment info
-        transaction_id: normalizedTransactionId,
-        payment_date: paymentDate.trim(),
-        fee_amount: paymentConfig.feeAmount ?? 500,
-        receipt_file_path: receiptFilePath,
-        receipt_file_name: receiptFile?.name || "receipt",
-        receipt_file_size: receiptFile?.size || 0,
-        receipt_mime_type: receiptFile?.type || "application/octet-stream",
-        remarks: remarks.trim() || null,
-        payment_status: "pending_verification",
-      }),
+      body: JSON.stringify(basePayload),
     });
 
     if (!insertRes.ok) {
@@ -466,6 +557,205 @@ export async function POST(request: NextRequest) {
         success: false,
         message: "An internal server error occurred while processing the registration.",
       },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== "object") {
+      return NextResponse.json(
+        { success: false, message: "Invalid request payload. Expected JSON body." },
+        { status: 400 }
+      );
+    }
+
+    const {
+      registrationNumber,
+      studentId,
+      email,
+      hasStartupOrProject,
+      teamLeaderName,
+      teamLeaderEnrollment,
+      teamLeaderEmail,
+      teamLeaderContact,
+      studentRole,
+      teamStructure,
+      teamMembers,
+      startupTitle,
+      startupDetails,
+      startupStage,
+      supportNeeded,
+      otherSupportDetails,
+      technologiesUsed,
+    } = body;
+
+    const normalizedRegNumber = (registrationNumber || "").trim().toUpperCase();
+    if (!normalizedRegNumber) {
+      return NextResponse.json(
+        { success: false, message: "Registration number is required to update details." },
+        { status: 400 }
+      );
+    }
+
+    // Identity verification: either studentId OR email must be provided to verify ownership
+    const cleanStudentId = (studentId || "").trim().toLowerCase();
+    const cleanEmail = (email || "").trim().toLowerCase();
+
+    if (!cleanStudentId && !cleanEmail) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Authentication failed. Please provide your Student ID or Email to verify ownership.",
+        },
+        { status: 401 }
+      );
+    }
+
+    const storedRegistrations = getStoredRegistrations();
+    const existingIndex = storedRegistrations.findIndex(
+      (r) => r.registration_number?.toUpperCase() === normalizedRegNumber
+    );
+
+    if (existingIndex === -1) {
+      return NextResponse.json(
+        { success: false, message: "No registration found matching that registration number." },
+        { status: 404 }
+      );
+    }
+
+    const existing = storedRegistrations[existingIndex];
+
+    // Verify ownership: studentId OR email must match
+    const matchesStudentId = cleanStudentId && existing.student_id?.toLowerCase() === cleanStudentId;
+    const matchesEmail = cleanEmail && existing.email?.toLowerCase() === cleanEmail;
+
+    if (!matchesStudentId && !matchesEmail) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Access denied. The provided Student ID or Email does not match this registration record.",
+        },
+        { status: 403 }
+      );
+    }
+
+    // Validate startup details using the same validator
+    const startupErrors = validateStartupDetails({
+      hasStartupOrProject: (hasStartupOrProject as any) || undefined,
+      teamLeaderName,
+      teamLeaderEnrollment,
+      teamLeaderEmail,
+      teamLeaderContact,
+      studentRole: (studentRole as any) || undefined,
+      teamStructure: (teamStructure as any) || undefined,
+      teamMembers: Array.isArray(teamMembers) ? teamMembers : [],
+      startupTitle,
+      startupDetails,
+      startupStage: (startupStage as any) || undefined,
+      supportNeeded: Array.isArray(supportNeeded) ? supportNeeded : [],
+      otherSupportDetails,
+    });
+
+    if (Object.keys(startupErrors).length > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          errors: startupErrors,
+          message: "Validation failed for startup details.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Safely update only startup fields; all payment, verification, and academic data remain strictly unchanged
+    const updatedRecord: RegistrationRecord = {
+      ...existing,
+      has_startup_or_project: hasStartupOrProject ? hasStartupOrProject.trim() : null,
+      team_leader_name: teamLeaderName ? teamLeaderName.trim() : null,
+      team_leader_enrollment: teamLeaderEnrollment ? teamLeaderEnrollment.trim() : null,
+      team_leader_email: teamLeaderEmail ? teamLeaderEmail.trim() : null,
+      team_leader_contact: teamLeaderContact ? teamLeaderContact.trim() : null,
+      student_role: studentRole ? studentRole.trim() : null,
+      team_structure: teamStructure ? teamStructure.trim() : null,
+      team_members: Array.isArray(teamMembers) && teamMembers.length > 0 ? teamMembers : null,
+      startup_title: startupTitle ? startupTitle.trim() : null,
+      startup_details: startupDetails ? startupDetails.trim() : null,
+      startup_stage: startupStage ? startupStage.trim() : null,
+      support_needed: Array.isArray(supportNeeded) && supportNeeded.length > 0 ? supportNeeded : null,
+      other_support_details: otherSupportDetails ? otherSupportDetails.trim() : null,
+      technologies_used: technologiesUsed ? technologiesUsed.trim() : existing.technologies_used,
+
+      // Bridge legacy fields
+      project_name: startupTitle ? startupTitle.trim() : existing.project_name,
+      project_role: studentRole ? studentRole.trim() : existing.project_role,
+      previous_work_description: startupDetails ? startupDetails.trim() : existing.previous_work_description,
+
+      updated_at: new Date().toISOString(),
+    };
+
+    saveStoredRegistration(updatedRecord);
+
+    // Sync to Supabase if configured
+    const configStatus = getSupabaseConfigStatus();
+    if (configStatus.hasUrl && (configStatus.hasServiceRoleKey || configStatus.hasAnonKey)) {
+      try {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+        const supabaseKey =
+          process.env.SUPABASE_SERVICE_ROLE_KEY ||
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+          process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+
+        const updateUrl = `${supabaseUrl}/rest/v1/registrations?registration_number=eq.${encodeURIComponent(
+          existing.registration_number
+        )}`;
+
+        await fetch(updateUrl, {
+          method: "PATCH",
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+            "Content-Type": "application/json",
+            Prefer: "return=minimal",
+          },
+          body: JSON.stringify({
+            has_startup_or_project: updatedRecord.has_startup_or_project,
+            team_leader_name: updatedRecord.team_leader_name,
+            team_leader_enrollment: updatedRecord.team_leader_enrollment,
+            team_leader_email: updatedRecord.team_leader_email,
+            team_leader_contact: updatedRecord.team_leader_contact,
+            student_role: updatedRecord.student_role,
+            team_structure: updatedRecord.team_structure,
+            team_members: updatedRecord.team_members,
+            startup_title: updatedRecord.startup_title,
+            startup_details: updatedRecord.startup_details,
+            startup_stage: updatedRecord.startup_stage,
+            support_needed: updatedRecord.support_needed,
+            other_support_details: updatedRecord.other_support_details,
+            project_name: updatedRecord.project_name,
+            project_role: updatedRecord.project_role,
+            previous_work_description: updatedRecord.previous_work_description,
+            updated_at: updatedRecord.updated_at,
+          }),
+        });
+      } catch (syncErr) {
+        console.warn("Supabase PATCH sync failed, persisted in local store:", syncErr);
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Startup and innovation details updated successfully.",
+      registrationNumber: existing.registration_number,
+    });
+  } catch (error: any) {
+    console.error("Unhandled registration PATCH error:", error);
+    return NextResponse.json(
+      { success: false, message: "An internal server error occurred while updating registration." },
       { status: 500 }
     );
   }

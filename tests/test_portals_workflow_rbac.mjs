@@ -166,6 +166,18 @@ async function runTests() {
   // STEP 4: President can approve or reject a pending proposal
   // ---------------------------------------------------------------------------
   console.log("\n[4/13] Testing President proposal decision workflow...");
+  // VP first approves logistical feasibility
+  const vpPreApproveRes = await fetch(`${BASE_URL}/api/admin/events`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Cookie: vpCookie },
+    body: JSON.stringify({
+      eventId: draftEventId,
+      action: "vp_approve",
+      comment: "Feasibility verified and venue allocated.",
+    }),
+  });
+  assert(vpPreApproveRes.ok, "VP approves proposal logistical feasibility (200)");
+
   // President approves the member's submitted proposal
   const approveRes = await fetch(`${BASE_URL}/api/admin/events`, {
     method: "PATCH",
@@ -367,6 +379,7 @@ async function runTests() {
   assert(vpPaymentRes.status === 403, "VP cannot verify payments (HTTP 403 ADMIN_REQUIRED_FOR_PAYMENTS)");
 
   // President also cannot verify payments
+  await new Promise((r) => setTimeout(r, 150));
   const presPaymentRes = await fetch(`${BASE_URL}/api/admin/payments/verify`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Cookie: presidentCookie },
@@ -381,6 +394,7 @@ async function runTests() {
   // STEP 9: Admin can publish eligible approved events
   // ---------------------------------------------------------------------------
   console.log("\n[9/13] Testing Admin event publishing...");
+  await new Promise((r) => setTimeout(r, 250));
   const adminPublishRes = await fetch(`${BASE_URL}/api/admin/events`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json", Cookie: adminCookie },
@@ -422,6 +436,7 @@ async function runTests() {
   assert(unauthGetRes.status === 401, "Unauthenticated GET /api/admin/events returns HTTP 401");
 
   // Unauthenticated POST
+  await new Promise((r) => setTimeout(r, 150));
   const unauthPostRes = await fetch(`${BASE_URL}/api/admin/tasks`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -430,6 +445,7 @@ async function runTests() {
   assert(unauthPostRes.status === 401, "Unauthenticated POST /api/admin/tasks returns HTTP 401");
 
   // Member assigning task
+  await new Promise((r) => setTimeout(r, 150));
   const memberAssignRes = await fetch(`${BASE_URL}/api/admin/tasks`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Cookie: memberCookie },
@@ -445,6 +461,7 @@ async function runTests() {
   // STEP 12: Existing student registration and payment verification still work
   // ---------------------------------------------------------------------------
   console.log("\n[12/13] Testing student registration and payment verification preservation...");
+  await new Promise((r) => setTimeout(r, 400));
   // Register a student using FormData
   const studentDummyId = `TEST_WF_${Date.now()}`;
   const regFormData = new FormData();

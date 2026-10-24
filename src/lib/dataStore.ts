@@ -15,6 +15,10 @@ import {
   ApprovalHistoryEntry,
   GoogleFormResponseRecord,
   EventPhotoRecord,
+  EventReadinessItem,
+  EventReadinessSummary,
+  OperationalBlockerRecord,
+  ReadinessCategory,
 } from "@/types/admin";
 
 export interface CouncilCredential {
@@ -38,10 +42,17 @@ export interface StoreData {
   notifications?: NotificationRecord[];
   googleFormResponses?: GoogleFormResponseRecord[];
   photos?: EventPhotoRecord[];
+  readinessItems?: EventReadinessItem[];
+  blockers?: OperationalBlockerRecord[];
 }
 
 const DATA_DIR = path.join(process.cwd(), ".data");
 const STORE_FILE = path.join(DATA_DIR, "avishkar_store.json");
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __avishkar_memory_store: StoreData | undefined;
+}
 
 function hashPassword(password: string, salt: string): string {
   return crypto.createHash("sha256").update(salt + password).digest("hex");
@@ -681,6 +692,234 @@ function getInitialStore(): StoreData {
     },
   ];
 
+  const initialReadinessItems: EventReadinessItem[] = [
+    // evt-001 (Hack-a-Sol)
+    {
+      id: "rdy-001-01",
+      eventId: "evt-001",
+      category: "venue_seating",
+      title: "Auditorium & Lab 3 Seating Allocation (120 Capacity)",
+      description: "Dual-row workstation desk layout with dedicated power rails.",
+      isMandatory: true,
+      status: "completed",
+      responsibleMemberId: "mem-003",
+      responsibleMemberName: "Technical Track Coordinator (Member)",
+      deadline: "2026-10-20",
+      completedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+      completedBy: "Technical Track Coordinator",
+      createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+      updatedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+    },
+    {
+      id: "rdy-001-02",
+      eventId: "evt-001",
+      category: "equipment_technical",
+      title: "Dedicated Gigabit Wi-Fi SSIDs & Core Switch Uplinks",
+      description: "Isolated VLAN for hackathon attendees with priority bandwidth shaping.",
+      isMandatory: true,
+      status: "completed",
+      responsibleMemberId: "mem-003",
+      responsibleMemberName: "Technical Track Coordinator (Member)",
+      deadline: "2026-10-21",
+      completedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+      completedBy: "Technical Track Coordinator",
+      createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+      updatedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+    },
+    {
+      id: "rdy-001-03",
+      eventId: "evt-001",
+      category: "committee_volunteers",
+      title: "Mentor Roster & 24h Evaluator Shift Briefings",
+      description: "Confirmation of faculty mentors and industry jury members.",
+      isMandatory: true,
+      status: "completed",
+      responsibleMemberId: "mem-002",
+      responsibleMemberName: "Vice President Council (Operations Co-Lead)",
+      deadline: "2026-10-22",
+      completedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+      completedBy: "Vice President Council",
+      createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+      updatedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+    },
+    {
+      id: "rdy-001-04",
+      eventId: "evt-001",
+      category: "logistics_materials",
+      title: "Participant ID Badges & Lanyards Printed",
+      description: "Color-coded participant, mentor, and organizer pass badges.",
+      isMandatory: false,
+      status: "completed",
+      responsibleMemberId: "mem-001",
+      responsibleMemberName: "Organizing Administrator",
+      deadline: "2026-10-22",
+      completedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+      completedBy: "Organizing Administrator",
+      createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+      updatedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+    },
+    {
+      id: "rdy-001-05",
+      eventId: "evt-001",
+      category: "scheduling_coordination",
+      title: "24-Hour Event Timeline & Emergency Lab Access Protocols",
+      description: "Signed campus safety clearance and night-pass protocols.",
+      isMandatory: true,
+      status: "completed",
+      responsibleMemberId: "mem-002",
+      responsibleMemberName: "Vice President Council (Operations Co-Lead)",
+      deadline: "2026-10-22",
+      completedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+      completedBy: "Vice President Council",
+      createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+      updatedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+    },
+    // evt-002 (RoboWars)
+    {
+      id: "rdy-002-01",
+      eventId: "evt-002",
+      category: "venue_seating",
+      title: "Polycarbonate Arena Containment Enclosure Certified",
+      description: "8mm polycarbonate double-wall impact containment inspection.",
+      isMandatory: true,
+      status: "completed",
+      responsibleMemberId: "mem-003",
+      responsibleMemberName: "Technical Track Coordinator (Member)",
+      deadline: "2026-10-20",
+      completedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+      completedBy: "Technical Track Coordinator",
+      createdAt: new Date(Date.now() - 86400000 * 4).toISOString(),
+      updatedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+    },
+    {
+      id: "rdy-002-02",
+      eventId: "evt-002",
+      category: "equipment_technical",
+      title: "Master Wireless Emergency Arena Kill-Switch Certified",
+      description: "Independent RF cutoff tested on both 433MHz and 2.4GHz bands.",
+      isMandatory: true,
+      status: "completed",
+      responsibleMemberId: "mem-003",
+      responsibleMemberName: "Technical Track Coordinator (Member)",
+      deadline: "2026-10-21",
+      completedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+      completedBy: "Technical Track Coordinator",
+      createdAt: new Date(Date.now() - 86400000 * 4).toISOString(),
+      updatedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+    },
+    {
+      id: "rdy-002-03",
+      eventId: "evt-002",
+      category: "logistics_materials",
+      title: "Spare Lexan Replacement Shields & Steel Floor Rivets",
+      description: "Reserve panels for arena maintenance between combat brackets.",
+      isMandatory: false,
+      status: "blocked",
+      responsibleMemberId: "mem-001",
+      responsibleMemberName: "Organizing Administrator",
+      deadline: "2026-10-21",
+      notes: "Freight delayed by supplier; backup vendor contacted.",
+      createdAt: new Date(Date.now() - 86400000 * 4).toISOString(),
+      updatedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+    },
+    {
+      id: "rdy-002-04",
+      eventId: "evt-002",
+      category: "equipment_technical",
+      title: "LiPo Battery Fire Safe Containment & Charging Bench",
+      description: "Explosion-proof charging boxes and dry chemical fire extinguishers.",
+      isMandatory: true,
+      status: "pending",
+      responsibleMemberId: "mem-003",
+      responsibleMemberName: "Technical Track Coordinator (Member)",
+      deadline: "2026-10-23",
+      createdAt: new Date(Date.now() - 86400000 * 4).toISOString(),
+      updatedAt: new Date(Date.now() - 86400000 * 4).toISOString(),
+    },
+    {
+      id: "rdy-002-05",
+      eventId: "evt-002",
+      category: "committee_volunteers",
+      title: "Scrutineers & Pit Marshals Safety Briefing",
+      description: "Weight class calibration and fail-safe radio check training.",
+      isMandatory: true,
+      status: "completed",
+      responsibleMemberId: "mem-002",
+      responsibleMemberName: "Vice President Council (Operations Co-Lead)",
+      deadline: "2026-10-22",
+      completedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+      completedBy: "Vice President Council",
+      createdAt: new Date(Date.now() - 86400000 * 4).toISOString(),
+      updatedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+    },
+  ];
+
+  const initialBlockers: OperationalBlockerRecord[] = [
+    {
+      id: "blk-001",
+      eventId: "evt-002",
+      eventTitle: "RoboWars: Clash of Titans",
+      taskId: "tsk-002",
+      taskTitle: "Polycarbonate Arena Inspection & Emergency Cutoff Test",
+      title: "Delayed Shipment of Heavy-Duty Lexan Panels",
+      description: "Supplier reported a 48-hour freight delay on 8mm polycarbonate replacement panels required for arena blast shield reinforcement.",
+      severity: "high",
+      operationalImpact: "Spare Lexan shield needed before live combat rounds; backup supplier quotation obtained.",
+      reportedBy: "Technical Track Coordinator (Member)",
+      reportedByEmail: "member@gdgoenka.ac.in",
+      reportedByRole: "AVISHKAR Member",
+      reportedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+      assignedToId: "mem-002",
+      assignedToName: "Vice President Council (Operations Co-Lead)",
+      assignedToEmail: "vp@gdgoenka.ac.in",
+      resolutionDeadline: "2026-10-22",
+      status: "open",
+      history: [
+        {
+          timestamp: new Date(Date.now() - 86400000 * 2).toISOString(),
+          actorName: "Technical Track Coordinator (Member)",
+          actorRole: "AVISHKAR Member",
+          action: "BLOCKER_REPORTED",
+          notes: "Reported supplier logistics delay.",
+        },
+      ],
+    },
+    {
+      id: "blk-002",
+      eventId: "evt-001",
+      eventTitle: "Hack-a-Sol: 24h Innovation Hackathon",
+      title: "Subnet IP Exhaustion in Lab 3 Dual-Band Router",
+      description: "DHCP scope in Lab 3 was configured for /26 (64 IPs), but expected participant devices plus mentors exceed 140 devices.",
+      severity: "critical",
+      operationalImpact: "Participants will fail to obtain IP addresses during initial registration and repository checkout.",
+      reportedBy: "Vice President Council",
+      reportedByEmail: "vp@gdgoenka.ac.in",
+      reportedByRole: "Vice President",
+      reportedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+      assignedToId: "mem-003",
+      assignedToName: "Technical Track Coordinator (Member)",
+      assignedToEmail: "member@gdgoenka.ac.in",
+      resolutionDeadline: "2026-10-21",
+      status: "in_progress",
+      history: [
+        {
+          timestamp: new Date(Date.now() - 86400000 * 1).toISOString(),
+          actorName: "Vice President Council",
+          actorRole: "Vice President",
+          action: "BLOCKER_REPORTED",
+          notes: "Identified during network pre-flight testing.",
+        },
+        {
+          timestamp: new Date(Date.now() - 86400000 * 1 + 3600000).toISOString(),
+          actorName: "Technical Track Coordinator (Member)",
+          actorRole: "AVISHKAR Member",
+          action: "STATUS_UPDATED",
+          notes: "Campus IT contacted to expand subnet mask to /24.",
+        },
+      ],
+    },
+  ];
+
   return {
     events: initialEvents,
     forms: initialForms,
@@ -694,6 +933,8 @@ function getInitialStore(): StoreData {
     notifications: initialNotifications,
     googleFormResponses: [],
     photos: [],
+    readinessItems: initialReadinessItems,
+    blockers: initialBlockers,
   };
 }
 
@@ -701,14 +942,26 @@ function getInitialStore(): StoreData {
  * Reads data store from disk with automatic seed creation.
  */
 export function readDataStore(): StoreData {
+  if (globalThis.__avishkar_memory_store) {
+    return globalThis.__avishkar_memory_store;
+  }
   try {
     if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+      try {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+      } catch {
+        // directory may already exist or be locked transiently
+      }
     }
 
     if (!fs.existsSync(STORE_FILE)) {
       const initial = getInitialStore();
-      fs.writeFileSync(STORE_FILE, JSON.stringify(initial, null, 2), "utf8");
+      try {
+        fs.writeFileSync(STORE_FILE, JSON.stringify(initial, null, 2), "utf8");
+      } catch {
+        // ignore write error on read-only environments
+      }
+      globalThis.__avishkar_memory_store = initial;
       return initial;
     }
 
@@ -924,7 +1177,7 @@ export function readDataStore(): StoreData {
       };
     });
 
-    return {
+    const finalStore: StoreData = {
       events: enrichedEvents,
       forms: sanitizedForms,
       formSubmissions: parsed.formSubmissions || [],
@@ -940,10 +1193,22 @@ export function readDataStore(): StoreData {
           : initial.notifications,
       googleFormResponses: parsed.googleFormResponses || [],
       photos: rawPhotos,
+      readinessItems:
+        parsed.readinessItems && parsed.readinessItems.length > 0
+          ? parsed.readinessItems
+          : initial.readinessItems || [],
+      blockers:
+        parsed.blockers && parsed.blockers.length > 0
+          ? parsed.blockers
+          : initial.blockers || [],
     };
+    globalThis.__avishkar_memory_store = finalStore;
+    return finalStore;
   } catch (err) {
     console.error("Error reading data store, using initial seed:", err);
-    return getInitialStore();
+    const initial = getInitialStore();
+    globalThis.__avishkar_memory_store = initial;
+    return initial;
   }
 }
 
@@ -951,9 +1216,14 @@ export function readDataStore(): StoreData {
  * Writes data store to disk atomically.
  */
 export function writeDataStore(data: StoreData): void {
+  globalThis.__avishkar_memory_store = data;
   try {
     if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+      try {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+      } catch {
+        // directory may already exist or be locked transiently
+      }
     }
     const content = JSON.stringify(data, null, 2);
     for (let attempt = 0; attempt < 5; attempt++) {
@@ -970,8 +1240,8 @@ export function writeDataStore(data: StoreData): void {
         throw err;
       }
     }
-  } catch (err) {
-    console.error("Error writing data store:", err);
+  } catch {
+    // Filesystem write errors in read-only / bundle environments are safely ignored
   }
 }
 
@@ -1358,20 +1628,43 @@ export function getStoredNotifications(role?: string, email?: string): Notificat
   if (!role && !email) return all;
   return all.filter((n) => {
     if (n.targetRole === "all") return true;
+    if (n.targetEmail) {
+      return email ? n.targetEmail.toLowerCase() === email.toLowerCase() : false;
+    }
     if (role && n.targetRole === role) return true;
     if (email && n.targetEmail && n.targetEmail.toLowerCase() === email.toLowerCase()) return true;
     return false;
   });
 }
 
-export function saveStoredNotification(notif: NotificationRecord): void {
+export function saveStoredNotification(notif: NotificationRecord): boolean {
   const store = readDataStore();
   if (!store.notifications) store.notifications = [];
+
+  // Prevent duplicate unread notifications within 2 hours
+  const twoHoursAgo = Date.now() - 2 * 3600 * 1000;
+  const isDuplicate = store.notifications.some((n) => {
+    const isSameTargetRole = n.targetRole === notif.targetRole;
+    const isSameTargetEmail =
+      (!notif.targetEmail && !n.targetEmail) ||
+      (Boolean(n.targetEmail) && Boolean(notif.targetEmail) && n.targetEmail?.toLowerCase() === notif.targetEmail?.toLowerCase());
+    const isSameTitle = n.title === notif.title;
+    const isSameType = n.type === notif.type;
+    const isSameLink = n.link === notif.link;
+    const isRecent = new Date(n.createdAt).getTime() > twoHoursAgo;
+    return isSameTargetRole && isSameTargetEmail && isSameTitle && isSameType && isSameLink && isRecent && !n.read;
+  });
+
+  if (isDuplicate) {
+    return false;
+  }
+
   store.notifications.unshift(notif);
-  if (store.notifications.length > 100) {
-    store.notifications = store.notifications.slice(0, 100);
+  if (store.notifications.length > 150) {
+    store.notifications = store.notifications.slice(0, 150);
   }
   writeDataStore(store);
+  return true;
 }
 
 export function markStoredNotificationRead(id: string): void {
@@ -1647,6 +1940,261 @@ export function updateStoredPhotoCaption(id: string, caption: string): EventPhot
 
   writeDataStore(store);
   return store.photos[idx];
+}
+
+// -----------------------------------------------------------------------------
+// EVENT READINESS TRACKER STORAGE HELPERS
+// -----------------------------------------------------------------------------
+
+export function getStoredReadinessItems(eventId?: string): EventReadinessItem[] {
+  const store = readDataStore();
+  const all = store.readinessItems || [];
+  if (!eventId || eventId === "ALL") return all;
+  return all.filter((i) => i.eventId === eventId);
+}
+
+export function saveStoredReadinessItem(item: EventReadinessItem): void {
+  const store = readDataStore();
+  if (!store.readinessItems) store.readinessItems = [];
+  const idx = store.readinessItems.findIndex((i) => i.id === item.id);
+  if (idx >= 0) {
+    store.readinessItems[idx] = item;
+  } else {
+    store.readinessItems.unshift(item);
+  }
+  writeDataStore(store);
+}
+
+export function deleteStoredReadinessItem(itemId: string): void {
+  const store = readDataStore();
+  if (!store.readinessItems) return;
+  store.readinessItems = store.readinessItems.filter((i) => i.id !== itemId);
+  writeDataStore(store);
+}
+
+export function ensureDefaultReadinessChecklist(eventId: string, eventTitle: string): EventReadinessItem[] {
+  const store = readDataStore();
+  if (!store.readinessItems) store.readinessItems = [];
+  const existing = store.readinessItems.filter((i) => i.eventId === eventId);
+  if (existing.length > 0) return existing;
+
+  const defaultTemplates: Array<{
+    category: ReadinessCategory;
+    title: string;
+    description: string;
+    isMandatory: boolean;
+    daysOffset: number;
+  }> = [
+    {
+      category: "venue_seating",
+      title: `${eventTitle} — Venue Space & Desk Layout Allocation`,
+      description: "Verify physical room capacity, participant desks, and seating arrangement.",
+      isMandatory: true,
+      daysOffset: 3,
+    },
+    {
+      category: "venue_seating",
+      title: `${eventTitle} — Stage AV & Acoustic Balance Verification`,
+      description: "Check projector HDMI handshakes, stage audio monitors, and presentation mics.",
+      isMandatory: false,
+      daysOffset: 4,
+    },
+    {
+      category: "equipment_technical",
+      title: `${eventTitle} — High-Speed Technical Network Infrastructure`,
+      description: "Dedicated Wi-Fi SSID configuration, subnets, and uplink bandwidth allocation.",
+      isMandatory: true,
+      daysOffset: 4,
+    },
+    {
+      category: "equipment_technical",
+      title: `${eventTitle} — Master Electrical Drops & UPS Backup Rails`,
+      description: "Power surge distribution strips tested at participant stations.",
+      isMandatory: true,
+      daysOffset: 5,
+    },
+    {
+      category: "committee_volunteers",
+      title: `${eventTitle} — Lead Track Coordinator & Host Briefing`,
+      description: "Assign stage anchors, time-keepers, and technical evaluators.",
+      isMandatory: true,
+      daysOffset: 5,
+    },
+    {
+      category: "committee_volunteers",
+      title: `${eventTitle} — Volunteer Crew Shift Rostering & Duties`,
+      description: "Roster active student volunteers for crowd navigation and desk support.",
+      isMandatory: true,
+      daysOffset: 6,
+    },
+    {
+      category: "logistics_materials",
+      title: `${eventTitle} — Badges, Lanyards & Registration Kits`,
+      description: "Printed attendee badges, participant IDs, and rulebook prints ready.",
+      isMandatory: false,
+      daysOffset: 6,
+    },
+    {
+      category: "logistics_materials",
+      title: `${eventTitle} — Trophy Plaques, Medals & Certificates Verified`,
+      description: "Official GD Goenka seal certificates and winner mementos stocked.",
+      isMandatory: true,
+      daysOffset: 7,
+    },
+    {
+      category: "scheduling_coordination",
+      title: `${eventTitle} — Detailed Timeline, Buffer Slots & Team Briefing`,
+      description: "Round schedules, submission deadlines, and jury evaluation windows.",
+      isMandatory: true,
+      daysOffset: 6,
+    },
+    {
+      category: "scheduling_coordination",
+      title: `${eventTitle} — Campus Security & Emergency Standby Coordination`,
+      description: "Campus gate entry permissions and medical first aid station standby.",
+      isMandatory: true,
+      daysOffset: 7,
+    },
+  ];
+
+  const now = Date.now();
+  const createdItems: EventReadinessItem[] = defaultTemplates.map((t, idx) => {
+    const deadline = new Date(now + t.daysOffset * 86400000).toISOString().split("T")[0];
+    return {
+      id: `rdy-${eventId}-${idx + 1}-${Date.now()}`,
+      eventId,
+      category: t.category,
+      title: t.title,
+      description: t.description,
+      isMandatory: t.isMandatory,
+      status: "pending",
+      deadline,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+  });
+
+  store.readinessItems.push(...createdItems);
+  writeDataStore(store);
+  return createdItems;
+}
+
+export function calculateEventReadiness(eventId: string): EventReadinessSummary {
+  const store = readDataStore();
+  let items = (store.readinessItems || []).filter((i) => i.eventId === eventId);
+  const event = store.events.find((e) => e.id === eventId);
+  const eventTitle = event?.title || "Event";
+
+  if (items.length === 0 && event) {
+    items = ensureDefaultReadinessChecklist(eventId, eventTitle);
+  }
+
+  const today = new Date().toISOString().split("T")[0];
+  const itemsWithComputedOverdue = items.map((item) => {
+    if (item.status === "pending" && item.deadline && item.deadline < today) {
+      return { ...item, status: "overdue" as const };
+    }
+    return item;
+  });
+
+  const totalItems = itemsWithComputedOverdue.length;
+  const completedItems = itemsWithComputedOverdue.filter((i) => i.status === "completed").length;
+  const pendingItems = itemsWithComputedOverdue.filter((i) => i.status === "pending").length;
+  const blockedItems = itemsWithComputedOverdue.filter((i) => i.status === "blocked").length;
+  const overdueItems = itemsWithComputedOverdue.filter((i) => i.status === "overdue").length;
+  const mandatoryItems = itemsWithComputedOverdue.filter((i) => i.isMandatory);
+  const mandatoryCount = mandatoryItems.length;
+  const mandatoryIncomplete = mandatoryItems.filter((i) => i.status !== "completed").length;
+
+  const readinessPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+  const isOperationallyReady = mandatoryIncomplete === 0 && completedItems === totalItems;
+
+  return {
+    eventId,
+    eventTitle,
+    totalItems,
+    completedItems,
+    pendingItems,
+    blockedItems,
+    overdueItems,
+    mandatoryCount,
+    mandatoryIncomplete,
+    readinessPercentage,
+    isOperationallyReady,
+    items: itemsWithComputedOverdue,
+  };
+}
+
+// -----------------------------------------------------------------------------
+// OPERATIONAL BLOCKERS & RISKS STORAGE HELPERS
+// -----------------------------------------------------------------------------
+
+export function getStoredBlockers(eventId?: string, status?: string): OperationalBlockerRecord[] {
+  const store = readDataStore();
+  let blockers = store.blockers || [];
+  if (eventId && eventId !== "ALL") {
+    blockers = blockers.filter((b) => b.eventId === eventId);
+  }
+  if (status && status !== "ALL") {
+    blockers = blockers.filter((b) => b.status === status);
+  }
+  return blockers;
+}
+
+export function saveStoredBlocker(blocker: OperationalBlockerRecord): void {
+  const store = readDataStore();
+  if (!store.blockers) store.blockers = [];
+  const idx = store.blockers.findIndex((b) => b.id === blocker.id);
+  if (idx >= 0) {
+    store.blockers[idx] = blocker;
+  } else {
+    store.blockers.unshift(blocker);
+  }
+  writeDataStore(store);
+}
+
+export function deleteStoredBlocker(blockerId: string): void {
+  const store = readDataStore();
+  if (!store.blockers) return;
+  store.blockers = store.blockers.filter((b) => b.id !== blockerId);
+  writeDataStore(store);
+}
+
+// -----------------------------------------------------------------------------
+// TASK DEPENDENCY & CIRCULAR DEPENDENCY VALIDATION HELPER
+// -----------------------------------------------------------------------------
+
+export function hasCircularDependency(
+  taskId: string,
+  candidatePrerequisiteIds: string[],
+  allTasks: MemberTaskRecord[]
+): boolean {
+  if (candidatePrerequisiteIds.includes(taskId)) {
+    return true; // Direct self-dependency
+  }
+
+  const visited = new Set<string>();
+  const queue = [...candidatePrerequisiteIds];
+
+  while (queue.length > 0) {
+    const currentId = queue.shift()!;
+    if (currentId === taskId) {
+      return true; // Cycle detected
+    }
+    if (!visited.has(currentId)) {
+      visited.add(currentId);
+      const prereqTask = allTasks.find((t) => t.id === currentId);
+      if (prereqTask && Array.isArray(prereqTask.dependsOnTaskIds)) {
+        for (const nextPrereqId of prereqTask.dependsOnTaskIds) {
+          if (!visited.has(nextPrereqId)) {
+            queue.push(nextPrereqId);
+          }
+        }
+      }
+    }
+  }
+
+  return false;
 }
 
 

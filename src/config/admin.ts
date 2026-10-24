@@ -100,7 +100,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     href: "/admin/settings",
     iconName: "Settings",
     description: "Role-based access matrix, audit logs & system setup",
-    allowedRoles: ["President", "Admin"],
+    allowedRoles: ["President"],
   },
 ];
 
@@ -298,13 +298,6 @@ export function getNavItemsForRole(role: AdminRole): AdminNavItem[] {
           href: "/admin/photos",
           iconName: "Images",
           description: "Event photo galleries, cover images & batch uploads",
-          allowedRoles: ["Admin"],
-        },
-        {
-          title: "Settings",
-          href: "/admin/settings",
-          iconName: "Settings",
-          description: "System settings & access configuration",
           allowedRoles: ["Admin"],
         },
       ];

@@ -11,10 +11,9 @@ export default function PresidentLoginPage() {
     <RoleLoginForm
       expectedRole="President"
       roleHeading="President Login"
-      roleSubtitle="Authorized access for the Executive President. Review and approve event proposals, oversee institutional governance, and inspect audit logs."
       roleBadge="Executive Leadership"
       targetDashboard="/admin/president"
-      accentColorClass="text-purple-600 bg-purple-50 border-purple-100"
+      accentColorClass="text-[#0A2047] bg-[#D4AF37]/20 border-[#D4AF37]/40"
     />
   );
 }

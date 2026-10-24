@@ -25,42 +25,42 @@ export function StatCard({
     switch (variant) {
       case "primary":
         return {
-          bg: "bg-blue-50/70",
-          border: "border-blue-200",
-          text: "text-blue-900",
-          iconBg: "bg-blue-600 text-white",
-          badge: "bg-blue-100 text-blue-800",
+          bg: "bg-[#0A2047]/5",
+          border: "border-[#E2E8F0]",
+          text: "text-[#0A2047]",
+          iconBg: "bg-[#0A2047] text-white",
+          badge: "bg-[#0A2047]/10 text-[#0A2047]",
         };
       case "warning":
         return {
-          bg: "bg-amber-50/70",
+          bg: "bg-amber-500/5",
           border: "border-amber-200",
           text: "text-amber-900",
-          iconBg: "bg-amber-500 text-white",
+          iconBg: "bg-[#D97706] text-white",
           badge: "bg-amber-100 text-amber-800",
         };
       case "purple":
         return {
-          bg: "bg-indigo-50/70",
-          border: "border-indigo-200",
-          text: "text-indigo-900",
-          iconBg: "bg-indigo-600 text-white",
-          badge: "bg-indigo-100 text-indigo-800",
+          bg: "bg-[#132E57]/5",
+          border: "border-[#132E57]/20",
+          text: "text-[#132E57]",
+          iconBg: "bg-[#132E57] text-white",
+          badge: "bg-[#132E57]/10 text-[#132E57]",
         };
       case "success":
         return {
-          bg: "bg-emerald-50/70",
+          bg: "bg-emerald-500/5",
           border: "border-emerald-200",
           text: "text-emerald-900",
-          iconBg: "bg-emerald-600 text-white",
+          iconBg: "bg-[#16A34A] text-white",
           badge: "bg-emerald-100 text-emerald-800",
         };
       case "danger":
         return {
-          bg: "bg-rose-50/70",
+          bg: "bg-rose-500/5",
           border: "border-rose-200",
           text: "text-rose-900",
-          iconBg: "bg-rose-600 text-white",
+          iconBg: "bg-[#DC2626] text-white",
           badge: "bg-rose-100 text-rose-800",
         };
     }
@@ -70,16 +70,16 @@ export function StatCard({
 
   const cardContent = (
     <div
-      className={`relative p-5 rounded-xl border bg-white shadow-xs transition-all duration-200 ${
-        href ? "hover:shadow-md hover:border-slate-300 cursor-pointer" : ""
+      className={`relative p-5 rounded-xl border border-[#E2E8F0] bg-white shadow-xs transition-all duration-200 ${
+        href ? "hover:shadow-md hover:border-[#D4AF37]/60 cursor-pointer" : ""
       }`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#64748B]">
             {title}
           </span>
-          <span className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1 font-mono">
+          <span className="text-2xl sm:text-3xl font-bold text-[#172033] tracking-tight mt-1 font-mono">
             {value.toLocaleString()}
           </span>
         </div>
@@ -88,7 +88,7 @@ export function StatCard({
         </div>
       </div>
 
-      <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+      <div className="mt-3 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs text-[#64748B]">
         <span>{subtitle}</span>
         {badgeText && (
           <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${colors.badge}`}>
@@ -96,7 +96,7 @@ export function StatCard({
           </span>
         )}
         {href && (
-          <span className="flex items-center text-blue-600 font-medium hover:underline text-[11px]">
+          <span className="flex items-center text-[#0A2047] font-semibold hover:text-[#D4AF37] text-[11px] transition-colors">
             View list <ArrowUpRight className="w-3 h-3 ml-0.5" />
           </span>
         )}

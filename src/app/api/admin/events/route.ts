@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authorizeAdminRequest, logAdminAction } from "@/lib/adminAuth";
 import { EventRecord, EventStatus } from "@/types/admin";
-import { getStoredEvents, saveStoredEvent, deleteStoredEvent, saveStoredNotification, getEventRegistrationCount } from "@/lib/dataStore";
+import {
+  getStoredEvents,
+  saveStoredEvent,
+  deleteStoredEvent,
+  saveStoredNotification,
+  getEventRegistrationCount,
+  calculateEventReadiness,
+} from "@/lib/dataStore";
 import { publishEventAtomic } from "@/lib/publishVerification";
 
 export async function GET(req: NextRequest) {
@@ -199,9 +206,9 @@ export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
     const eventId = body.eventId || body.id;
+    const rejectionReason = body.rejectionReason || body.reason;
     const {
       action,
-      rejectionReason,
       reviewComment,
       title,
       description,
@@ -544,6 +551,17 @@ export async function PATCH(req: NextRequest) {
     }
     // 5. Publish event (Strict verification and atomic publication)
     else if (action === "publish") {
+      if (userRole !== "Admin" && userRole !== "admin") {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Role not authorized to publish events. Admin access required.",
+            code: "PUBLISH_FORBIDDEN",
+          },
+          { status: 403 }
+        );
+      }
+
       const pubResult = await publishEventAtomic(
         event.id,
         {
@@ -560,6 +578,7 @@ export async function PATCH(req: NextRequest) {
           {
             success: false,
             error: pubResult.error || "Event verification and publication failed.",
+            code: event.status === "rejected" ? "REJECTED_CANNOT_PUBLISH" : "APPROVAL_REQUIRED",
             report: pubResult.report,
           },
           { status: 400 }
@@ -597,6 +616,27 @@ export async function PATCH(req: NextRequest) {
           { status: 400 }
         );
       }
+      if (coordinationStatus === "coordination_ready") {
+        const readinessSummary = calculateEventReadiness(event.id);
+        if (readinessSummary.mandatoryIncomplete > 0) {
+          const incompleteTitles = readinessSummary.items
+            .filter((i) => i.isMandatory && i.status !== "completed")
+            .map((i) => `'${i.title}'`)
+            .slice(0, 3)
+            .join(", ");
+          return NextResponse.json(
+            {
+              success: false,
+              error: `Cannot mark event as operationally ready while mandatory readiness items remain incomplete: ${incompleteTitles}${
+                readinessSummary.mandatoryIncomplete > 3 ? " and others" : ""
+              }.`,
+              code: "MANDATORY_READINESS_INCOMPLETE",
+            },
+            { status: 400 }
+          );
+        }
+      }
+
       if (coordinatorId !== undefined) event.coordinatorId = coordinatorId;
       if (coordinatorName !== undefined) event.coordinatorName = coordinatorName;
       if (coordinatorEmail !== undefined) event.coordinatorEmail = coordinatorEmail;
@@ -615,7 +655,9 @@ export async function PATCH(req: NextRequest) {
         event.vpComment = coordinationNotes;
         event.vpRejectionReason = coordinationBlockers;
       } else if (coordinatorName || coordinationNotes) {
-        event.vpStatus = "in_coordination";
+        if (event.vpStatus !== "approved") {
+          event.vpStatus = "in_coordination";
+        }
         event.vpDecisionBy = auth.session.user.fullName || auth.session.user.email;
         event.vpDecidedAt = nowIso;
         event.vpComment = coordinationNotes || "Under active coordination.";
@@ -785,7 +827,7 @@ export async function DELETE(req: NextRequest) {
 
   try {
     const { searchParams } = new URL(req.url);
-    const eventId = searchParams.get("eventId");
+    const eventId = searchParams.get("eventId") || searchParams.get("id");
     if (!eventId) {
       return NextResponse.json({ success: false, error: "eventId is required." }, { status: 400 });
     }

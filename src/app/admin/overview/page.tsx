@@ -157,10 +157,11 @@ export default function AdministrativeOverviewPage() {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-[#0E2A5C] via-[#143A7B] to-[#1E4D9F] text-white rounded-xl py-6 px-4 sm:px-8 shadow-sm border border-[#1B3F7E] flex items-center justify-center text-center">
+      <div className="bg-[#0A2047] text-white rounded-xl py-6 px-4 sm:px-8 shadow-xs border border-[#D4AF37]/30 border-b-2 border-b-[#D4AF37] flex flex-col items-center justify-center text-center relative overflow-hidden">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white text-center">
           Administrative Management Overview
         </h1>
+        <div className="w-16 h-0.5 bg-[#D4AF37] mt-2.5 rounded-full" />
       </div>
 
       {error && (
@@ -181,154 +182,166 @@ export default function AdministrativeOverviewPage() {
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Total Registrations */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs hover:border-blue-400 transition-colors flex flex-col justify-between">
+        <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 shadow-xs hover:border-[#D4AF37]/60 transition-colors flex flex-col justify-between">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <p className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
                 Total Registrations
               </p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2047] mt-1.5 font-mono">
                 {totalRegistrations}
               </h2>
             </div>
-            <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
+            <div className="w-10 h-10 rounded-lg bg-[#0A2047]/5 border border-[#0A2047]/15 flex items-center justify-center text-[#D4AF37]">
               <Users className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-            <span className="text-slate-500">All submissions</span>
+          <div className="mt-4 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
+            <span className="text-[#64748B]">All submissions</span>
             <Link
               href="/admin/reports"
-              className="font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1"
+              className="font-semibold text-[#0A2047] hover:text-[#D4AF37] flex items-center gap-1 transition-colors"
             >
-              Reports <ChevronRight className="w-3 h-3" />
+              Reports <ChevronRight className="w-3 h-3 text-[#D4AF37]" />
             </Link>
           </div>
         </div>
 
         {/* Pending Payment Verifications */}
-        <div className="bg-white rounded-xl border border-amber-200 bg-gradient-to-br from-white to-amber-50/30 p-5 shadow-xs hover:border-amber-400 transition-colors flex flex-col justify-between">
+        <div className="bg-white rounded-xl border border-[#E2E8F0] hover:border-amber-400 p-5 shadow-xs transition-colors flex flex-col justify-between">
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-1.5">
-                <p className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
+                <p className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
                   Pending Payments
                 </p>
                 {pendingPayments > 0 && (
-                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+                    Review
+                  </span>
                 )}
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-amber-900 mt-1.5">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2047] mt-1.5 font-mono">
                 {pendingPayments}
               </h2>
             </div>
-            <div className="w-10 h-10 rounded-lg bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-700">
+            <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-[#D97706]">
               <Clock className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-amber-100 flex items-center justify-between text-xs">
+          <div className="mt-4 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
             <span className="text-amber-700/80 font-medium">Awaiting review</span>
             <Link
               href="/admin/payments"
-              className="font-bold text-amber-800 hover:text-amber-950 flex items-center gap-1"
+              className="font-semibold text-[#0A2047] hover:text-amber-700 flex items-center gap-1 transition-colors"
             >
-              Verify <ChevronRight className="w-3 h-3" />
+              Verify <ChevronRight className="w-3 h-3 text-[#D4AF37]" />
             </Link>
           </div>
         </div>
 
         {/* Approved Payments */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs hover:border-emerald-400 transition-colors flex flex-col justify-between">
+        <div className="bg-white rounded-xl border border-[#E2E8F0] hover:border-emerald-400 p-5 shadow-xs transition-colors flex flex-col justify-between">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
-                Approved Payments
-              </p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5">
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
+                  Approved Payments
+                </p>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Verified
+                </span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2047] mt-1.5 font-mono">
                 {verifiedPayments}
               </h2>
             </div>
-            <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+            <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#16A34A]">
               <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-            <span className="text-slate-500">Confirmed seats</span>
+          <div className="mt-4 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
+            <span className="text-[#64748B]">Confirmed seats</span>
             <Link
               href="/admin/payments"
-              className="font-semibold text-emerald-600 hover:text-emerald-800 flex items-center gap-1"
+              className="font-semibold text-[#0A2047] hover:text-emerald-700 flex items-center gap-1 transition-colors"
             >
-              Queue <ChevronRight className="w-3 h-3" />
+              Queue <ChevronRight className="w-3 h-3 text-[#D4AF37]" />
             </Link>
           </div>
         </div>
 
         {/* Rejected Payments */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs hover:border-rose-400 transition-colors flex flex-col justify-between">
+        <div className="bg-white rounded-xl border border-[#E2E8F0] hover:border-rose-400 p-5 shadow-xs transition-colors flex flex-col justify-between">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs font-semibold text-rose-700 uppercase tracking-wider">
-                Rejected Payments
-              </p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5">
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
+                  Rejected Payments
+                </p>
+                {rejectedPayments > 0 && (
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200">
+                    Audit
+                  </span>
+                )}
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2047] mt-1.5 font-mono">
                 {rejectedPayments}
               </h2>
             </div>
-            <div className="w-10 h-10 rounded-lg bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600">
+            <div className="w-10 h-10 rounded-lg bg-rose-50 border border-rose-200 flex items-center justify-center text-[#DC2626]">
               <XCircle className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-            <span className="text-slate-500">Invalid UTR / slips</span>
+          <div className="mt-4 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
+            <span className="text-[#64748B]">Invalid UTR / slips</span>
             <Link
               href="/admin/payments"
-              className="font-semibold text-rose-600 hover:text-rose-800 flex items-center gap-1"
+              className="font-semibold text-[#0A2047] hover:text-rose-700 flex items-center gap-1 transition-colors"
             >
-              Audits <ChevronRight className="w-3 h-3" />
+              Audits <ChevronRight className="w-3 h-3 text-[#D4AF37]" />
             </Link>
           </div>
         </div>
 
         {/* Events Publication */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs hover:border-purple-400 transition-colors flex flex-col justify-between">
+        <div className="bg-white rounded-xl border border-[#E2E8F0] hover:border-[#D4AF37]/60 p-5 shadow-xs transition-colors flex flex-col justify-between">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs font-semibold text-purple-700 uppercase tracking-wider">
+              <p className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
                 Published Events
               </p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2047] mt-1.5 font-mono">
                 {publishedEventsCount}{" "}
-                <span className="text-sm font-semibold text-slate-400">/ {totalEvents}</span>
+                <span className="text-sm font-semibold text-[#64748B]">/ {totalEvents}</span>
               </h2>
             </div>
-            <div className="w-10 h-10 rounded-lg bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
+            <div className="w-10 h-10 rounded-lg bg-[#0A2047]/5 border border-[#0A2047]/15 flex items-center justify-center text-[#D4AF37]">
               <Calendar className="w-5 h-5" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-            <span className="text-slate-500">{approvedEventsCount} approved</span>
+          <div className="mt-4 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
+            <span className="text-[#64748B]">{approvedEventsCount} approved</span>
             <Link
               href="/admin/events"
-              className="font-semibold text-purple-600 hover:text-purple-800 flex items-center gap-1"
+              className="font-semibold text-[#0A2047] hover:text-[#D4AF37] flex items-center gap-1 transition-colors"
             >
-              Events <ChevronRight className="w-3 h-3" />
+              Events <ChevronRight className="w-3 h-3 text-[#D4AF37]" />
             </Link>
           </div>
         </div>
       </div>
 
-
-
       {/* Event Approval Pipeline Tracker Section */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="p-4 sm:p-5 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden">
+        <div className="p-4 sm:p-5 border-b border-[#E2E8F0] bg-[#F5F7FA] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-[#174789]/10 text-[#174789] flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-lg bg-[#0A2047]/10 text-[#0A2047] flex items-center justify-center shrink-0">
               <ClipboardList className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-bold text-slate-900 text-base">
+                <h2 className="font-bold text-[#0A2047] text-base">
                   Event Approval Pipeline
                 </h2>
                 {approvalStats.actionable.length > 0 && (
@@ -337,7 +350,7 @@ export default function AdministrativeOverviewPage() {
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-[#64748B] mt-0.5">
                 Track Vice President and President sign-offs, identifying delays before public event launch.
               </p>
             </div>
@@ -345,20 +358,20 @@ export default function AdministrativeOverviewPage() {
 
           <Link
             href="/admin/events?tab=tracker"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#174789] hover:bg-[#0E2A5C] text-white text-xs font-semibold shadow-xs transition-colors shrink-0"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0A2047] hover:bg-[#132E57] text-white text-xs font-semibold shadow-xs transition-colors shrink-0"
           >
             <span>Open Approval Tracker</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3.5 h-3.5 text-[#D4AF37]" />
           </Link>
         </div>
 
         {/* Pipeline Stage Summary Counters */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 divide-x divide-y sm:divide-y-0 divide-slate-100 border-b border-slate-100 bg-white text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 divide-x divide-y sm:divide-y-0 divide-[#E2E8F0] border-b border-[#E2E8F0] bg-white text-xs">
           <div className="p-3.5 text-center sm:text-left">
-            <span className="text-[11px] font-bold uppercase text-slate-400 block tracking-wider">
+            <span className="text-[11px] font-bold uppercase text-[#0A2047] block tracking-wider">
               Total Proposals
             </span>
-            <span className="text-xl font-black text-slate-800 mt-0.5 block">
+            <span className="text-xl font-black text-[#0A2047] mt-0.5 block font-mono">
               {totalEvents}
             </span>
           </div>
@@ -367,16 +380,16 @@ export default function AdministrativeOverviewPage() {
             <span className="text-[11px] font-bold uppercase text-amber-700 block tracking-wider">
               Pending Pres.
             </span>
-            <span className="text-xl font-black text-amber-600 mt-0.5 block">
+            <span className="text-xl font-black text-amber-600 mt-0.5 block font-mono">
               {approvalStats.pendingPresident}
             </span>
           </div>
 
           <div className="p-3.5 text-center sm:text-left">
-            <span className="text-[11px] font-bold uppercase text-indigo-700 block tracking-wider">
+            <span className="text-[11px] font-bold uppercase text-[#132E57] block tracking-wider">
               Pending VP
             </span>
-            <span className="text-xl font-black text-indigo-600 mt-0.5 block">
+            <span className="text-xl font-black text-[#132E57] mt-0.5 block font-mono">
               {approvalStats.pendingVp}
             </span>
           </div>
@@ -385,16 +398,16 @@ export default function AdministrativeOverviewPage() {
             <span className="text-[11px] font-bold uppercase text-emerald-700 block tracking-wider">
               Ready to Publish
             </span>
-            <span className="text-xl font-black text-emerald-600 mt-0.5 block">
+            <span className="text-xl font-black text-emerald-600 mt-0.5 block font-mono">
               {approvalStats.readyForPublication}
             </span>
           </div>
 
           <div className="p-3.5 text-center sm:text-left">
-            <span className="text-[11px] font-bold uppercase text-teal-700 block tracking-wider">
+            <span className="text-[11px] font-bold uppercase text-[#0A2047] block tracking-wider">
               Published Live
             </span>
-            <span className="text-xl font-black text-teal-600 mt-0.5 block">
+            <span className="text-xl font-black text-[#0A2047] mt-0.5 block font-mono">
               {approvalStats.published}
             </span>
           </div>
@@ -403,16 +416,16 @@ export default function AdministrativeOverviewPage() {
             <span className="text-[11px] font-bold uppercase text-rose-700 block tracking-wider">
               Rejected
             </span>
-            <span className="text-xl font-black text-rose-600 mt-0.5 block">
+            <span className="text-xl font-black text-rose-600 mt-0.5 block font-mono">
               {approvalStats.rejected}
             </span>
           </div>
         </div>
 
         {/* Actionable Proposals Queue */}
-        <div className="divide-y divide-slate-100 text-xs">
+        <div className="divide-y divide-[#E2E8F0] text-xs">
           {approvalStats.actionable.length === 0 ? (
-            <div className="p-5 text-center text-slate-400 text-xs">
+            <div className="p-5 text-center text-[#64748B] text-xs">
               No event proposals currently awaiting executive decision. All tracks are processed.
             </div>
           ) : (
@@ -426,22 +439,22 @@ export default function AdministrativeOverviewPage() {
               return (
                 <div
                   key={evt.id}
-                  className="p-3.5 sm:px-5 hover:bg-slate-50/70 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3"
+                  className="p-3.5 sm:px-5 hover:bg-[#F0F3F8]/70 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-slate-900 text-sm">
+                      <span className="font-bold text-[#172033] text-sm">
                         {evt.title}
                       </span>
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 uppercase tracking-wide">
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#F5F7FA] text-[#64748B] border border-[#E2E8F0] uppercase tracking-wide">
                         {evt.category}
                       </span>
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${overall.badgeClass}`}>
                         {overall.label}
                       </span>
                     </div>
-                    <div className="text-xs text-slate-500 mt-1 flex items-center gap-2 flex-wrap">
-                      <span>Proposed by <strong className="text-slate-700 font-medium">{evt.proposedBy}</strong></span>
+                    <div className="text-xs text-[#64748B] mt-1 flex items-center gap-2 flex-wrap">
+                      <span>Proposed by <strong className="text-[#172033] font-semibold">{evt.proposedBy}</strong></span>
                       <span>•</span>
                       <span>Target: {evt.datePlaceholder || evt.proposedDateTime || "TBA"}</span>
                     </div>
@@ -450,7 +463,7 @@ export default function AdministrativeOverviewPage() {
                   <div className="flex items-center gap-3 shrink-0 flex-wrap">
                     {/* VP Badge */}
                     <div className="flex items-center gap-1 text-[11px]" title={`VP Status: ${vpDec.label}`}>
-                      <span className="text-slate-400">VP:</span>
+                      <span className="text-[#64748B]">VP:</span>
                       <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded text-[10px] font-semibold border ${vpDec.badgeClass}`}>
                         <VpIcon className="w-2.5 h-2.5" />
                         <span>{vpDec.label}</span>
@@ -459,7 +472,7 @@ export default function AdministrativeOverviewPage() {
 
                     {/* Pres Badge */}
                     <div className="flex items-center gap-1 text-[11px]" title={`President Status: ${presDec.label}`}>
-                      <span className="text-slate-400">Pres:</span>
+                      <span className="text-[#64748B]">Pres:</span>
                       <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded text-[10px] font-semibold border ${presDec.badgeClass}`}>
                         <PresIcon className="w-2.5 h-2.5" />
                         <span>{presDec.label}</span>
@@ -467,13 +480,13 @@ export default function AdministrativeOverviewPage() {
                     </div>
 
                     {/* Blocking Actor */}
-                    <span className="text-[11px] font-bold text-[#174789] bg-blue-50 px-2 py-1 rounded border border-blue-100 whitespace-nowrap">
+                    <span className="text-[11px] font-bold text-[#0A2047] bg-[#0A2047]/10 px-2 py-1 rounded border border-[#0A2047]/20 whitespace-nowrap">
                       Next: {overall.nextActor}
                     </span>
 
                     <Link
                       href="/admin/events?tab=tracker"
-                      className="text-xs font-semibold text-slate-700 hover:text-blue-700 px-2.5 py-1 rounded border border-slate-200 hover:bg-slate-100 transition-colors"
+                      className="text-xs font-semibold text-[#0A2047] hover:text-[#D4AF37] px-2.5 py-1 rounded border border-[#E2E8F0] hover:bg-[#F0F3F8] transition-colors"
                     >
                       Track
                     </Link>

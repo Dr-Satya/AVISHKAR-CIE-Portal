@@ -246,8 +246,8 @@ function EventRegisterContent() {
     return (
       <div className="py-20 flex items-center justify-center min-h-[60vh]">
         <div className="text-center space-y-3">
-          <Loader2 className="w-8 h-8 text-[#2563EB] animate-spin mx-auto" />
-          <p className="text-sm text-slate-500">Loading competition registration questionnaire...</p>
+          <Loader2 className="w-8 h-8 text-[#0A2047] animate-spin mx-auto" />
+          <p className="text-sm text-[#64748B]">Loading competition registration questionnaire...</p>
         </div>
       </div>
     );
@@ -257,18 +257,18 @@ function EventRegisterContent() {
     return (
       <div className="py-16">
         <Container size="default">
-          <div className="max-w-xl mx-auto bg-white p-8 rounded-xl border border-slate-200 shadow-sm text-center space-y-4">
+          <div className="max-w-xl mx-auto bg-white p-8 rounded-xl border border-[#E2E8F0] shadow-sm text-center space-y-4">
             <AlertCircle className="w-12 h-12 text-amber-500 mx-auto" />
-            <h2 className="text-xl font-bold text-slate-800">Registration Not Available</h2>
-            <p className="text-sm text-slate-600 leading-relaxed">
+            <h2 className="text-xl font-bold text-[#0A2047]">Registration Not Available</h2>
+            <p className="text-sm text-[#64748B] leading-relaxed">
               {loadError || "This competition does not currently have an active registration questionnaire."}
             </p>
             <div className="pt-4">
               <Link
                 href="/#competitions"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#2563EB] text-white text-xs font-semibold hover:bg-[#1D4ED8] transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-[#0A2047] text-white text-xs font-semibold hover:bg-[#132E57] border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-200"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-4 h-4 text-[#D4AF37]" />
                 <span>Return to Competition Tracks</span>
               </Link>
             </div>
@@ -280,52 +280,52 @@ function EventRegisterContent() {
 
   if (submittedReceipt) {
     return (
-      <div className="py-16">
+      <div className="py-16 bg-[#F5F7FA] min-h-[calc(100vh-80px)]">
         <Container size="default">
-          <div className="max-w-xl mx-auto bg-white p-8 rounded-xl border border-slate-200 shadow-md text-center space-y-5">
+          <div className="max-w-xl mx-auto bg-white p-8 rounded-xl border border-[#E2E8F0] shadow-sm text-center space-y-5">
             <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mx-auto border border-emerald-200">
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold text-[#174789]">Registration Received!</h2>
-              <p className="text-xs text-slate-500">
-                Your questionnaire submission for <span className="font-semibold text-slate-700">{event.title}</span> has been securely recorded.
+              <h2 className="text-2xl font-bold text-[#0A2047]">Registration Received!</h2>
+              <p className="text-xs text-[#64748B]">
+                Your questionnaire submission for <span className="font-semibold text-[#172033]">{event.title}</span> has been securely recorded.
               </p>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-left text-xs space-y-2">
-              <div className="flex justify-between border-b border-slate-200 pb-2">
-                <span className="text-slate-500">Submission Reference:</span>
-                <span className="font-mono font-bold text-blue-700">{submittedReceipt.submissionId}</span>
+            <div className="bg-[#F5F7FA] p-4 rounded-lg border border-[#E2E8F0] text-left text-xs space-y-2">
+              <div className="flex justify-between border-b border-[#E2E8F0] pb-2">
+                <span className="text-[#64748B]">Submission Reference:</span>
+                <span className="font-mono font-bold text-[#0A2047]">{submittedReceipt.submissionId}</span>
               </div>
-              <div className="flex justify-between border-b border-slate-200 pb-2">
-                <span className="text-slate-500">Student Name:</span>
-                <span className="font-medium text-slate-800">{submittedReceipt.studentName}</span>
+              <div className="flex justify-between border-b border-[#E2E8F0] pb-2">
+                <span className="text-[#64748B]">Student Name:</span>
+                <span className="font-semibold text-[#172033]">{submittedReceipt.studentName}</span>
               </div>
-              <div className="flex justify-between border-b border-slate-200 pb-2">
-                <span className="text-slate-500">Student ID / Enrolment:</span>
-                <span className="font-medium text-slate-800">{submittedReceipt.studentId}</span>
+              <div className="flex justify-between border-b border-[#E2E8F0] pb-2">
+                <span className="text-[#64748B]">Student ID / Enrolment:</span>
+                <span className="font-semibold text-[#172033]">{submittedReceipt.studentId}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Submitted At:</span>
-                <span className="text-slate-600">{new Date(submittedReceipt.submittedAt).toLocaleString()}</span>
+                <span className="text-[#64748B]">Submitted At:</span>
+                <span className="text-[#172033]">{new Date(submittedReceipt.submittedAt).toLocaleString()}</span>
               </div>
             </div>
 
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-[#64748B] leading-relaxed">
               Please preserve this reference for team verification on the day of the event. If this track requires delegate credentials, complete your registration if not already done.
             </p>
 
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/register"
-                className="w-full sm:w-auto px-4 py-2 rounded-lg bg-[#2563EB] text-white text-xs font-semibold hover:bg-[#1D4ED8] transition-colors"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-[#0A2047] text-white text-xs font-semibold hover:bg-[#132E57] transition-colors shadow-xs"
               >
                 Delegate Registration Portal
               </Link>
               <Link
                 href="/#competitions"
-                className="w-full sm:w-auto px-4 py-2 rounded-lg border border-slate-200 text-slate-700 text-xs font-medium hover:bg-slate-50 transition-colors"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-[#E2E8F0] text-[#0A2047] text-xs font-semibold hover:bg-[#F0F3F8] transition-colors"
               >
                 View Other Competitions
               </Link>
@@ -337,13 +337,13 @@ function EventRegisterContent() {
   }
 
   return (
-    <div className="py-8 sm:py-12 bg-slate-50/60 min-h-[calc(100vh-80px)]">
+    <div className="py-8 sm:py-12 bg-[#F5F7FA] min-h-[calc(100vh-80px)]">
       <Container size="default">
         {/* Back Link */}
         <div className="mb-6 max-w-2xl mx-auto">
           <Link
             href="/#competitions"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#153D73] hover:text-[#2563EB] transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0A2047] hover:text-[#B89125] transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Competition Tracks</span>
@@ -353,38 +353,38 @@ function EventRegisterContent() {
         {/* Form Container */}
         <div className="max-w-2xl mx-auto space-y-6">
           {/* Header Card */}
-          <div className="bg-white p-6 sm:p-8 rounded-xl border border-slate-200 shadow-sm border-t-8 border-t-[#2563EB] space-y-3">
+          <div className="bg-white p-6 sm:p-8 rounded-xl border border-[#E2E8F0] shadow-sm border-t-4 border-t-[#0A2047] space-y-3">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">
+              <span className="px-2.5 py-0.5 rounded-md bg-[#0A2047]/5 text-[#0A2047] text-xs font-bold border border-[#0A2047]/15">
                 {event.category}
               </span>
-              <span className="text-xs text-slate-500 font-medium">
+              <span className="text-xs text-[#64748B] font-medium">
                 {event.teamSizeMin === 1 && event.teamSizeMax === 1
                   ? "Individual Participation (1 Member)"
                   : `Team Size: ${event.teamSizeMin}–${event.teamSizeMax} Members`}
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#174789] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#0A2047] tracking-tight">
               {form.formTitle || event.title}
             </h1>
 
-            <p className="text-sm text-slate-600 leading-relaxed">
+            <p className="text-sm text-[#64748B] leading-relaxed">
               {form.formDescription || "Please provide your participant and team information below."}
             </p>
-            <div className="text-xs text-rose-600 pt-2 border-t border-slate-100">
+            <div className="text-xs text-rose-600 pt-2 border-t border-[#E2E8F0]">
               * Indicates required question
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Participant Identification Section */}
-            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2">
+            <div className="bg-white p-6 rounded-xl border border-[#E2E8F0] shadow-sm space-y-4">
+              <h3 className="text-sm font-bold text-[#0A2047] uppercase tracking-wider border-b border-[#E2E8F0] pb-2">
                 Participant Identification
               </h3>
 
               <div className="space-y-1">
-                <label className="block text-xs font-semibold text-slate-700">
+                <label className="block text-xs font-semibold text-[#0A2047]">
                   Full Name <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -400,15 +400,15 @@ function EventRegisterContent() {
                       });
                     }
                   }}
-                  placeholder="e.g., Aarav Sharma"
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  placeholder=""
+                  className="w-full px-3 py-2 text-sm border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] focus:outline-none text-[#172033]"
                 />
                 {errors.studentName && <p className="text-xs text-rose-500">{errors.studentName}</p>}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold text-slate-700">
+                  <label className="block text-xs font-semibold text-[#0A2047]">
                     Student ID / Enrolment <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -424,14 +424,14 @@ function EventRegisterContent() {
                         });
                       }
                     }}
-                    placeholder="e.g., 22001015001"
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    placeholder=""
+                    className="w-full px-3 py-2 text-sm border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] focus:outline-none text-[#172033]"
                   />
                   {errors.studentId && <p className="text-xs text-rose-500">{errors.studentId}</p>}
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-xs font-semibold text-slate-700">
+                  <label className="block text-xs font-semibold text-[#0A2047]">
                     University Email <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -447,8 +447,8 @@ function EventRegisterContent() {
                         });
                       }
                     }}
-                    placeholder="student@gdgoenka.ac.in"
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    placeholder=""
+                    className="w-full px-3 py-2 text-sm border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] focus:outline-none text-[#172033]"
                   />
                   {errors.studentEmail && <p className="text-xs text-rose-500">{errors.studentEmail}</p>}
                 </div>
@@ -467,12 +467,12 @@ function EventRegisterContent() {
 
               return (
                 <React.Fragment key={field.id}>
-                  <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                  <div className="bg-white p-6 rounded-xl border border-[#E2E8F0] shadow-xs space-y-3">
                     <div className="space-y-1">
-                      <label className="block text-sm font-semibold text-slate-800">
+                      <label className="block text-sm font-semibold text-[#0A2047]">
                         {field.label} {field.required && <span className="text-rose-500">*</span>}
                       </label>
-                      {field.helpText && <p className="text-xs text-slate-500">{field.helpText}</p>}
+                      {field.helpText && <p className="text-xs text-[#64748B]">{field.helpText}</p>}
                     </div>
 
                     {/* Short Text */}
@@ -481,8 +481,8 @@ function EventRegisterContent() {
                         type="text"
                         value={responses[field.id] || ""}
                         onChange={(e) => handleResponseChange(field.id, e.target.value)}
-                        placeholder={field.placeholder || "Your answer"}
-                        className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder={field.placeholder || ""}
+                        className="w-full px-3 py-2 text-sm border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] focus:outline-none text-[#172033]"
                       />
                     )}
 
@@ -492,8 +492,8 @@ function EventRegisterContent() {
                         rows={3}
                         value={responses[field.id] || ""}
                         onChange={(e) => handleResponseChange(field.id, e.target.value)}
-                        placeholder={field.placeholder || "Your detailed answer"}
-                        className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder={field.placeholder || ""}
+                        className="w-full px-3 py-2 text-sm border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] focus:outline-none text-[#172033]"
                       />
                     )}
 
@@ -503,8 +503,8 @@ function EventRegisterContent() {
                         type="number"
                         value={responses[field.id] || ""}
                         onChange={(e) => handleResponseChange(field.id, e.target.value)}
-                        placeholder={field.placeholder || "0"}
-                        className="w-48 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        placeholder={field.placeholder || ""}
+                        className="w-48 px-3 py-2 text-sm border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] focus:outline-none text-[#172033]"
                       />
                     )}
 
@@ -514,7 +514,7 @@ function EventRegisterContent() {
                         type="date"
                         value={responses[field.id] || ""}
                         onChange={(e) => handleResponseChange(field.id, e.target.value)}
-                        className="w-full sm:w-64 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="w-full sm:w-64 px-3 py-2 text-sm border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] focus:outline-none text-[#172033]"
                       />
                     )}
 
@@ -523,7 +523,7 @@ function EventRegisterContent() {
                       <select
                         value={responses[field.id] || ""}
                         onChange={(e) => handleResponseChange(field.id, e.target.value)}
-                        className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white font-medium text-slate-800"
+                        className="w-full px-3 py-2 text-sm border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] focus:outline-none bg-white font-medium text-[#172033]"
                       >
                         <option value="">Select an option</option>
                         {(field.options || []).map((opt, i) => (
@@ -538,14 +538,14 @@ function EventRegisterContent() {
                     {field.type === "radio" && (
                       <div className="space-y-2 pt-1">
                         {(field.options || []).map((opt, i) => (
-                          <label key={i} className="flex items-center gap-2.5 text-xs sm:text-sm text-slate-700 cursor-pointer">
+                          <label key={i} className="flex items-center gap-2.5 text-xs sm:text-sm text-[#172033] cursor-pointer">
                             <input
                               type="radio"
                               name={field.id}
                               value={opt}
                               checked={responses[field.id] === opt}
                               onChange={(e) => handleResponseChange(field.id, e.target.value)}
-                              className="text-blue-600 focus:ring-blue-500"
+                              className="text-[#0A2047] focus:ring-[#0A2047]"
                             />
                             <span>{opt}</span>
                           </label>
@@ -560,12 +560,12 @@ function EventRegisterContent() {
                           const selectedList = (responses[field.id] as string[]) || [];
                           const isChecked = selectedList.includes(opt);
                           return (
-                            <label key={i} className="flex items-center gap-2.5 text-xs sm:text-sm text-slate-700 cursor-pointer">
+                            <label key={i} className="flex items-center gap-2.5 text-xs sm:text-sm text-[#172033] cursor-pointer">
                               <input
                                 type="checkbox"
                                 checked={isChecked}
                                 onChange={() => handleCheckboxToggle(field.id, opt)}
-                                className="rounded text-blue-600 focus:ring-blue-500"
+                                className="rounded text-[#0A2047] focus:ring-[#0A2047]"
                               />
                               <span>{opt}</span>
                             </label>
@@ -579,18 +579,18 @@ function EventRegisterContent() {
 
                   {/* Dynamic Member Cards Section: Triggered right when team size is answered */}
                   {isTeamSizeField && isTeamEvent && selectedTeamSize >= 1 && (
-                    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div className="bg-white p-6 rounded-xl border border-[#E2E8F0] shadow-xs space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E2E8F0] pb-3">
                         <div>
-                          <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                            <Users className="w-4 h-4 text-blue-600" />
+                          <h3 className="text-sm font-bold text-[#0A2047] uppercase tracking-wider flex items-center gap-2">
+                            <Users className="w-4 h-4 text-[#D4AF37]" />
                             <span>Team Members Information ({selectedTeamSize} Members)</span>
                           </h3>
-                          <p className="text-xs text-slate-500 mt-0.5">
+                          <p className="text-xs text-[#64748B] mt-0.5">
                             Provide full legal name, university mail ID, and student enrollment number for each squad member.
                           </p>
                         </div>
-                        <span className="self-start sm:self-auto px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">
+                        <span className="self-start sm:self-auto px-2.5 py-1 rounded-full bg-[#0A2047]/10 text-[#0A2047] text-xs font-bold border border-[#0A2047]/20">
                           {selectedTeamSize} Members Selected
                         </span>
                       </div>
@@ -602,21 +602,21 @@ function EventRegisterContent() {
                           return (
                             <div
                               key={memberNum}
-                              className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3 hover:border-blue-200 transition-colors"
+                              className="p-4 rounded-xl border border-[#E2E8F0] bg-[#F5F7FA] space-y-3 hover:border-[#0A2047]/30 transition-colors"
                             >
                               <div className="flex items-center justify-between">
-                                <span className="text-xs font-bold text-slate-800 flex items-center gap-2">
-                                  <span className="w-5 h-5 rounded-full bg-[#174789] text-white flex items-center justify-center text-[10px] font-bold">
+                                <span className="text-xs font-bold text-[#0A2047] flex items-center gap-2">
+                                  <span className="w-5 h-5 rounded-full bg-[#0A2047] text-[#D4AF37] border border-[#D4AF37]/30 flex items-center justify-center text-[10px] font-bold">
                                     {memberNum}
                                   </span>
                                   <span>Member {memberNum} {isLeader ? "(Team Leader)" : ""}</span>
                                 </span>
                                 {isLeader ? (
-                                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                  <span className="text-[10px] font-bold text-[#0A2047] bg-[#0A2047]/10 px-2 py-0.5 rounded border border-[#0A2047]/20">
                                     Team Leader / Primary
                                   </span>
                                 ) : (
-                                  <span className="text-[10px] font-semibold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+                                  <span className="text-[10px] font-semibold text-[#64748B] bg-white px-2 py-0.5 rounded border border-[#E2E8F0]">
                                     Squad Participant
                                   </span>
                                 )}
@@ -625,7 +625,7 @@ function EventRegisterContent() {
                               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 {/* Member Name */}
                                 <div className="space-y-1">
-                                  <label className="block text-xs font-semibold text-slate-700">
+                                  <label className="block text-xs font-semibold text-[#0A2047]">
                                     Member {memberNum} Name <span className="text-rose-500">*</span>
                                   </label>
                                   <input
@@ -651,8 +651,8 @@ function EventRegisterContent() {
                                         }
                                       }
                                     }}
-                                    placeholder={`Full Name of Member ${memberNum}`}
-                                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+                                    placeholder=""
+                                    className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] focus:outline-none bg-white text-[#172033]"
                                   />
                                   {errors[`member_${memberNum}_name`] && (
                                     <p className="text-[11px] text-rose-500">{errors[`member_${memberNum}_name`]}</p>
@@ -661,7 +661,7 @@ function EventRegisterContent() {
 
                                 {/* Member Email */}
                                 <div className="space-y-1">
-                                  <label className="block text-xs font-semibold text-slate-700">
+                                  <label className="block text-xs font-semibold text-[#0A2047]">
                                     Member {memberNum} Mail ID <span className="text-rose-500">*</span>
                                   </label>
                                   <input
@@ -687,8 +687,8 @@ function EventRegisterContent() {
                                         }
                                       }
                                     }}
-                                    placeholder={`member${memberNum}@gdgoenka.ac.in`}
-                                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+                                    placeholder=""
+                                    className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] focus:outline-none bg-white text-[#172033]"
                                   />
                                   {errors[`member_${memberNum}_email`] && (
                                     <p className="text-[11px] text-rose-500">{errors[`member_${memberNum}_email`]}</p>
@@ -697,7 +697,7 @@ function EventRegisterContent() {
 
                                 {/* Member Enrollment */}
                                 <div className="space-y-1">
-                                  <label className="block text-xs font-semibold text-slate-700">
+                                  <label className="block text-xs font-semibold text-[#0A2047]">
                                     Member {memberNum} Enrollment <span className="text-rose-500">*</span>
                                   </label>
                                   <input
@@ -723,8 +723,8 @@ function EventRegisterContent() {
                                         }
                                       }
                                     }}
-                                    placeholder={`Enrollment of Member ${memberNum}`}
-                                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+                                    placeholder=""
+                                    className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] focus:outline-none bg-white text-[#172033]"
                                   />
                                   {errors[`member_${memberNum}_enrollment`] && (
                                     <p className="text-[11px] text-rose-500">{errors[`member_${memberNum}_enrollment`]}</p>
@@ -743,18 +743,18 @@ function EventRegisterContent() {
 
             {/* Fallback if team size question was not in questionnaire but event is team-based */}
             {!teamSizeField && isTeamEvent && selectedTeamSize >= 1 && (
-              <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+              <div className="bg-white p-6 rounded-xl border border-[#E2E8F0] shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E2E8F0] pb-3">
                   <div>
-                    <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                      <Users className="w-4 h-4 text-blue-600" />
+                    <h3 className="text-sm font-bold text-[#0A2047] uppercase tracking-wider flex items-center gap-2">
+                      <Users className="w-4 h-4 text-[#D4AF37]" />
                       <span>Team Members Information ({selectedTeamSize} Members)</span>
                     </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-xs text-[#64748B] mt-0.5">
                       Provide full legal name, university mail ID, and student enrollment number for each squad member.
                     </p>
                   </div>
-                  <span className="self-start sm:self-auto px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">
+                  <span className="self-start sm:self-auto px-2.5 py-1 rounded-full bg-[#0A2047]/10 text-[#0A2047] text-xs font-bold border border-[#0A2047]/20">
                     {selectedTeamSize} Members Selected
                   </span>
                 </div>
@@ -766,11 +766,11 @@ function EventRegisterContent() {
                     return (
                       <div
                         key={memberNum}
-                        className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3 hover:border-blue-200 transition-colors"
+                        className="p-4 rounded-xl border border-[#E2E8F0] bg-[#F5F7FA] space-y-3 hover:border-[#0A2047]/30 transition-colors"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-slate-800 flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-full bg-[#174789] text-white flex items-center justify-center text-[10px] font-bold">
+                          <span className="text-xs font-bold text-[#0A2047] flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full bg-[#0A2047] text-[#D4AF37] border border-[#D4AF37]/30 flex items-center justify-center text-[10px] font-bold">
                               {memberNum}
                             </span>
                             <span>Member {memberNum} {isLeader ? "(Team Leader)" : ""}</span>
@@ -779,7 +779,7 @@ function EventRegisterContent() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <div className="space-y-1">
-                            <label className="block text-xs font-semibold text-slate-700">
+                            <label className="block text-xs font-semibold text-[#0A2047]">
                               Member {memberNum} Name <span className="text-rose-500">*</span>
                             </label>
                             <input
@@ -796,8 +796,8 @@ function EventRegisterContent() {
                                 handleResponseChange(`member_${memberNum}_name`, val);
                                 if (isLeader) setStudentName(val);
                               }}
-                              placeholder={`Full Name of Member ${memberNum}`}
-                              className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+                              placeholder=""
+                              className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] focus:outline-none bg-white text-[#172033]"
                             />
                             {errors[`member_${memberNum}_name`] && (
                               <p className="text-[11px] text-rose-500">{errors[`member_${memberNum}_name`]}</p>
@@ -805,7 +805,7 @@ function EventRegisterContent() {
                           </div>
 
                           <div className="space-y-1">
-                            <label className="block text-xs font-semibold text-slate-700">
+                            <label className="block text-xs font-semibold text-[#0A2047]">
                               Member {memberNum} Mail ID <span className="text-rose-500">*</span>
                             </label>
                             <input
@@ -822,8 +822,8 @@ function EventRegisterContent() {
                                 handleResponseChange(`member_${memberNum}_email`, val);
                                 if (isLeader) setStudentEmail(val);
                               }}
-                              placeholder={`member${memberNum}@gdgoenka.ac.in`}
-                              className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+                              placeholder=""
+                              className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] focus:outline-none bg-white text-[#172033]"
                             />
                             {errors[`member_${memberNum}_email`] && (
                               <p className="text-[11px] text-rose-500">{errors[`member_${memberNum}_email`]}</p>
@@ -831,7 +831,7 @@ function EventRegisterContent() {
                           </div>
 
                           <div className="space-y-1">
-                            <label className="block text-xs font-semibold text-slate-700">
+                            <label className="block text-xs font-semibold text-[#0A2047]">
                               Member {memberNum} Enrollment <span className="text-rose-500">*</span>
                             </label>
                             <input
@@ -848,8 +848,8 @@ function EventRegisterContent() {
                                 handleResponseChange(`member_${memberNum}_enrollment`, val);
                                 if (isLeader) setStudentId(val);
                               }}
-                              placeholder={`Enrollment of Member ${memberNum}`}
-                              className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+                              placeholder=""
+                              className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] focus:outline-none bg-white text-[#172033]"
                             />
                             {errors[`member_${memberNum}_enrollment`] && (
                               <p className="text-[11px] text-rose-500">{errors[`member_${memberNum}_enrollment`]}</p>
@@ -867,7 +867,7 @@ function EventRegisterContent() {
             <div className="flex items-center justify-between pt-4">
               <Link
                 href="/#competitions"
-                className="text-xs text-slate-500 hover:text-slate-700 transition-colors"
+                className="text-xs text-[#64748B] hover:text-[#0A2047] transition-colors"
               >
                 Cancel and return
               </Link>
@@ -875,7 +875,7 @@ function EventRegisterContent() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2.5 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-sm shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2 disabled:opacity-50"
+                className="px-6 py-2.5 rounded-lg bg-[#0A2047] hover:bg-[#132E57] text-white font-semibold text-sm shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#0A2047] flex items-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 {submitting ? (
                   <>
@@ -901,9 +901,9 @@ export default function EventRegisterPage() {
   return (
     <React.Suspense
       fallback={
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-8">
-          <div className="flex items-center gap-3 text-blue-600 font-medium">
-            <Loader2 className="w-6 h-6 animate-spin" />
+        <div className="min-h-screen bg-[#F5F7FA] flex items-center justify-center p-8">
+          <div className="flex items-center gap-3 text-[#0A2047] font-semibold">
+            <Loader2 className="w-6 h-6 animate-spin text-[#0A2047]" />
             <span>Loading registration form...</span>
           </div>
         </div>

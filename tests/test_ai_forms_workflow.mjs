@@ -14,7 +14,7 @@
  * 10. QR code generation functions correctly.
  */
 
-const BASE_URL = process.env.TEST_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.TEST_BASE_URL || "http://localhost:3001";
 
 let passedCount = 0;
 let failedCount = 0;

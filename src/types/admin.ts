@@ -54,6 +54,7 @@ export interface EventRecord {
   datePlaceholder: string;
   venuePlaceholder: string;
   rulebookUrl?: string;
+  feeAmount?: number;
   assignedMemberIds: string[];
   createdAt: string;
   updatedAt: string;
@@ -320,6 +321,32 @@ export interface MemberRecord {
 }
 
 export type TaskStatus = "todo" | "in_progress" | "blocked" | "completed";
+export type TaskPriority = "low" | "medium" | "high" | "critical";
+
+export interface TaskSubtask {
+  id: string;
+  title: string;
+  completed: boolean;
+  completedAt?: string;
+}
+
+export interface TaskReassignmentEntry {
+  fromMemberId: string;
+  fromMemberName: string;
+  toMemberId: string;
+  toMemberName: string;
+  reassignedBy: string;
+  reassignedAt: string;
+  reason: string;
+}
+
+export interface TaskActivityEntry {
+  timestamp: string;
+  actorName: string;
+  actorRole: string;
+  action: string;
+  details?: string;
+}
 
 export interface MemberTaskRecord {
   id: string;
@@ -327,17 +354,108 @@ export interface MemberTaskRecord {
   eventTitle: string;
   memberId: string;
   memberName: string;
+  memberEmail?: string;
   title: string;
   description: string;
   status: TaskStatus;
-  priority: "low" | "medium" | "high";
+  priority: TaskPriority;
   dueDate: string;
+  dueTime?: string;
   createdAt: string;
   assignedBy?: string;
   assignedByRole?: string;
   notes?: string;
   completedAt?: string;
   updatedAt?: string;
+  subtasks?: TaskSubtask[];
+  completionCriteria?: string;
+  dependsOnTaskIds?: string[];
+  reassignmentHistory?: TaskReassignmentEntry[];
+  completionNotes?: string;
+  completionEvidenceUrl?: string;
+  history?: TaskActivityEntry[];
+}
+
+export type ReadinessCategory =
+  | "venue_seating"
+  | "equipment_technical"
+  | "committee_volunteers"
+  | "logistics_materials"
+  | "scheduling_coordination"
+  | "other_mandatory";
+
+export type ReadinessItemStatus = "completed" | "pending" | "blocked" | "overdue";
+
+export interface EventReadinessItem {
+  id: string;
+  eventId: string;
+  category: ReadinessCategory;
+  title: string;
+  description?: string;
+  isMandatory: boolean;
+  status: ReadinessItemStatus;
+  responsibleMemberId?: string;
+  responsibleMemberName?: string;
+  deadline: string;
+  completedAt?: string;
+  completedBy?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EventReadinessSummary {
+  eventId: string;
+  eventTitle: string;
+  totalItems: number;
+  completedItems: number;
+  pendingItems: number;
+  blockedItems: number;
+  overdueItems: number;
+  mandatoryCount: number;
+  mandatoryIncomplete: number;
+  readinessPercentage: number;
+  isOperationallyReady: boolean;
+  items: EventReadinessItem[];
+}
+
+export type BlockerSeverity = "low" | "medium" | "high" | "critical";
+export type BlockerStatus = "open" | "in_progress" | "escalated" | "resolved";
+
+export interface OperationalBlockerRecord {
+  id: string;
+  eventId: string;
+  eventTitle: string;
+  taskId?: string;
+  taskTitle?: string;
+  title: string;
+  description: string;
+  severity: BlockerSeverity;
+  operationalImpact: string;
+  evidenceUrl?: string;
+  reportedBy: string;
+  reportedByEmail: string;
+  reportedByRole: string;
+  reportedAt: string;
+  assignedToId?: string;
+  assignedToName?: string;
+  assignedToEmail?: string;
+  resolutionDeadline?: string;
+  status: BlockerStatus;
+  resolutionNotes?: string;
+  resolvedAt?: string;
+  resolvedBy?: string;
+  escalatedTo?: "President";
+  escalatedAt?: string;
+  escalatedBy?: string;
+  escalationReason?: string;
+  history: Array<{
+    timestamp: string;
+    actorName: string;
+    actorRole: string;
+    action: string;
+    notes?: string;
+  }>;
 }
 
 export interface AuditLogRecord {
@@ -352,7 +470,7 @@ export interface AuditLogRecord {
   timestamp: string;
 }
 
-export type NotificationType = "proposal" | "approval" | "rejection" | "task" | "publish" | "payment" | "system";
+export type NotificationType = "proposal" | "approval" | "rejection" | "task" | "publish" | "payment" | "system" | "blocker";
 
 export interface NotificationRecord {
   id: string;
@@ -392,6 +510,21 @@ export interface RegistrationRecord {
   event_title?: string | null;
 
   // Previous Work / Startup Details (Optional)
+  has_startup_or_project?: string | null;
+  team_leader_name?: string | null;
+  team_leader_enrollment?: string | null;
+  team_leader_email?: string | null;
+  team_leader_contact?: string | null;
+  student_role?: string | null;
+  team_structure?: string | null;
+  team_members?: any; // TeamMemberEntry[] or JSON or string
+  startup_title?: string | null;
+  startup_details?: string | null;
+  startup_stage?: string | null;
+  support_needed?: any; // string[] or JSON or string
+  other_support_details?: string | null;
+
+  // Legacy mirrors (backward-compatible)
   previous_work_description?: string | null;
   project_name?: string | null;
   project_role?: string | null;

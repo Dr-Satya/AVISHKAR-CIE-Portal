@@ -42,7 +42,7 @@ export function getPresidentDecision(event: EventRecord) {
     return {
       status: "not_required" as const,
       label: "Not Required",
-      badgeClass: "bg-blue-50 text-blue-700 border-blue-200",
+      badgeClass: "bg-[#0A2047]/10 text-[#0A2047] border border-[#0A2047]/20",
       icon: CheckCircle2,
       decisionBy: "Administrator Direct Entry",
       decidedAt: event.createdAt,
@@ -105,7 +105,7 @@ export function getVicePresidentDecision(event: EventRecord) {
     return {
       status: "not_required" as const,
       label: "Not Required",
-      badgeClass: "bg-blue-50 text-blue-700 border-blue-200",
+      badgeClass: "bg-[#0A2047]/10 text-[#0A2047] border border-[#0A2047]/20",
       icon: CheckCircle2,
       decisionBy: "Administrator Direct Entry",
       decidedAt: event.createdAt,
@@ -156,7 +156,7 @@ export function getVicePresidentDecision(event: EventRecord) {
     return {
       status: "in_coordination" as const,
       label: "In Coordination",
-      badgeClass: "bg-indigo-50 text-indigo-800 border-indigo-200",
+      badgeClass: "bg-[#0A2047]/10 text-[#0A2047] border border-[#0A2047]/20",
       icon: Users,
       decisionBy: event.coordinatorName || event.vpDecisionBy || "Vice President Council",
       decidedAt: event.vpDecidedAt || event.updatedAt,
@@ -199,8 +199,8 @@ export function getOverallApprovalStatus(event: EventRecord) {
       return {
         stage: "published" as const,
         label: "Published (Direct)",
-        badgeClass: "bg-teal-50 text-teal-800 border-teal-200",
-        dotClass: "bg-teal-500",
+        badgeClass: "bg-emerald-50 text-emerald-800 border-emerald-200",
+        dotClass: "bg-emerald-500",
         description: "Live on official AVISHKAR website for student registrations",
         nextActor: "Students (Live)",
       };
@@ -208,8 +208,8 @@ export function getOverallApprovalStatus(event: EventRecord) {
     return {
       stage: "ready_for_publication" as const,
       label: "Ready to Publish (Direct)",
-      badgeClass: "bg-blue-50 text-blue-800 border-blue-200",
-      dotClass: "bg-blue-500",
+      badgeClass: "bg-[#0A2047]/10 text-[#0A2047] border border-[#0A2047]/20",
+      dotClass: "bg-[#0A2047]",
       description: "Administrator direct event. Ready for immediate verification & publishing.",
       nextActor: "Administrator (Publish)",
     };
@@ -219,8 +219,8 @@ export function getOverallApprovalStatus(event: EventRecord) {
     return {
       stage: "published" as const,
       label: "Published",
-      badgeClass: "bg-teal-50 text-teal-800 border-teal-200",
-      dotClass: "bg-teal-500",
+      badgeClass: "bg-emerald-50 text-emerald-800 border-emerald-200",
+      dotClass: "bg-emerald-500",
       description: "Live on official AVISHKAR website for student registrations",
       nextActor: "Students (Live)",
     };
@@ -262,8 +262,8 @@ export function getOverallApprovalStatus(event: EventRecord) {
     return {
       stage: "awaiting_next_approval" as const,
       label: "Awaiting Next Approval",
-      badgeClass: "bg-indigo-50 text-indigo-800 border-indigo-200",
-      dotClass: "bg-indigo-500",
+      badgeClass: "bg-[#0A2047]/10 text-[#0A2047] border border-[#0A2047]/20",
+      dotClass: "bg-[#0A2047]",
       description: "President approved. Awaiting Vice President logistical coordination.",
       nextActor: "Vice President",
     };
@@ -273,8 +273,8 @@ export function getOverallApprovalStatus(event: EventRecord) {
       return {
         stage: "awaiting_next_approval" as const,
         label: "Pending President Review",
-        badgeClass: "bg-purple-50 text-purple-800 border-purple-200",
-        dotClass: "bg-purple-500",
+        badgeClass: "bg-[#D4AF37]/20 text-[#0A2047] border border-[#D4AF37]/40",
+        dotClass: "bg-[#D4AF37]",
         description: "VP approved. Awaiting Executive President final decision.",
         nextActor: "President",
       };
@@ -403,43 +403,43 @@ export function EventApprovalTracker({
           onClick={() => setFilter("ALL")}
           className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
             filter === "ALL"
-              ? "bg-[#174789] text-white border-[#174789] shadow-sm"
-              : "bg-white text-slate-800 border-slate-200 hover:border-slate-300"
+              ? "bg-[#0A2047] text-white border-[#0A2047] shadow-sm ring-1 ring-[#D4AF37]/30"
+              : "bg-white text-[#172033] border-[#E2E8F0] hover:border-[#D4AF37]/50"
           }`}
         >
           <div className="flex items-center justify-between">
             <span
-              className={`text-[11px] font-semibold uppercase tracking-wider ${
-                filter === "ALL" ? "text-blue-100" : "text-slate-500"
+              className={`text-[11px] font-bold uppercase tracking-wider ${
+                filter === "ALL" ? "text-slate-200" : "text-[#64748B]"
               }`}
             >
               All Events
             </span>
-            <Calendar className={`w-4 h-4 ${filter === "ALL" ? "text-blue-200" : "text-slate-400"}`} />
+            <Calendar className={`w-4 h-4 ${filter === "ALL" ? "text-[#D4AF37]" : "text-slate-400"}`} />
           </div>
-          <p className="text-2xl font-black mt-1">{counts.total}</p>
+          <p className="text-2xl font-black mt-1 font-mono">{counts.total}</p>
         </button>
 
         <button
           onClick={() => setFilter("PENDING_PRESIDENT")}
           className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
             filter === "PENDING_PRESIDENT"
-              ? "bg-amber-500 text-white border-amber-500 shadow-sm"
-              : "bg-white text-slate-800 border-slate-200 hover:border-amber-300"
+              ? "bg-[#0A2047] text-white border-[#0A2047] shadow-sm ring-2 ring-amber-400"
+              : "bg-white text-[#172033] border-[#E2E8F0] hover:border-amber-300"
           }`}
         >
           <div className="flex items-center justify-between">
             <span
-              className={`text-[11px] font-semibold uppercase tracking-wider ${
-                filter === "PENDING_PRESIDENT" ? "text-amber-100" : "text-amber-700"
+              className={`text-[11px] font-bold uppercase tracking-wider ${
+                filter === "PENDING_PRESIDENT" ? "text-amber-300" : "text-amber-700"
               }`}
             >
               Pending Pres.
             </span>
-            <Clock className={`w-4 h-4 ${filter === "PENDING_PRESIDENT" ? "text-amber-100" : "text-amber-500"}`} />
+            <Clock className={`w-4 h-4 ${filter === "PENDING_PRESIDENT" ? "text-amber-300" : "text-amber-500"}`} />
           </div>
           <p
-            className={`text-2xl font-black mt-1 ${
+            className={`text-2xl font-black mt-1 font-mono ${
               filter === "PENDING_PRESIDENT" ? "text-white" : "text-amber-600"
             }`}
           >
@@ -451,23 +451,23 @@ export function EventApprovalTracker({
           onClick={() => setFilter("PENDING_VP")}
           className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
             filter === "PENDING_VP"
-              ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
-              : "bg-white text-slate-800 border-slate-200 hover:border-indigo-300"
+              ? "bg-[#0A2047] text-white border-[#0A2047] shadow-sm ring-2 ring-[#D4AF37]"
+              : "bg-white text-[#172033] border-[#E2E8F0] hover:border-[#D4AF37]"
           }`}
         >
           <div className="flex items-center justify-between">
             <span
-              className={`text-[11px] font-semibold uppercase tracking-wider ${
-                filter === "PENDING_VP" ? "text-indigo-100" : "text-indigo-700"
+              className={`text-[11px] font-bold uppercase tracking-wider ${
+                filter === "PENDING_VP" ? "text-[#D4AF37]" : "text-[#0A2047]"
               }`}
             >
               Pending VP
             </span>
-            <Users className={`w-4 h-4 ${filter === "PENDING_VP" ? "text-indigo-100" : "text-indigo-500"}`} />
+            <Users className={`w-4 h-4 ${filter === "PENDING_VP" ? "text-[#D4AF37]" : "text-[#0A2047]"}`} />
           </div>
           <p
-            className={`text-2xl font-black mt-1 ${
-              filter === "PENDING_VP" ? "text-white" : "text-indigo-600"
+            className={`text-2xl font-black mt-1 font-mono ${
+              filter === "PENDING_VP" ? "text-white" : "text-[#0A2047]"
             }`}
           >
             {counts.pendingVp}
@@ -478,26 +478,26 @@ export function EventApprovalTracker({
           onClick={() => setFilter("READY_FOR_PUBLICATION")}
           className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
             filter === "READY_FOR_PUBLICATION"
-              ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
-              : "bg-white text-slate-800 border-slate-200 hover:border-emerald-300"
+              ? "bg-[#0A2047] text-white border-[#0A2047] shadow-sm ring-2 ring-emerald-400"
+              : "bg-white text-[#172033] border-[#E2E8F0] hover:border-emerald-300"
           }`}
         >
           <div className="flex items-center justify-between">
             <span
-              className={`text-[11px] font-semibold uppercase tracking-wider ${
-                filter === "READY_FOR_PUBLICATION" ? "text-emerald-100" : "text-emerald-700"
+              className={`text-[11px] font-bold uppercase tracking-wider ${
+                filter === "READY_FOR_PUBLICATION" ? "text-emerald-300" : "text-emerald-700"
               }`}
             >
               Ready to Publish
             </span>
             <CheckCircle2
               className={`w-4 h-4 ${
-                filter === "READY_FOR_PUBLICATION" ? "text-emerald-100" : "text-emerald-500"
+                filter === "READY_FOR_PUBLICATION" ? "text-emerald-300" : "text-emerald-500"
               }`}
             />
           </div>
           <p
-            className={`text-2xl font-black mt-1 ${
+            className={`text-2xl font-black mt-1 font-mono ${
               filter === "READY_FOR_PUBLICATION" ? "text-white" : "text-emerald-600"
             }`}
           >
@@ -509,23 +509,23 @@ export function EventApprovalTracker({
           onClick={() => setFilter("PUBLISHED")}
           className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
             filter === "PUBLISHED"
-              ? "bg-teal-600 text-white border-teal-600 shadow-sm"
-              : "bg-white text-slate-800 border-slate-200 hover:border-teal-300"
+              ? "bg-[#0A2047] text-white border-[#0A2047] shadow-sm ring-2 ring-[#D4AF37]"
+              : "bg-white text-[#172033] border-[#E2E8F0] hover:border-[#D4AF37]"
           }`}
         >
           <div className="flex items-center justify-between">
             <span
-              className={`text-[11px] font-semibold uppercase tracking-wider ${
-                filter === "PUBLISHED" ? "text-teal-100" : "text-teal-700"
+              className={`text-[11px] font-bold uppercase tracking-wider ${
+                filter === "PUBLISHED" ? "text-[#D4AF37]" : "text-[#0A2047]"
               }`}
             >
               Published
             </span>
-            <Globe className={`w-4 h-4 ${filter === "PUBLISHED" ? "text-teal-100" : "text-teal-500"}`} />
+            <Globe className={`w-4 h-4 ${filter === "PUBLISHED" ? "text-[#D4AF37]" : "text-[#0A2047]"}`} />
           </div>
           <p
-            className={`text-2xl font-black mt-1 ${
-              filter === "PUBLISHED" ? "text-white" : "text-teal-600"
+            className={`text-2xl font-black mt-1 font-mono ${
+              filter === "PUBLISHED" ? "text-white" : "text-[#0A2047]"
             }`}
           >
             {counts.published}
@@ -536,13 +536,13 @@ export function EventApprovalTracker({
           onClick={() => setFilter("REJECTED")}
           className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
             filter === "REJECTED"
-              ? "bg-rose-600 text-white border-rose-600 shadow-sm"
-              : "bg-white text-slate-800 border-slate-200 hover:border-rose-300"
+              ? "bg-rose-700 text-white border-rose-700 shadow-sm ring-1 ring-rose-400"
+              : "bg-white text-[#172033] border-[#E2E8F0] hover:border-rose-300"
           }`}
         >
           <div className="flex items-center justify-between">
             <span
-              className={`text-[11px] font-semibold uppercase tracking-wider ${
+              className={`text-[11px] font-bold uppercase tracking-wider ${
                 filter === "REJECTED" ? "text-rose-100" : "text-rose-700"
               }`}
             >
@@ -551,7 +551,7 @@ export function EventApprovalTracker({
             <XCircle className={`w-4 h-4 ${filter === "REJECTED" ? "text-rose-100" : "text-rose-500"}`} />
           </div>
           <p
-            className={`text-2xl font-black mt-1 ${
+            className={`text-2xl font-black mt-1 font-mono ${
               filter === "REJECTED" ? "text-white" : "text-rose-600"
             }`}
           >
@@ -561,15 +561,15 @@ export function EventApprovalTracker({
       </div>
 
       {/* Control Bar: Filters & Search */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="bg-white border border-[#E2E8F0] rounded-xl p-3.5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           {/* Workflow Stage Filter Dropdown */}
           <div className="flex items-center gap-1.5">
-            <Filter className="w-4 h-4 text-slate-400 shrink-0" />
+            <Filter className="w-4 h-4 text-[#64748B] shrink-0" />
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value as TrackerFilter)}
-              className="text-xs font-semibold px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#174789]/20"
+              className="text-xs font-semibold px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-[#172033] focus:outline-none focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047]"
             >
               <option value="ALL">All Stages ({counts.total})</option>
               <option value="PENDING_PRESIDENT">Pending President Approval ({counts.pendingPresident})</option>
@@ -585,7 +585,7 @@ export function EventApprovalTracker({
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="text-xs px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#174789]/20"
+            className="text-xs font-medium px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-[#172033] focus:outline-none focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047]"
           >
             <option value="ALL">All Categories</option>
             <option value="Hackathon">Hackathon</option>
@@ -606,7 +606,7 @@ export function EventApprovalTracker({
               placeholder="Search event name, proposed by, venue..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full text-xs pl-8 pr-3 py-2 rounded-lg border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#174789]/20"
+              className="w-full text-xs pl-8 pr-3 py-2 rounded-lg border border-[#E2E8F0] bg-white focus:outline-none focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] placeholder:text-slate-400 text-[#172033]"
             />
           </div>
 
@@ -614,21 +614,21 @@ export function EventApprovalTracker({
             <button
               onClick={onRefresh}
               disabled={isRefreshing}
-              className="p-2 rounded-lg border border-slate-200 text-slate-600 hover:text-[#174789] hover:bg-slate-50 transition-colors disabled:opacity-50"
+              className="p-2 rounded-lg border border-[#E2E8F0] text-[#172033] hover:text-[#0A2047] hover:bg-[#F0F3F8] transition-colors disabled:opacity-50 cursor-pointer"
               title="Refresh approval tracker records"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-blue-600" : ""}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-[#0A2047]" : ""}`} />
             </button>
           )}
         </div>
       </div>
 
       {/* Main Approval Tracker Table */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
+      <div className="bg-white border border-[#E2E8F0] rounded-xl shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50/90 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+              <tr className="bg-slate-50 border-b border-[#E2E8F0] text-[11px] font-bold text-slate-600 uppercase tracking-wider">
                 <th className="py-3.5 px-4 sm:px-6">Event Name</th>
                 <th className="py-3.5 px-4">Proposed By</th>
                 <th className="py-3.5 px-4">Submission Date</th>
@@ -642,10 +642,10 @@ export function EventApprovalTracker({
             <tbody className="divide-y divide-slate-100 text-xs">
               {filteredEvents.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-12 px-4 text-center text-slate-400">
+                  <td colSpan={8} className="py-14 px-4 text-center text-slate-400">
                     <Calendar className="w-8 h-8 mx-auto text-slate-300 mb-2" />
-                    <p className="font-semibold text-slate-600">No event proposals found</p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">
+                    <p className="font-bold text-[#172033]">No event proposals found</p>
+                    <p className="text-[11px] text-[#64748B] mt-0.5">
                       No events match the selected workflow filter or search query.
                     </p>
                   </td>
@@ -681,18 +681,18 @@ export function EventApprovalTracker({
                   return (
                     <tr
                       key={event.id}
-                      className="hover:bg-slate-50/70 transition-colors group cursor-pointer"
+                      className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
                       onClick={() => setSelectedEvent(event)}
                     >
                       {/* Event Name */}
                       <td className="py-3.5 px-4 sm:px-6">
-                        <div className="font-bold text-slate-900 group-hover:text-[#174789] transition-colors">
+                        <div className="font-bold text-[#0A2047] group-hover:text-[#132E57] transition-colors text-sm">
                           {event.title}
                         </div>
-                        <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-slate-500">
-                          <span className="font-mono text-[10px] text-slate-400">{event.id}</span>
+                        <div className="flex items-center gap-1.5 mt-1 text-[11px] text-[#64748B]">
+                          <span className="font-mono text-[10px] text-slate-400 bg-slate-100 px-1 py-0.5 rounded">{event.id}</span>
                           <span>•</span>
-                          <span className="font-medium text-slate-600">{event.category}</span>
+                          <span className="font-semibold text-[#0A2047] bg-[#0A2047]/5 px-1.5 py-0.5 rounded border border-[#0A2047]/10">{event.category}</span>
                           <span>•</span>
                           <span>Team: {event.teamSizeMin}–{event.teamSizeMax}</span>
                         </div>
@@ -700,16 +700,16 @@ export function EventApprovalTracker({
 
                       {/* Proposed By */}
                       <td className="py-3.5 px-4">
-                        <div className="font-medium text-slate-800">{event.proposedBy}</div>
+                        <div className="font-semibold text-[#172033]">{event.proposedBy}</div>
                         {event.proposedByEmail && (
-                          <div className="text-[11px] text-slate-400 truncate max-w-[150px]" title={event.proposedByEmail}>
+                          <div className="text-[11px] text-[#64748B] truncate max-w-[150px]" title={event.proposedByEmail}>
                             {event.proposedByEmail}
                           </div>
                         )}
                       </td>
 
                       {/* Submission Date */}
-                      <td className="py-3.5 px-4 text-slate-600 font-medium">
+                      <td className="py-3.5 px-4 text-[#64748B] font-medium font-mono text-[11px]">
                         {formattedSubDate}
                       </td>
 
@@ -723,7 +723,7 @@ export function EventApprovalTracker({
                           <span>{vpDec.label}</span>
                         </span>
                         {vpDec.decisionBy && (
-                          <div className="text-[10px] text-slate-400 mt-0.5 truncate max-w-[120px] mx-auto" title={vpDec.decisionBy}>
+                          <div className="text-[10px] text-[#64748B] mt-0.5 truncate max-w-[120px] mx-auto font-medium" title={vpDec.decisionBy}>
                             {vpDec.decisionBy}
                           </div>
                         )}
@@ -739,7 +739,7 @@ export function EventApprovalTracker({
                           <span>{presDec.label}</span>
                         </span>
                         {presDec.decisionBy && (
-                          <div className="text-[10px] text-slate-400 mt-0.5 truncate max-w-[120px] mx-auto" title={presDec.decisionBy}>
+                          <div className="text-[10px] text-[#64748B] mt-0.5 truncate max-w-[120px] mx-auto font-medium" title={presDec.decisionBy}>
                             {presDec.decisionBy}
                           </div>
                         )}
@@ -754,14 +754,14 @@ export function EventApprovalTracker({
                             <span className={`w-1.5 h-1.5 rounded-full ${overall.dotClass}`} />
                             <span>{overall.label}</span>
                           </span>
-                          <span className="text-[10px] text-slate-500 font-medium line-clamp-1 max-w-[180px]">
+                          <span className="text-[10px] text-[#64748B] font-medium line-clamp-1 max-w-[180px]">
                             Next: {overall.nextActor}
                           </span>
                         </div>
                       </td>
 
                       {/* Last Updated */}
-                      <td className="py-3.5 px-4 text-slate-500 text-[11px]">
+                      <td className="py-3.5 px-4 text-[#64748B] text-[11px] font-mono">
                         {formattedUpDate}
                       </td>
 
@@ -773,10 +773,10 @@ export function EventApprovalTracker({
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => setSelectedEvent(event)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-[#0A2047] border border-[#E2E8F0] text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
                             title="Inspect full proposal and approval history trail"
                           >
-                            <Eye className="w-3.5 h-3.5 text-slate-500" />
+                            <Eye className="w-3.5 h-3.5 text-[#64748B]" />
                             <span>Details</span>
                           </button>
 
@@ -785,10 +785,10 @@ export function EventApprovalTracker({
                             <button
                               onClick={() => onPublishEvent(event.id)}
                               disabled={publishingId === event.id}
-                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#174789] hover:bg-[#123668] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0A2047] hover:bg-[#132E57] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                               title="Publish approved event to public catalogue"
                             >
-                              <Globe className="w-3.5 h-3.5" />
+                              <Globe className="w-3.5 h-3.5 text-[#D4AF37]" />
                               <span>{publishingId === event.id ? "Publishing..." : "Publish"}</span>
                             </button>
                           )}
@@ -803,9 +803,9 @@ export function EventApprovalTracker({
         </div>
 
         {/* Footer info bar */}
-        <div className="p-3 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+        <div className="p-3.5 bg-slate-50 border-t border-[#E2E8F0] flex flex-col sm:flex-row items-center justify-between text-xs text-[#64748B] gap-2">
           <span>
-            Showing <strong>{filteredEvents.length}</strong> of <strong>{events.length}</strong> event proposals
+            Showing <strong className="text-[#0A2047]">{filteredEvents.length}</strong> of <strong className="text-[#0A2047]">{events.length}</strong> event proposals
           </span>
           <span className="text-[11px] text-slate-400">
             Click on any event row to open the complete decision trail and audit history.
@@ -864,17 +864,17 @@ export function EventApprovalDetailModal({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl max-w-3xl w-full border border-slate-200 shadow-2xl my-8 overflow-hidden"
+        className="bg-white rounded-2xl max-w-3xl w-full border border-[#E2E8F0] shadow-2xl my-8 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Top Header */}
-        <div className="px-6 py-5 bg-[#0E2A5C] text-white flex items-start justify-between gap-4">
+        <div className="px-6 py-5 bg-[#0A2047] text-white flex items-start justify-between gap-4 border-b-2 border-[#D4AF37]">
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-white/10 text-white/90">
                 {event.id}
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-400/20 text-blue-200 border border-blue-400/30">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/40">
                 {event.category}
               </span>
               <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${overall.badgeClass}`}>
@@ -898,24 +898,24 @@ export function EventApprovalDetailModal({
         {/* Modal Body */}
         <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
           {/* Current Blocking Stage Banner */}
-          <div className="p-4 rounded-xl border bg-slate-50 border-slate-200 flex items-start justify-between gap-3">
+          <div className="p-4 rounded-xl border bg-[#F8FAFC] border-[#E2E8F0] flex items-start justify-between gap-3">
             <div>
-              <span className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block">
+              <span className="text-[10px] font-bold uppercase text-[#64748B] tracking-wider block">
                 Current Workflow Stage
               </span>
-              <p className="text-sm font-bold text-slate-900 mt-0.5 flex items-center gap-1.5">
+              <p className="text-sm font-bold text-[#172033] mt-0.5 flex items-center gap-1.5">
                 <span className={`w-2 h-2 rounded-full ${overall.dotClass} animate-pulse`} />
                 <span>{overall.label}</span>
               </p>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+              <p className="text-xs text-[#64748B] mt-1 leading-relaxed">
                 {overall.description}
               </p>
             </div>
             <div className="text-right shrink-0">
-              <span className="text-[10px] font-bold uppercase text-slate-400 block">
+              <span className="text-[10px] font-bold uppercase text-[#64748B] block">
                 Next Action Required By
               </span>
-              <span className="text-xs font-bold text-[#174789] block mt-0.5">
+              <span className="text-xs font-bold text-[#0A2047] block mt-0.5 bg-[#0A2047]/5 px-2 py-0.5 rounded border border-[#0A2047]/10">
                 {overall.nextActor}
               </span>
             </div>
@@ -940,16 +940,16 @@ export function EventApprovalDetailModal({
 
           {/* Independent Executive Approvals Grid */}
           <div>
-            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-bold text-[#0A2047] uppercase tracking-wider mb-3">
               Independent Executive Approvals
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* President Approval Card */}
-              <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <Award className="w-3.5 h-3.5 text-purple-600" />
+              <div className="p-4 rounded-xl border border-[#E2E8F0] bg-white space-y-3 shadow-2xs">
+                <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-2">
+                  <span className="text-xs font-bold text-[#0A2047] flex items-center gap-1.5">
+                    <Award className="w-3.5 h-3.5 text-[#D4AF37]" />
                     <span>President Council</span>
                   </span>
                   <span
@@ -962,15 +962,15 @@ export function EventApprovalDetailModal({
 
                 <div className="text-xs space-y-1.5 text-slate-600">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Decided By:</span>
-                    <span className="font-semibold text-slate-800">
+                    <span className="text-[#64748B]">Decided By:</span>
+                    <span className="font-semibold text-[#172033]">
                       {presDec.decisionBy || "Awaiting President"}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Decision Date:</span>
-                    <span className="font-medium text-slate-700">
+                    <span className="text-[#64748B]">Decision Date:</span>
+                    <span className="font-medium text-[#172033] font-mono text-[11px]">
                       {presDec.decidedAt
                         ? new Date(presDec.decidedAt).toLocaleString("en-IN", {
                             month: "short",
@@ -984,26 +984,26 @@ export function EventApprovalDetailModal({
                   </div>
 
                   {presDec.comment && (
-                    <div className="pt-1.5 border-t border-slate-100 text-[11px]">
-                      <span className="text-slate-400 block font-medium">President Comment:</span>
-                      <p className="text-slate-700 italic mt-0.5">&ldquo;{presDec.comment}&rdquo;</p>
+                    <div className="pt-1.5 border-t border-[#E2E8F0] text-[11px]">
+                      <span className="text-[#64748B] block font-medium">President Comment:</span>
+                      <p className="text-[#172033] italic mt-0.5 bg-[#F8FAFC] p-2 rounded-md border border-[#E2E8F0]">&ldquo;{presDec.comment}&rdquo;</p>
                     </div>
                   )}
 
                   {presDec.rejectionReason && (
-                    <div className="pt-1.5 border-t border-slate-100 text-[11px] text-rose-700">
+                    <div className="pt-1.5 border-t border-rose-200 text-[11px] text-rose-700">
                       <span className="font-semibold block">Rejection Rationale:</span>
-                      <p className="mt-0.5">{presDec.rejectionReason}</p>
+                      <p className="mt-0.5 bg-rose-50 p-2 rounded-md border border-rose-200">{presDec.rejectionReason}</p>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* Vice President Coordination Card */}
-              <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5 text-indigo-600" />
+              <div className="p-4 rounded-xl border border-[#E2E8F0] bg-white space-y-3 shadow-2xs">
+                <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-2">
+                  <span className="text-xs font-bold text-[#0A2047] flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5 text-[#0A2047]" />
                     <span>Vice President Council</span>
                   </span>
                   <span
@@ -1016,23 +1016,23 @@ export function EventApprovalDetailModal({
 
                 <div className="text-xs space-y-1.5 text-slate-600">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Coordinated By:</span>
-                    <span className="font-semibold text-slate-800">
+                    <span className="text-[#64748B]">Coordinated By:</span>
+                    <span className="font-semibold text-[#172033]">
                       {event.coordinatorName || vpDec.decisionBy || "Unassigned"}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Coordination Status:</span>
-                    <span className="font-semibold text-slate-800 capitalize">
+                    <span className="text-[#64748B]">Coordination Status:</span>
+                    <span className="font-semibold text-[#172033] capitalize">
                       {(event.coordinationStatus || "Awaiting Coordination").replace(/_/g, " ")}
                     </span>
                   </div>
 
                   {vpDec.decidedAt && (
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400">Sign-Off Date:</span>
-                      <span className="font-medium text-slate-700">
+                      <span className="text-[#64748B]">Sign-Off Date:</span>
+                      <span className="font-medium text-[#172033] font-mono text-[11px]">
                         {new Date(vpDec.decidedAt).toLocaleString("en-IN", {
                           month: "short",
                           day: "numeric",
@@ -1045,16 +1045,16 @@ export function EventApprovalDetailModal({
                   )}
 
                   {vpDec.comment && (
-                    <div className="pt-1.5 border-t border-slate-100 text-[11px]">
-                      <span className="text-slate-400 block font-medium">VP Notes:</span>
-                      <p className="text-slate-700 italic mt-0.5">&ldquo;{vpDec.comment}&rdquo;</p>
+                    <div className="pt-1.5 border-t border-[#E2E8F0] text-[11px]">
+                      <span className="text-[#64748B] block font-medium">VP Notes:</span>
+                      <p className="text-[#172033] italic mt-0.5 bg-[#F8FAFC] p-2 rounded-md border border-[#E2E8F0]">&ldquo;{vpDec.comment}&rdquo;</p>
                     </div>
                   )}
 
                   {event.coordinationBlockers && (
-                    <div className="pt-1.5 border-t border-slate-100 text-[11px] text-amber-700">
+                    <div className="pt-1.5 border-t border-amber-200 text-[11px] text-amber-700">
                       <span className="font-semibold block">Logistical Blocker:</span>
-                      <p className="mt-0.5">{event.coordinationBlockers}</p>
+                      <p className="mt-0.5 bg-amber-50 p-2 rounded-md border border-amber-200">{event.coordinationBlockers}</p>
                     </div>
                   )}
                 </div>
@@ -1063,19 +1063,19 @@ export function EventApprovalDetailModal({
           </div>
 
           {/* Proposal Specifications */}
-          <div className="bg-slate-50/70 border border-slate-200 rounded-xl p-4 space-y-3">
-            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+          <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4 space-y-3">
+            <h3 className="text-xs font-bold text-[#0A2047] uppercase tracking-wider">
               Proposal Details & Logistics
             </h3>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div>
-                <span className="text-slate-400 block text-[11px]">Proposed By</span>
-                <span className="font-semibold text-slate-800">{event.proposedBy}</span>
+                <span className="text-[#64748B] block text-[11px]">Proposed By</span>
+                <span className="font-semibold text-[#172033]">{event.proposedBy}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Submission Date</span>
-                <span className="font-semibold text-slate-800">
+                <span className="text-[#64748B] block text-[11px]">Submission Date</span>
+                <span className="font-semibold text-[#172033] font-mono text-[11px]">
                   {event.submittedAt || event.createdAt
                     ? new Date(event.submittedAt || event.createdAt).toLocaleDateString("en-IN", {
                         month: "short",
@@ -1086,62 +1086,62 @@ export function EventApprovalDetailModal({
                 </span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Venue</span>
-                <span className="font-semibold text-slate-800">{event.venuePlaceholder}</span>
+                <span className="text-[#64748B] block text-[11px]">Venue</span>
+                <span className="font-semibold text-[#172033]">{event.venuePlaceholder}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Target Dates</span>
-                <span className="font-semibold text-slate-800">
+                <span className="text-[#64748B] block text-[11px]">Target Dates</span>
+                <span className="font-semibold text-[#172033]">
                   {event.proposedDateTime || event.datePlaceholder}
                 </span>
               </div>
             </div>
 
-            <div className="text-xs pt-2 border-t border-slate-200/60">
-              <span className="text-slate-400 block text-[11px] font-medium">Description</span>
-              <p className="text-slate-700 mt-0.5 leading-relaxed">{event.description}</p>
+            <div className="text-xs pt-2 border-t border-[#E2E8F0]">
+              <span className="text-[#64748B] block text-[11px] font-medium">Description</span>
+              <p className="text-[#172033] mt-0.5 leading-relaxed">{event.description}</p>
             </div>
 
             {event.objectives && (
               <div className="text-xs pt-1">
-                <span className="text-slate-400 block text-[11px] font-medium">Objectives</span>
-                <p className="text-slate-700 mt-0.5 leading-relaxed">{event.objectives}</p>
+                <span className="text-[#64748B] block text-[11px] font-medium">Objectives</span>
+                <p className="text-[#172033] mt-0.5 leading-relaxed">{event.objectives}</p>
               </div>
             )}
           </div>
 
           {/* Chronological Approval & Decision History Trail */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center justify-between">
+            <h3 className="text-xs font-bold text-[#0A2047] uppercase tracking-wider flex items-center justify-between">
               <span>Chronological Approval Trail</span>
-              <span className="text-[11px] font-normal text-slate-400">
+              <span className="text-[11px] font-normal text-[#64748B]">
                 {event.approvalHistory?.length || 1} logged events
               </span>
             </h3>
 
-            <div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100 bg-white">
+            <div className="border border-[#E2E8F0] rounded-xl overflow-hidden divide-y divide-slate-100 bg-white">
               {(!event.approvalHistory || event.approvalHistory.length === 0) ? (
                 <div className="p-4 text-xs text-slate-600 flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 mt-0.5">
-                    <Send className="w-3 h-3" />
+                  <div className="w-6 h-6 rounded-full bg-[#0A2047]/10 text-[#0A2047] flex items-center justify-center shrink-0 mt-0.5">
+                    <Send className="w-3 h-3 text-[#D4AF37]" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-900">Proposal Submitted</span>
-                      <span className="text-[11px] text-slate-400">
+                      <span className="font-bold text-[#172033]">Proposal Submitted</span>
+                      <span className="text-[11px] text-[#64748B]">
                         {event.submittedAt
                           ? new Date(event.submittedAt).toLocaleString("en-IN")
                           : new Date(event.createdAt).toLocaleString("en-IN")}
                       </span>
                     </div>
-                    <p className="text-slate-600 text-[11px] mt-0.5">
+                    <p className="text-[#64748B] text-[11px] mt-0.5">
                       Submitted by {event.proposedBy} for executive evaluation.
                     </p>
                   </div>
                 </div>
               ) : (
                 event.approvalHistory.map((item, idx) => (
-                  <div key={item.id || idx} className="p-3.5 text-xs flex items-start gap-3">
+                  <div key={item.id || idx} className="p-3.5 text-xs flex items-start gap-3 hover:bg-slate-50/50 transition-colors">
                     <div
                       className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
                         item.decision === "approved"
@@ -1149,10 +1149,10 @@ export function EventApprovalDetailModal({
                           : item.decision === "rejected"
                           ? "bg-rose-100 text-rose-700"
                           : item.decision === "published"
-                          ? "bg-teal-100 text-teal-700"
+                          ? "bg-[#0A2047] text-[#D4AF37]"
                           : item.decision === "coordinated"
-                          ? "bg-indigo-100 text-indigo-700"
-                          : "bg-blue-100 text-blue-700"
+                          ? "bg-[#0A2047]/10 text-[#0A2047]"
+                          : "bg-[#0A2047]/10 text-[#0A2047]"
                       }`}
                     >
                       {item.decision === "approved" ? (
@@ -1164,15 +1164,15 @@ export function EventApprovalDetailModal({
                       ) : item.decision === "coordinated" ? (
                         <Users className="w-3.5 h-3.5" />
                       ) : (
-                        <Send className="w-3 h-3" />
+                        <Send className="w-3.5 h-3.5" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="font-bold text-slate-900 capitalize">
+                        <span className="font-bold text-[#172033] capitalize">
                           {item.stage} • {item.decision}
                         </span>
-                        <span className="text-[10px] text-slate-400 font-mono shrink-0">
+                        <span className="text-[10px] text-[#64748B] font-mono shrink-0">
                           {new Date(item.timestamp).toLocaleString("en-IN", {
                             month: "short",
                             day: "numeric",
@@ -1182,11 +1182,11 @@ export function EventApprovalDetailModal({
                           })}
                         </span>
                       </div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">
-                        Actor: <strong className="text-slate-700">{item.actorName}</strong> ({item.actorRole || item.stage})
+                      <div className="text-[11px] text-[#64748B] mt-0.5">
+                        Actor: <strong className="text-[#172033]">{item.actorName}</strong> ({item.actorRole || item.stage})
                       </div>
                       {item.comment && (
-                        <p className="text-[11px] text-slate-600 mt-1 italic bg-slate-50 p-2 rounded-md border border-slate-100">
+                        <p className="text-[11px] text-[#172033] mt-1 italic bg-[#F8FAFC] p-2 rounded-md border border-[#E2E8F0]">
                           &ldquo;{item.comment}&rdquo;
                         </p>
                       )}
@@ -1204,10 +1204,10 @@ export function EventApprovalDetailModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 px-6 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3">
-          <div className="text-xs text-slate-500">
+        <div className="p-4 px-6 bg-slate-50 border-t border-[#E2E8F0] flex items-center justify-between gap-3">
+          <div className="text-xs text-[#64748B]">
             Current Status:{" "}
-            <span className="font-semibold text-slate-800 capitalize">
+            <span className="font-bold text-[#0A2047] capitalize">
               {event.status}
             </span>
           </div>
@@ -1215,7 +1215,7 @@ export function EventApprovalDetailModal({
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-semibold transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-lg bg-white border border-[#E2E8F0] text-[#172033] hover:bg-slate-100 text-xs font-semibold transition-colors cursor-pointer"
             >
               Close
             </button>
@@ -1224,9 +1224,9 @@ export function EventApprovalDetailModal({
               <button
                 onClick={() => onPublish(event.id)}
                 disabled={isPublishing}
-                className="px-4 py-2 rounded-lg bg-[#174789] hover:bg-[#123668] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                className="px-4 py-2 rounded-lg bg-[#0A2047] hover:bg-[#132E57] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
               >
-                <Globe className="w-3.5 h-3.5" />
+                <Globe className="w-3.5 h-3.5 text-[#D4AF37]" />
                 <span>{isPublishing ? "Publishing Event..." : "Publish Event Now"}</span>
               </button>
             )}

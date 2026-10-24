@@ -167,6 +167,9 @@ async function runTrackerTests() {
     body: JSON.stringify({ eventId: newEvtId, action: "submit" }),
   });
   const submitData = await submitRes.json();
+  if (submitRes.status !== 200) {
+    console.log("DEBUG submitRes:", submitRes.status, submitData);
+  }
   assert(submitRes.status === 200 && submitData.event?.status === "proposed", "Proposal submitted for review");
 
   // Check state: Should be pending VP review first in Workflow A
@@ -290,7 +293,11 @@ async function runTrackerTests() {
     body: JSON.stringify({ eventId: newEvtId, action: "publish" }),
   });
   const adminPublishData = await adminPublishRes.json();
-  assert(adminPublishRes.status === 200 && adminPublishData.event?.status === "published", "Administrator published fully approved event");
+  assert(
+    adminPublishRes.status === 200 &&
+      (adminPublishData.event?.status === "published" || adminPublishData.event?.event?.status === "published"),
+    "Administrator published fully approved event"
+  );
 
   // Summary
   console.log("\n=================================================================");

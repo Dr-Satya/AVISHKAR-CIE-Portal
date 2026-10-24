@@ -150,8 +150,8 @@ export default function PresidentPortalPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-3">
-        <Loader2 className="w-8 h-8 text-purple-700 animate-spin" />
-        <p className="text-xs text-slate-500 font-medium">Loading President Executive Portal...</p>
+        <Loader2 className="w-8 h-8 text-[#0A2047] animate-spin" />
+        <p className="text-xs text-[#64748B] font-medium">Loading President Executive Portal...</p>
       </div>
     );
   }
@@ -173,13 +173,13 @@ export default function PresidentPortalPage() {
         <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href="/admin/president/login"
-            className="px-4 py-2 rounded-lg bg-[#174789] hover:bg-[#123668] text-white text-xs font-semibold shadow-xs transition-colors"
+            className="px-4 py-2 rounded-lg bg-[#0A2047] hover:bg-[#132E57] text-white text-xs font-semibold shadow-xs border border-[#D4AF37]/30 transition-colors"
           >
             Sign in with President Account
           </Link>
           <Link
             href="/admin/dashboard"
-            className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold shadow-xs transition-colors"
+            className="px-4 py-2 rounded-lg bg-[#F0F3F8] hover:bg-[#E2E8F0] text-[#172033] text-xs font-semibold shadow-xs transition-colors"
           >
             Back to Portal Selection
           </Link>
@@ -241,13 +241,13 @@ export default function PresidentPortalPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#E2E8F0]">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0A2047] flex items-center gap-2">
-            <Crown className="w-6 h-6 text-purple-700 inline" />
+            <Crown className="w-6 h-6 text-[#D4AF37] inline" />
             <span>President Dashboard</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-[#64748B] mt-1">
             Welcome, {user?.fullName || "President"}. Executive event proposal approvals, committee oversight, and audit logs.
           </p>
         </div>
@@ -255,16 +255,16 @@ export default function PresidentPortalPage() {
 
       {/* Executive Action Banner */}
       {pendingProposals.length > 0 && (
-        <div className="bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 border border-purple-200 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+        <div className="bg-[#0A2047]/5 border border-[#D4AF37]/30 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
           <div className="flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-lg bg-purple-700 text-white flex items-center justify-center shrink-0 shadow-xs">
-              <Clock className="w-5 h-5 animate-pulse" />
+            <div className="w-10 h-10 rounded-lg bg-[#0A2047] text-white flex items-center justify-center shrink-0 shadow-xs border border-[#D4AF37]/30">
+              <Clock className="w-5 h-5 text-[#D4AF37] animate-pulse" />
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-bold text-slate-900">
+              <h3 className="text-sm sm:text-base font-bold text-[#0A2047]">
                 Action Required: {pendingProposals.length} Proposal{pendingProposals.length > 1 ? "s" : ""} Awaiting Executive Review
               </h3>
-              <p className="text-xs text-slate-600 mt-0.5">
+              <p className="text-xs text-[#64748B] mt-0.5">
                 Council members have submitted competition proposals requiring formal presidential authorization before logistical planning can begin.
               </p>
             </div>
@@ -274,10 +274,10 @@ export default function PresidentPortalPage() {
               setQueueTab("pending");
               document.getElementById("review-queue-section")?.scrollIntoView({ behavior: "smooth" });
             }}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold transition-colors shadow-xs shrink-0 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#0A2047] hover:bg-[#132E57] border border-[#D4AF37]/30 text-white text-xs font-bold transition-colors shadow-xs shrink-0 cursor-pointer"
           >
             <span>Review Queue ({pendingProposals.length})</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3.5 h-3.5 text-[#D4AF37]" />
           </button>
         </div>
       )}
@@ -287,14 +287,14 @@ export default function PresidentPortalPage() {
           className={`p-4 rounded-lg flex items-center justify-between gap-3 text-xs sm:text-sm border ${
             feedbackMessage.type === "success"
               ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-              : "bg-red-50 border-red-200 text-red-800"
+              : "bg-rose-50 border-rose-200 text-rose-800"
           }`}
         >
           <div className="flex items-center gap-2">
             {feedbackMessage.type === "success" ? (
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             ) : (
-              <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
             )}
             <span>{feedbackMessage.text}</span>
           </div>
@@ -308,9 +308,9 @@ export default function PresidentPortalPage() {
       )}
 
       {awaitingVpReview.length > 0 && (
-        <div className="p-3.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs flex items-center justify-between">
+        <div className="p-3.5 rounded-lg bg-[#0A2047]/5 border border-[#D4AF37]/30 text-[#0A2047] text-xs flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-indigo-600 shrink-0" />
+            <Clock className="w-4 h-4 text-[#D4AF37] shrink-0" />
             <span>
               Workflow A Pipeline: <strong>{awaitingVpReview.length}</strong> member proposal{awaitingVpReview.length > 1 ? "s are" : " is"} currently undergoing Step 1 (Vice President operational review) and will enter this queue once approved by the Vice President.
             </span>
@@ -320,57 +320,57 @@ export default function PresidentPortalPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 sm:gap-4">
-        <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs">
+        <div className="bg-white border border-[#E2E8F0] rounded-xl p-4 sm:p-5 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Pending Approvals</span>
-            <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs">
-              <Clock className="w-4 h-4" />
+            <span className="text-xs font-semibold text-[#64748B]">Pending Approvals</span>
+            <div className="w-8 h-8 rounded-lg bg-[#0A2047]/10 text-[#0A2047] flex items-center justify-center font-bold text-xs border border-[#0A2047]/20">
+              <Clock className="w-4 h-4 text-[#D4AF37]" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-slate-900 mt-2">{pendingProposals.length}</p>
-          <span className="text-[11px] text-purple-700 font-medium mt-1 block">Awaiting executive decision</span>
+          <p className="text-2xl font-bold text-[#172033] mt-2">{pendingProposals.length}</p>
+          <span className="text-[11px] text-[#0A2047] font-medium mt-1 block">Awaiting executive decision</span>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs">
+        <div className="bg-white border border-[#E2E8F0] rounded-xl p-4 sm:p-5 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Approved Proposals</span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
+            <span className="text-xs font-semibold text-[#64748B]">Approved Proposals</span>
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center font-bold text-xs">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-emerald-600 mt-2">{approvedProposals.length}</p>
+          <p className="text-2xl font-bold text-emerald-700 mt-2">{approvedProposals.length}</p>
           <span className="text-[11px] text-emerald-700 font-medium mt-1 block">In VP/Admin pipeline</span>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs">
+        <div className="bg-white border border-[#E2E8F0] rounded-xl p-4 sm:p-5 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Rejected Proposals</span>
-            <div className="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-xs">
+            <span className="text-xs font-semibold text-[#64748B]">Rejected Proposals</span>
+            <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center font-bold text-xs">
               <XCircle className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-rose-600 mt-2">{rejectedProposals.length}</p>
+          <p className="text-2xl font-bold text-rose-700 mt-2">{rejectedProposals.length}</p>
           <span className="text-[11px] text-rose-700 font-medium mt-1 block">Feedback saved</span>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-xs">
+        <div className="bg-white border border-[#E2E8F0] rounded-xl p-4 sm:p-5 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Active Published</span>
-            <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">
-              <Calendar className="w-4 h-4" />
+            <span className="text-xs font-semibold text-[#64748B]">Active Published</span>
+            <div className="w-8 h-8 rounded-lg bg-[#0A2047]/10 text-[#0A2047] flex items-center justify-center font-bold text-xs border border-[#0A2047]/20">
+              <Calendar className="w-4 h-4 text-[#D4AF37]" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-slate-900 mt-2">{publishedEvents.length}</p>
-          <span className="text-[11px] text-blue-700 font-medium mt-1 block">Live on public portal</span>
+          <p className="text-2xl font-bold text-[#172033] mt-2">{publishedEvents.length}</p>
+          <span className="text-[11px] text-[#0A2047] font-medium mt-1 block">Live on public portal</span>
         </div>
       </div>
 
       {/* Decision Modal (Approve / Reject) */}
       {activeDecisionModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-          <div className="bg-white border border-slate-200 rounded-xl shadow-xl w-full max-w-lg p-6 space-y-4 animate-in fade-in">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A2047]/60 backdrop-blur-xs p-4">
+          <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-2xl w-full max-w-lg p-6 space-y-4 animate-in fade-in">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
+              <h3 className="text-base font-bold text-[#0A2047] flex items-center gap-2">
                 {activeDecisionModal.action === "approve" ? (
                   <>
                     <CheckCircle2 className="w-5 h-5 text-emerald-600" />
@@ -385,31 +385,31 @@ export default function PresidentPortalPage() {
               </h3>
               <button
                 onClick={() => setActiveDecisionModal(null)}
-                className="text-slate-400 hover:text-slate-600 text-lg font-bold cursor-pointer"
+                className="text-slate-400 hover:text-[#0A2047] text-lg font-bold cursor-pointer"
               >
                 &times;
               </button>
             </div>
 
             <div>
-              <p className="text-xs text-slate-500">
-                Competition Track: <strong className="text-slate-800">{activeDecisionModal.event.title}</strong>
+              <p className="text-xs text-[#64748B]">
+                Competition Track: <strong className="text-[#172033]">{activeDecisionModal.event.title}</strong>
               </p>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-[#64748B]">
                 Proposed By: {activeDecisionModal.event.proposedBy}
               </p>
             </div>
 
             {decisionError && (
-              <div className="p-3 rounded-lg bg-red-50 text-red-700 border border-red-200 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
+              <div className="p-3 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                 <span>{decisionError}</span>
               </div>
             )}
 
             {activeDecisionModal.action === "reject" ? (
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-[#172033] mb-1">
                   Reason for Rejection * (Mandatory for member feedback)
                 </label>
                 <textarea
@@ -418,12 +418,12 @@ export default function PresidentPortalPage() {
                   placeholder="Explain why this proposal is not approved (e.g., overlapping track, insufficient lab space, budget constraints, safety review required)..."
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
-                  className="w-full text-xs px-3 py-2 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  className="w-full text-xs px-3 py-2 rounded-lg border border-[#E2E8F0] focus:outline-none focus:ring-2 focus:ring-rose-500 text-[#172033]"
                 />
               </div>
             ) : (
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-[#172033] mb-1">
                   Approval Notes / Committee Directives (Optional)
                 </label>
                 <textarea
@@ -431,16 +431,16 @@ export default function PresidentPortalPage() {
                   placeholder="e.g., Approved for Main Auditorium. Assign VP Operations for scheduling and sponsor allocation."
                   value={approvalNote}
                   onChange={(e) => setApprovalNote(e.target.value)}
-                  className="w-full text-xs px-3 py-2 rounded-md border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full text-xs px-3 py-2 rounded-lg border border-[#E2E8F0] focus:outline-none focus:ring-2 focus:ring-[#0A2047]/15 focus:border-[#0A2047] text-[#172033]"
                 />
               </div>
             )}
 
-            <div className="flex items-center justify-end gap-3 pt-2">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#E2E8F0]">
               <button
                 type="button"
                 onClick={() => setActiveDecisionModal(null)}
-                className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-lg border border-[#E2E8F0] text-[#172033] text-xs font-semibold hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -467,64 +467,64 @@ export default function PresidentPortalPage() {
 
       {/* Inspect Proposal Modal */}
       {inspectEvent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-          <div className="bg-white border border-slate-200 rounded-xl shadow-xl w-full max-w-2xl p-6 space-y-4 animate-in fade-in max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0A2047]/60 backdrop-blur-xs p-4">
+          <div className="bg-white border border-[#E2E8F0] rounded-2xl shadow-2xl w-full max-w-2xl p-6 space-y-4 animate-in fade-in max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-100 text-purple-800">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#0A2047]/10 text-[#0A2047] border border-[#0A2047]/20">
                   {inspectEvent.category}
                 </span>
-                <h3 className="text-base font-bold text-slate-900">{inspectEvent.title}</h3>
+                <h3 className="text-base font-bold text-[#0A2047]">{inspectEvent.title}</h3>
               </div>
               <button
                 onClick={() => setInspectEvent(null)}
-                className="text-slate-400 hover:text-slate-600 text-lg font-bold cursor-pointer"
+                className="text-slate-400 hover:text-[#0A2047] text-lg font-bold cursor-pointer"
               >
                 &times;
               </button>
             </div>
 
-            <div className="space-y-3 text-xs text-slate-700">
+            <div className="space-y-3 text-xs text-[#172033]">
               <div>
-                <strong className="text-slate-900 block mb-0.5">Description:</strong>
-                <p className="leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <strong className="text-[#172033] block mb-0.5">Description:</strong>
+                <p className="leading-relaxed bg-[#F5F7FA] p-2.5 rounded-lg border border-[#E2E8F0] text-[#172033]">
                   {inspectEvent.description}
                 </p>
               </div>
 
               {inspectEvent.objectives && (
                 <div>
-                  <strong className="text-slate-900 block mb-0.5">Objectives:</strong>
-                  <p className="leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                  <strong className="text-[#172033] block mb-0.5">Objectives:</strong>
+                  <p className="leading-relaxed bg-[#F5F7FA] p-2.5 rounded-lg border border-[#E2E8F0] text-[#172033]">
                     {inspectEvent.objectives}
                   </p>
                 </div>
               )}
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">
-                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <span className="text-[10px] text-slate-400 block">Proposed Date</span>
-                  <span className="font-semibold text-slate-800">{inspectEvent.proposedDateTime || inspectEvent.datePlaceholder}</span>
+                <div className="bg-[#F5F7FA] p-2 rounded-lg border border-[#E2E8F0]">
+                  <span className="text-[10px] text-[#64748B] block">Proposed Date</span>
+                  <span className="font-semibold text-[#172033]">{inspectEvent.proposedDateTime || inspectEvent.datePlaceholder}</span>
                 </div>
-                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <span className="text-[10px] text-slate-400 block">Venue & Mode</span>
-                  <span className="font-semibold text-slate-800">{inspectEvent.venuePlaceholder} ({inspectEvent.deliveryMode || "In-Person"})</span>
+                <div className="bg-[#F5F7FA] p-2 rounded-lg border border-[#E2E8F0]">
+                  <span className="text-[10px] text-[#64748B] block">Venue & Mode</span>
+                  <span className="font-semibold text-[#172033]">{inspectEvent.venuePlaceholder} ({inspectEvent.deliveryMode || "In-Person"})</span>
                 </div>
-                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <span className="text-[10px] text-slate-400 block">Participants</span>
-                  <span className="font-semibold text-slate-800">~{inspectEvent.expectedParticipants || 50} Students</span>
+                <div className="bg-[#F5F7FA] p-2 rounded-lg border border-[#E2E8F0]">
+                  <span className="text-[10px] text-[#64748B] block">Participants</span>
+                  <span className="font-semibold text-[#172033]">~{inspectEvent.expectedParticipants || 50} Students</span>
                 </div>
-                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <span className="text-[10px] text-slate-400 block">Team Sizes</span>
-                  <span className="font-semibold text-slate-800">{inspectEvent.teamSizeMin}–{inspectEvent.teamSizeMax} Members</span>
+                <div className="bg-[#F5F7FA] p-2 rounded-lg border border-[#E2E8F0]">
+                  <span className="text-[10px] text-[#64748B] block">Team Sizes</span>
+                  <span className="font-semibold text-[#172033]">{inspectEvent.teamSizeMin}–{inspectEvent.teamSizeMax} Members</span>
                 </div>
-                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <span className="text-[10px] text-slate-400 block">Submitter</span>
-                  <span className="font-semibold text-slate-800 truncate block">{inspectEvent.proposedBy}</span>
+                <div className="bg-[#F5F7FA] p-2 rounded-lg border border-[#E2E8F0]">
+                  <span className="text-[10px] text-[#64748B] block">Submitter</span>
+                  <span className="font-semibold text-[#172033] truncate block">{inspectEvent.proposedBy}</span>
                 </div>
-                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  <span className="text-[10px] text-slate-400 block">Submission Date</span>
-                  <span className="font-semibold text-slate-800">
+                <div className="bg-[#F5F7FA] p-2 rounded-lg border border-[#E2E8F0]">
+                  <span className="text-[10px] text-[#64748B] block">Submission Date</span>
+                  <span className="font-semibold text-[#172033]">
                     {inspectEvent.submittedAt ? new Date(inspectEvent.submittedAt).toLocaleDateString() : "Earlier"}
                   </span>
                 </div>
@@ -532,8 +532,8 @@ export default function PresidentPortalPage() {
 
               {inspectEvent.requiredResources && (
                 <div>
-                  <strong className="text-slate-900 block mb-0.5">Required Resources:</strong>
-                  <p className="bg-slate-50 p-2 rounded-lg border border-slate-100">
+                  <strong className="text-[#172033] block mb-0.5">Required Resources:</strong>
+                  <p className="bg-[#F5F7FA] p-2 rounded-lg border border-[#E2E8F0] text-[#172033]">
                     {inspectEvent.requiredResources}
                   </p>
                 </div>
@@ -541,8 +541,8 @@ export default function PresidentPortalPage() {
 
               {inspectEvent.reviewComment && (
                 <div>
-                  <strong className="text-slate-900 block mb-0.5">Review Decision Comment:</strong>
-                  <p className="bg-purple-50 p-2.5 rounded-lg border border-purple-100 text-purple-900">
+                  <strong className="text-[#172033] block mb-0.5">Review Decision Comment:</strong>
+                  <p className="bg-[#0A2047]/5 p-2.5 rounded-lg border border-[#0A2047]/15 text-[#0A2047]">
                     {inspectEvent.reviewComment}
                   </p>
                 </div>
@@ -554,8 +554,8 @@ export default function PresidentPortalPage() {
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-[11px] text-slate-400">ID: {inspectEvent.id}</span>
+            <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-between">
+              <span className="text-[11px] text-[#64748B]">ID: {inspectEvent.id}</span>
               <div className="flex items-center gap-2">
                 {inspectEvent.status === "proposed" && (
                   <>
@@ -581,7 +581,7 @@ export default function PresidentPortalPage() {
                 )}
                 <button
                   onClick={() => setInspectEvent(null)}
-                  className="px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer"
+                  className="px-4 py-1.5 rounded-lg bg-[#F0F3F8] hover:bg-[#E2E8F0] text-[#172033] text-xs font-semibold cursor-pointer border border-[#E2E8F0]"
                 >
                   Close
                 </button>
@@ -592,15 +592,15 @@ export default function PresidentPortalPage() {
       )}
 
       {/* 1. Proposal Review Queue */}
-      <div id="review-queue-section" className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
-        <div className="p-5 sm:p-6 border-b border-slate-200 flex flex-col gap-4">
+      <div id="review-queue-section" className="bg-white border border-[#E2E8F0] rounded-xl shadow-xs overflow-hidden">
+        <div className="p-5 sm:p-6 border-b border-[#E2E8F0] flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-purple-700" />
+              <h2 className="text-base font-bold text-[#0A2047] flex items-center gap-2">
+                <Clock className="w-4 h-4 text-[#D4AF37]" />
                 <span>Event Proposal Review Queue</span>
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-[#64748B] mt-0.5">
                 Review and authorize proposed event tracks submitted by AVISHKAR members.
               </p>
             </div>
@@ -610,8 +610,8 @@ export default function PresidentPortalPage() {
                 onClick={() => setQueueTab("pending")}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                   queueTab === "pending"
-                    ? "bg-purple-600 text-white shadow-xs"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    ? "bg-[#0A2047] text-white shadow-xs"
+                    : "bg-[#F0F3F8] text-[#172033] hover:bg-[#E2E8F0]"
                 }`}
               >
                 Pending ({pendingProposals.length})
@@ -620,8 +620,8 @@ export default function PresidentPortalPage() {
                 onClick={() => setQueueTab("approved")}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                   queueTab === "approved"
-                    ? "bg-purple-600 text-white shadow-xs"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    ? "bg-[#0A2047] text-white shadow-xs"
+                    : "bg-[#F0F3F8] text-[#172033] hover:bg-[#E2E8F0]"
                 }`}
               >
                 Approved ({approvedProposals.length})
@@ -630,8 +630,8 @@ export default function PresidentPortalPage() {
                 onClick={() => setQueueTab("rejected")}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                   queueTab === "rejected"
-                    ? "bg-purple-600 text-white shadow-xs"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    ? "bg-[#0A2047] text-white shadow-xs"
+                    : "bg-[#F0F3F8] text-[#172033] hover:bg-[#E2E8F0]"
                 }`}
               >
                 Rejected ({rejectedProposals.length})
@@ -640,8 +640,8 @@ export default function PresidentPortalPage() {
                 onClick={() => setQueueTab("all")}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                   queueTab === "all"
-                    ? "bg-purple-600 text-white shadow-xs"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    ? "bg-[#0A2047] text-white shadow-xs"
+                    : "bg-[#F0F3F8] text-[#172033] hover:bg-[#E2E8F0]"
                 }`}
               >
                 All Proposals
@@ -652,21 +652,21 @@ export default function PresidentPortalPage() {
           {/* Search & Category Filter */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
             <div className="relative flex-1">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search proposal title, category, or submitter..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full text-xs pl-8 pr-3 py-2 rounded-md border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                className="w-full text-xs pl-8 pr-3 py-2 rounded-md border border-[#E2E8F0] bg-white text-[#172033] placeholder:text-[#64748B]/60 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0A2047] focus:border-[#0A2047]"
               />
             </div>
             <div className="flex items-center gap-2">
-              <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+              <Filter className="w-3.5 h-3.5 text-[#64748B] shrink-0" />
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="text-xs py-2 px-2.5 rounded-md border border-slate-200 bg-slate-50/50 text-slate-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                className="text-xs py-2 px-2.5 rounded-md border border-[#E2E8F0] bg-white text-[#172033] focus:outline-none focus:ring-2 focus:ring-[#0A2047] focus:border-[#0A2047]"
               >
                 <option value="ALL">All Categories</option>
                 <option value="Coding">Coding</option>
@@ -680,9 +680,9 @@ export default function PresidentPortalPage() {
           </div>
         </div>
 
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-[#E2E8F0]">
           {filteredQueueItems.length === 0 ? (
-            <div className="p-8 text-center text-xs text-slate-400">
+            <div className="p-8 text-center text-xs text-[#64748B]">
               No event proposals match your filter criteria.
             </div>
           ) : (
@@ -692,13 +692,13 @@ export default function PresidentPortalPage() {
               const isRejected = event.status === "rejected";
 
               return (
-                <div key={event.id} className="p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:bg-slate-50/50 transition-colors">
+                <div key={event.id} className="p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:bg-[#F5F7FA] transition-colors">
                   <div className="space-y-1.5 max-w-3xl">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#F0F3F8] text-[#172033] border border-[#E2E8F0]">
                         {event.id}
                       </span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-100 text-purple-800">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#0A2047]/10 text-[#0A2047] border border-[#0A2047]/20">
                         {event.category}
                       </span>
                       {event.vpStatus === "approved" && (
@@ -707,11 +707,11 @@ export default function PresidentPortalPage() {
                           <span>VP Approved ({event.vpApprovedBy || "Vice President"})</span>
                         </span>
                       )}
-                      <h3 className="text-sm sm:text-base font-bold text-slate-900">{event.title}</h3>
+                      <h3 className="text-sm sm:text-base font-bold text-[#172033]">{event.title}</h3>
                     </div>
-                    <p className="text-xs text-slate-600 leading-relaxed">{event.description}</p>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-500 pt-1">
-                      <span>Proposed By: <strong className="text-slate-700">{event.proposedBy}</strong></span>
+                    <p className="text-xs text-[#64748B] leading-relaxed">{event.description}</p>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-[#64748B] pt-1">
+                      <span>Proposed By: <strong className="text-[#172033]">{event.proposedBy}</strong></span>
                       <span>Venue: {event.venuePlaceholder}</span>
                       <span>Team Sizes: {event.teamSizeMin}–{event.teamSizeMax} Members</span>
                       {event.submittedAt && (
@@ -722,7 +722,7 @@ export default function PresidentPortalPage() {
                     {/* Review comment preview if decision was made */}
                     {event.reviewComment && (
                       <div className="pt-1 text-[11px]">
-                        <span className="text-slate-500">Executive Decision: </span>
+                        <span className="text-[#64748B]">Executive Decision: </span>
                         <strong className={isRejected ? "text-rose-700" : "text-emerald-700"}>
                           {event.reviewComment}
                         </strong>
@@ -733,7 +733,7 @@ export default function PresidentPortalPage() {
                   <div className="flex flex-wrap items-center gap-2.5 shrink-0 self-start lg:self-center">
                     <button
                       onClick={() => setInspectEvent(event)}
-                      className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-[#F0F3F8] hover:bg-[#E2E8F0] text-[#172033] text-xs font-semibold transition-colors cursor-pointer border border-[#E2E8F0]"
                       title="Inspect full details"
                     >
                       <Eye className="w-3.5 h-3.5" />
@@ -779,30 +779,30 @@ export default function PresidentPortalPage() {
       {/* 2. Committee Overview & Audit Trail */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Committee Overview */}
-        <div className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
-          <div className="p-5 border-b border-slate-200 flex items-center justify-between">
+        <div className="bg-white border border-[#E2E8F0] rounded-xl shadow-xs overflow-hidden">
+          <div className="p-5 border-b border-[#E2E8F0] flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Users className="w-4 h-4 text-blue-700" />
+              <h2 className="text-sm font-bold text-[#0A2047] flex items-center gap-2">
+                <Users className="w-4 h-4 text-[#D4AF37]" />
                 <span>Organizing Committee Roster</span>
               </h2>
-              <p className="text-[11px] text-slate-500 mt-0.5">Council roles, departments, and active leads.</p>
+              <p className="text-[11px] text-[#64748B] mt-0.5">Council roles, departments, and active leads.</p>
             </div>
             <Link
               href="/admin/members"
-              className="text-xs font-semibold text-blue-700 hover:underline"
+              className="text-xs font-semibold text-[#0A2047] hover:text-[#D4AF37] hover:underline transition-colors"
             >
               Manage Roster
             </Link>
           </div>
-          <div className="divide-y divide-slate-100 max-h-72 overflow-y-auto">
+          <div className="divide-y divide-[#E2E8F0] max-h-72 overflow-y-auto">
             {members.map((m) => (
               <div key={m.id} className="p-3.5 px-5 flex items-center justify-between text-xs">
                 <div>
-                  <p className="font-semibold text-slate-900">{m.fullName}</p>
-                  <p className="text-[11px] text-slate-500">{m.email} &bull; {m.department}</p>
+                  <p className="font-semibold text-[#172033]">{m.fullName}</p>
+                  <p className="text-[11px] text-[#64748B]">{m.email} &bull; {m.department}</p>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#F0F3F8] text-[#172033] border border-[#E2E8F0]">
                   {m.role}
                 </span>
               </div>
@@ -811,35 +811,35 @@ export default function PresidentPortalPage() {
         </div>
 
         {/* Read-Only Audit Log Preview */}
-        <div className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
-          <div className="p-5 border-b border-slate-200 flex items-center justify-between">
+        <div className="bg-white border border-[#E2E8F0] rounded-xl shadow-xs overflow-hidden">
+          <div className="p-5 border-b border-[#E2E8F0] flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Shield className="w-4 h-4 text-purple-700" />
+              <h2 className="text-sm font-bold text-[#0A2047] flex items-center gap-2">
+                <Shield className="w-4 h-4 text-[#D4AF37]" />
                 <span>Executive Governance & Audit Trail</span>
               </h2>
-              <p className="text-[11px] text-slate-500 mt-0.5">Restricted immutable log of administrative operations.</p>
+              <p className="text-[11px] text-[#64748B] mt-0.5">Restricted immutable log of administrative operations.</p>
             </div>
             <Link
               href="/admin/settings"
-              className="text-xs font-semibold text-purple-700 hover:underline"
+              className="text-xs font-semibold text-[#0A2047] hover:text-[#D4AF37] hover:underline transition-colors"
             >
               Full Log
             </Link>
           </div>
-          <div className="divide-y divide-slate-100 max-h-72 overflow-y-auto">
+          <div className="divide-y divide-[#E2E8F0] max-h-72 overflow-y-auto">
             {auditLogs.length === 0 ? (
-              <div className="p-6 text-center text-xs text-slate-400">No audit records recorded yet.</div>
+              <div className="p-6 text-center text-xs text-[#64748B]">No audit records recorded yet.</div>
             ) : (
               auditLogs.slice(0, 7).map((log) => (
                 <div key={log.id} className="p-3 px-5 text-xs space-y-0.5">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-800">{log.action}</span>
-                    <span className="text-[10px] text-slate-400">
+                    <span className="font-semibold text-[#172033]">{log.action}</span>
+                    <span className="text-[10px] text-[#64748B]">
                       {new Date(log.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500 truncate">
+                  <p className="text-[11px] text-[#64748B] truncate">
                     Actor: {log.actorEmail} ({log.actorRole}) &bull; Target: {log.targetType}: {log.targetId}
                   </p>
                 </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import { StudentRegistrationInput, RegistrationValidationErrors } from "@/types/registration";
-import { Briefcase, Code, Link2, UserCheck, AlertCircle, Info } from "lucide-react";
+import { Briefcase, Code, Link2, UserCheck, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PreviousWorkStepProps {
@@ -18,28 +18,15 @@ export function PreviousWorkStep({ formData, errors, onChange }: PreviousWorkSte
   return (
     <div className="space-y-6">
       {/* Section Header */}
-      <div className="border-b border-[#D9E4F2] pb-3">
+      <div className="border-b border-[#E2E8F0] pb-3">
         <div className="flex items-center gap-2">
-          <h3 className="text-[20px] font-normal text-[#174789]">
-            Previous Work / Startup Details <span className="text-sm font-medium text-[#475569]">(Optional)</span>
+          <h3 className="text-xl font-bold text-[#0A2047]">
+            Previous Work / Startup Details <span className="text-sm font-normal text-[#64748B]">(Optional)</span>
           </h3>
         </div>
-        <p className="text-xs text-[#475569] mt-1 leading-relaxed">
+        <p className="text-xs text-[#64748B] mt-1 leading-relaxed">
           Tell us about any previous projects, startup initiatives, hackathons, research, or other relevant work you have completed. This information is optional and helps the organizing team understand your experience and interests. If you have no previous experience, you can skip this section.
         </p>
-      </div>
-
-      {/* Optionality Clarification Banner */}
-      <div className="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200/80 text-blue-900 text-xs flex items-start gap-2.5">
-        <Info className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" />
-        <div className="space-y-0.5">
-          <span className="font-semibold text-[#174789] block">
-            100% Voluntary &amp; Non-Binding
-          </span>
-          <p className="text-blue-800 leading-relaxed">
-            All fields in this section are completely optional. You can leave every field blank and continue to the next step without affecting your registration, fee, eligibility, or event participation.
-          </p>
-        </div>
       </div>
 
       {/* Field 1: Previous Work / Project Description */}
@@ -47,7 +34,7 @@ export function PreviousWorkStep({ formData, errors, onChange }: PreviousWorkSte
         <div className="flex items-center justify-between">
           <label
             htmlFor="previousWorkDescription"
-            className="block text-sm font-medium text-[#174789]"
+            className="block text-sm font-semibold text-[#0A2047]"
           >
             Previous Work or Project Details <span className="text-xs text-[#64748B] font-normal">(Optional)</span>
           </label>
@@ -63,14 +50,14 @@ export function PreviousWorkStep({ formData, errors, onChange }: PreviousWorkSte
             maxLength={2000}
             aria-invalid={Boolean(errors.previousWorkDescription)}
             aria-describedby={errors.previousWorkDescription ? "previousWorkDescription-error" : undefined}
-            placeholder="Describe any projects, startup ideas, businesses, hackathons, research, or other relevant work you have completed."
+            placeholder="Describe your previous projects or work"
             value={formData.previousWorkDescription || ""}
             onChange={(e) => onChange("previousWorkDescription", e.target.value)}
             className={cn(
-              "w-full px-3.5 py-2.5 rounded-lg border text-sm text-[#153D73] placeholder:text-slate-400 bg-white transition-all focus:outline-none focus:ring-2",
+              "w-full px-3.5 py-2.5 rounded-lg border text-sm text-[#172033] placeholder:text-[#94A3B8] bg-white transition-all focus:outline-none focus:ring-2",
               errors.previousWorkDescription
                 ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                : "border-[#D9E4F2] hover:border-slate-300 focus:border-[#2563EB] focus:ring-blue-100"
+                : "border-[#E2E8F0] hover:border-slate-300 focus:border-[#0A2047] focus:ring-[#0A2047]/15"
             )}
           />
         </div>
@@ -89,7 +76,7 @@ export function PreviousWorkStep({ formData, errors, onChange }: PreviousWorkSte
           <div className="flex items-center justify-between">
             <label
               htmlFor="projectName"
-              className="block text-sm font-medium text-[#174789]"
+              className="block text-sm font-semibold text-[#0A2047]"
             >
               Project or Startup Name <span className="text-xs text-[#64748B] font-normal">(Optional)</span>
             </label>
@@ -98,7 +85,7 @@ export function PreviousWorkStep({ formData, errors, onChange }: PreviousWorkSte
             </span>
           </div>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#475569]">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#64748B]">
               <Briefcase className="w-4 h-4" />
             </div>
             <input
@@ -108,14 +95,14 @@ export function PreviousWorkStep({ formData, errors, onChange }: PreviousWorkSte
               maxLength={150}
               aria-invalid={Boolean(errors.projectName)}
               aria-describedby={errors.projectName ? "projectName-error" : undefined}
-              placeholder="Enter your project or startup name, if applicable."
+              placeholder="Enter your project or startup title"
               value={formData.projectName || ""}
               onChange={(e) => onChange("projectName", e.target.value)}
               className={cn(
-                "w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#153D73] placeholder:text-slate-400 bg-white transition-all focus:outline-none focus:ring-2",
+                "w-full h-11 pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#172033] placeholder:text-[#94A3B8] bg-white transition-all focus:outline-none focus:ring-2",
                 errors.projectName
                   ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                  : "border-[#D9E4F2] hover:border-slate-300 focus:border-[#2563EB] focus:ring-blue-100"
+                  : "border-[#E2E8F0] hover:border-slate-300 focus:border-[#0A2047] focus:ring-[#0A2047]/15"
               )}
             />
           </div>
@@ -132,7 +119,7 @@ export function PreviousWorkStep({ formData, errors, onChange }: PreviousWorkSte
           <div className="flex items-center justify-between">
             <label
               htmlFor="projectRole"
-              className="block text-sm font-medium text-[#174789]"
+              className="block text-sm font-semibold text-[#0A2047]"
             >
               Your Role <span className="text-xs text-[#64748B] font-normal">(Optional)</span>
             </label>
@@ -141,7 +128,7 @@ export function PreviousWorkStep({ formData, errors, onChange }: PreviousWorkSte
             </span>
           </div>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#475569]">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#64748B]">
               <UserCheck className="w-4 h-4" />
             </div>
             <input
@@ -151,14 +138,14 @@ export function PreviousWorkStep({ formData, errors, onChange }: PreviousWorkSte
               maxLength={100}
               aria-invalid={Boolean(errors.projectRole)}
               aria-describedby={errors.projectRole ? "projectRole-error" : undefined}
-              placeholder="e.g., Founder, Co-founder, Developer, Team Member, Researcher."
+              placeholder="Enter your role in the project"
               value={formData.projectRole || ""}
               onChange={(e) => onChange("projectRole", e.target.value)}
               className={cn(
-                "w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#153D73] placeholder:text-slate-400 bg-white transition-all focus:outline-none focus:ring-2",
+                "w-full h-11 pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#172033] placeholder:text-[#94A3B8] bg-white transition-all focus:outline-none focus:ring-2",
                 errors.projectRole
                   ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                  : "border-[#D9E4F2] hover:border-slate-300 focus:border-[#2563EB] focus:ring-blue-100"
+                  : "border-[#E2E8F0] hover:border-slate-300 focus:border-[#0A2047] focus:ring-[#0A2047]/15"
               )}
             />
           </div>
@@ -176,7 +163,7 @@ export function PreviousWorkStep({ formData, errors, onChange }: PreviousWorkSte
         <div className="flex items-center justify-between">
           <label
             htmlFor="technologiesUsed"
-            className="block text-sm font-medium text-[#174789]"
+            className="block text-sm font-semibold text-[#0A2047]"
           >
             Technologies Used <span className="text-xs text-[#64748B] font-normal">(Optional)</span>
           </label>
@@ -185,7 +172,7 @@ export function PreviousWorkStep({ formData, errors, onChange }: PreviousWorkSte
           </span>
         </div>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#475569]">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#64748B]">
             <Code className="w-4 h-4" />
           </div>
           <input
@@ -195,14 +182,14 @@ export function PreviousWorkStep({ formData, errors, onChange }: PreviousWorkSte
             maxLength={500}
             aria-invalid={Boolean(errors.technologiesUsed)}
             aria-describedby={errors.technologiesUsed ? "technologiesUsed-error" : undefined}
-            placeholder="e.g., Python, React, Next.js, FastAPI, Machine Learning."
+            placeholder="Enter the technologies used"
             value={formData.technologiesUsed || ""}
             onChange={(e) => onChange("technologiesUsed", e.target.value)}
             className={cn(
-              "w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#153D73] placeholder:text-slate-400 bg-white transition-all focus:outline-none focus:ring-2",
+              "w-full h-11 pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#172033] placeholder:text-[#94A3B8] bg-white transition-all focus:outline-none focus:ring-2",
               errors.technologiesUsed
                 ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                : "border-[#D9E4F2] hover:border-slate-300 focus:border-[#2563EB] focus:ring-blue-100"
+                : "border-[#E2E8F0] hover:border-slate-300 focus:border-[#0A2047] focus:ring-[#0A2047]/15"
             )}
           />
         </div>
@@ -219,16 +206,16 @@ export function PreviousWorkStep({ formData, errors, onChange }: PreviousWorkSte
         <div className="flex items-center justify-between">
           <label
             htmlFor="projectLink"
-            className="block text-sm font-medium text-[#174789]"
+            className="block text-sm font-semibold text-[#0A2047]"
           >
             Project Link or Portfolio URL <span className="text-xs text-[#64748B] font-normal">(Optional)</span>
           </label>
           <span className="text-[11px] text-[#64748B]">
-            Accepts GitHub repos, demo sites, or portfolio links
+            GitHub repo, demo site, or portfolio link
           </span>
         </div>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#475569]">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#64748B]">
             <Link2 className="w-4 h-4" />
           </div>
           <input
@@ -238,14 +225,14 @@ export function PreviousWorkStep({ formData, errors, onChange }: PreviousWorkSte
             maxLength={500}
             aria-invalid={Boolean(errors.projectLink)}
             aria-describedby={errors.projectLink ? "projectLink-error" : undefined}
-            placeholder="https://github.com/username/project"
+            placeholder="Enter project link or demo URL"
             value={formData.projectLink || ""}
             onChange={(e) => onChange("projectLink", e.target.value)}
             className={cn(
-              "w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#153D73] placeholder:text-slate-400 bg-white transition-all focus:outline-none focus:ring-2",
+              "w-full h-11 pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#172033] placeholder:text-[#94A3B8] bg-white transition-all focus:outline-none focus:ring-2",
               errors.projectLink
                 ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                : "border-[#D9E4F2] hover:border-slate-300 focus:border-[#2563EB] focus:ring-blue-100"
+                : "border-[#E2E8F0] hover:border-slate-300 focus:border-[#0A2047] focus:ring-[#0A2047]/15"
             )}
           />
         </div>

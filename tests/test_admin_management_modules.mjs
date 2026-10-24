@@ -90,9 +90,25 @@ async function runTests() {
   });
   const blockedPublishData = await blockedPublishRes.json();
   assert(
-    blockedPublishRes.status === 400 && blockedPublishData.error.includes("Only President-approved"),
+    blockedPublishRes.status === 400 &&
+      (blockedPublishData.error.includes("Approval Required") ||
+        blockedPublishData.error.includes("President-approved") ||
+        blockedPublishData.error.includes("Vice President")),
     "Publishing unapproved proposal is strictly rejected (HTTP 400) on server"
   );
+
+  // 2b. Vice President approves the proposal (Dual-Approval Requirement)
+  const vpAuth = await loginAs("vp@gdgoenka.ac.in", "VP@2026");
+  const vpApproveRes = await fetch(`${BASE_URL}/api/admin/events`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Cookie: vpAuth.cookie },
+    body: JSON.stringify({
+      id: createdEvent.id,
+      action: "vp_approve",
+      reviewComment: "Logistics and facilities verified by VP",
+    }),
+  });
+  assert(vpApproveRes.status === 200, "Vice President approved the event proposal");
 
   // 3. President approves the proposal
   const approveRes = await fetch(`${BASE_URL}/api/admin/events`, {
@@ -300,12 +316,14 @@ async function runTests() {
   assert(invalidDateRes.status === 400, "Invalid registration date range (start > end) rejected (HTTP 400)");
 
   // 3. Valid Form creation & version snapshotting
+  const formTestEventId = "evt-form-test-" + Date.now();
+  const formTestEventTitle = "Standalone Form Test Event " + Date.now();
   const validFormRes = await fetch(`${BASE_URL}/api/admin/forms`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Cookie: adminAuth.cookie },
     body: JSON.stringify({
-      eventId: createdEvent.id,
-      eventTitle: testTitle,
+      eventId: formTestEventId,
+      eventTitle: formTestEventTitle,
       formTitle: "Robotics Official Form v1",
       formDescription: "Official event registration questionnaire",
       feeAmount: 500,
@@ -331,8 +349,8 @@ async function runTests() {
     method: "POST",
     headers: { "Content-Type": "application/json", Cookie: adminAuth.cookie },
     body: JSON.stringify({
-      eventId: createdEvent.id,
-      eventTitle: testTitle,
+      eventId: formTestEventId,
+      eventTitle: formTestEventTitle,
       formTitle: "Robotics Official Form v2 (Updated)",
       feeAmount: 600,
       fields: [

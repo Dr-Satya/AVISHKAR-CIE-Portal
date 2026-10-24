@@ -188,11 +188,11 @@ function RegistrationsContent() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <Users className="w-5 h-5 text-blue-700" />
+          <h2 className="text-xl font-bold text-[#0A2047] tracking-tight flex items-center gap-2">
+            <Users className="w-5 h-5 text-[#D4AF37]" />
             Registration Directory
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#64748B] mt-0.5">
             Search, filter, and inspect student registrations across GD Goenka University schools.
           </p>
         </div>
@@ -201,20 +201,20 @@ function RegistrationsContent() {
           <button
             onClick={fetchRegistrations}
             disabled={isRefreshing}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-blue-700 hover:bg-white border border-slate-300 bg-white shadow-2xs transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#172033] hover:text-[#0A2047] hover:bg-[#F0F3F8] border border-[#E2E8F0] bg-white shadow-2xs transition-colors disabled:opacity-50 cursor-pointer"
             title="Refresh database records"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-blue-600" : ""}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-[#0A2047]" : "text-[#64748B]"}`} />
             <span>Refresh</span>
           </button>
 
           <button
             onClick={exportCsv}
             disabled={registrations.length === 0}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-slate-300 bg-white shadow-2xs transition-colors disabled:opacity-40"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-[#172033] hover:text-[#0A2047] hover:bg-[#F0F3F8] border border-[#E2E8F0] bg-white shadow-2xs transition-colors disabled:opacity-40 cursor-pointer"
             title="Export filtered records to CSV"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-3.5 h-3.5 text-[#D4AF37]" />
             <span>Export CSV</span>
           </button>
         </div>

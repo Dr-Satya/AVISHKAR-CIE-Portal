@@ -78,26 +78,26 @@ export function AdminSidebar({
     switch (role) {
       case "President":
         return (
-          <span className="bg-purple-500/20 text-purple-300 border border-purple-400/30 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+          <span className="bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/40 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
             President
           </span>
         );
       case "Vice President":
         return (
-          <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+          <span className="bg-white/10 text-white/90 border border-white/20 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
             Vice President
           </span>
         );
       case "AVISHKAR Member":
         return (
-          <span className="bg-teal-500/20 text-teal-300 border border-teal-400/30 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+          <span className="bg-[#D4AF37]/10 text-white border border-[#D4AF37]/30 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
             Member
           </span>
         );
       case "Admin":
       default:
         return (
-          <span className="bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+          <span className="bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/40 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
             Admin
           </span>
         );
@@ -116,14 +116,14 @@ export function AdminSidebar({
   const navItems = getNavItemsForRole(userRole);
 
   const navContent = (
-    <div className="flex flex-col h-full bg-[#0E2A5C] text-white border-r border-[#1B3F7E] select-none">
+    <div className="flex flex-col h-full bg-[#0A2047] text-white border-r border-[#132E57] select-none">
       {/* Brand Top Header */}
-      <div className="p-4 sm:p-5 border-b border-[#1B3F7E] flex items-center justify-between">
+      <div className="p-4 sm:p-5 border-b border-[#132E57] flex items-center justify-between">
         <Link
           href={roleHomeHref}
           className="flex items-center gap-3 overflow-hidden group focus:outline-none"
         >
-          <div className="relative shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-[#193F88] border border-[#2B57A3]/50">
+          <div className="relative shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-[#132E57] border border-[#D4AF37]/30 shadow-xs">
             <Image
               src="/images/avishkar-lotus-logo.png"
               alt="AVISHKAR Lotus Logo"
@@ -139,7 +139,7 @@ export function AdminSidebar({
                 AVISHKAR
                 {getRolePill(userRole)}
               </span>
-              <span className="text-[10px] text-white/70 font-normal tracking-wide truncate">
+              <span className="text-[10px] text-slate-300 font-normal tracking-wide truncate">
                 GD Goenka University
               </span>
             </div>
@@ -186,7 +186,7 @@ export function AdminSidebar({
               ? pathname === "/admin/vice-president"
               : item.href === "/admin/member"
               ? pathname === "/admin/member"
-              : pathname.startsWith(item.href);
+              : pathname?.startsWith(item.href) || false;
 
           return (
             <Link
@@ -195,21 +195,36 @@ export function AdminSidebar({
               onClick={onCloseMobile}
               className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group ${
                 isActive
-                  ? "bg-[#2563EB] text-white shadow-sm font-semibold"
-                  : "text-white/80 hover:text-white hover:bg-white/10"
+                  ? "bg-[#132E57] text-white border-l-4 border-[#D4AF37] font-semibold shadow-xs"
+                  : "text-white/80 hover:text-white hover:bg-[#132E57]/60"
               }`}
               title={collapsed ? `${item.title} (${item.description})` : item.description}
             >
               <div className="flex items-center gap-3 min-w-0">
-                {getIcon(item.iconName)}
+                <span className={isActive ? "text-[#D4AF37]" : "text-white/70 group-hover:text-white"}>
+                  {getIcon(item.iconName)}
+                </span>
                 {!collapsed && (
-                  <span className="truncate">{item.title}</span>
+                  <span className="truncate text-white">{item.title}</span>
                 )}
               </div>
             </Link>
           );
         })}
       </nav>
+
+      {/* Switch / Return to 4-Portal Selector */}
+      <div className="p-3 border-t border-[#132E57] shrink-0">
+        <Link
+          href="/admin/dashboard"
+          onClick={onCloseMobile}
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-[#D4AF37] hover:bg-[#132E57]/60 transition-colors"
+          title="Return to Portal Selector"
+        >
+          <LayoutDashboard className="w-4 h-4 shrink-0 text-[#D4AF37]" />
+          {!collapsed && <span>Portal Selector</span>}
+        </Link>
+      </div>
     </div>
   );
 

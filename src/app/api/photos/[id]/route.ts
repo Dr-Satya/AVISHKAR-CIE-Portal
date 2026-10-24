@@ -1,7 +1,6 @@
-import fs from "fs";
 import { NextRequest, NextResponse } from "next/server";
 import { getStoredPhotoById, getStoredEvents } from "@/lib/dataStore";
-import { resolvePhotoDiskPath } from "@/lib/photoStorage";
+import { getPhotoBuffer } from "@/lib/photoStorage";
 import { getAdminSessionFromRequest } from "@/lib/adminAuth";
 
 export async function GET(
@@ -48,17 +47,15 @@ export async function GET(
     }
 
     // Resolve file from persistent storage
-    const filePath = resolvePhotoDiskPath(photo.storagePath);
-    if (!filePath || !fs.existsSync(filePath)) {
+    const fileBuffer = getPhotoBuffer(photo.storagePath, id);
+    if (!fileBuffer) {
       return NextResponse.json(
         { success: false, error: "Image file content not found in storage." },
         { status: 404 }
       );
     }
 
-    const fileBuffer = fs.readFileSync(filePath);
-
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(new Uint8Array(fileBuffer), {
       status: 200,
       headers: {
         "Content-Type": photo.mimeType || "image/jpeg",

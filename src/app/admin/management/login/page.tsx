@@ -11,10 +11,9 @@ export default function AdministrativeManagementLoginPage() {
     <RoleLoginForm
       expectedRole="Admin"
       roleHeading="Administrative Management"
-      roleSubtitle="Sign in to access the administration dashboard."
       roleBadge="Administration"
       targetDashboard="/admin/overview"
-      accentColorClass="text-blue-600 bg-blue-50 border-blue-100"
+      accentColorClass="text-[#0A2047] bg-[#0A2047]/10 border-[#0A2047]/20"
     />
   );
 }

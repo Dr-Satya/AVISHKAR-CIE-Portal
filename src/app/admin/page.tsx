@@ -12,7 +12,7 @@ export default function AdminIndexPage() {
       try {
         const res = await fetch("/api/admin/auth/me");
         if (!res.ok) {
-          router.replace("/admin/management/login");
+          router.replace("/admin/dashboard");
           return;
         }
         const data = await res.json();
@@ -24,11 +24,13 @@ export default function AdminIndexPage() {
             ? "/admin/vice-president"
             : role === "AVISHKAR Member"
             ? "/admin/member"
-            : "/admin/overview";
+            : role === "Admin" || role === "admin"
+            ? "/admin/overview"
+            : "/admin/dashboard";
 
         router.replace(target);
       } catch {
-        router.replace("/admin/management/login");
+        router.replace("/admin/dashboard");
       }
     }
 
@@ -37,8 +39,8 @@ export default function AdminIndexPage() {
 
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center gap-3">
-      <Loader2 className="w-8 h-8 text-blue-700 animate-spin" />
-      <p className="text-xs text-slate-500 font-medium">Navigating to your dashboard...</p>
+      <Loader2 className="w-8 h-8 text-[#0A2047] animate-spin" />
+      <p className="text-xs text-[#64748B] font-medium">Navigating to portal...</p>
     </div>
   );
 }

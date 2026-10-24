@@ -181,7 +181,7 @@ export async function verifyEventForPublishing(
       event.proposedByEmail === "member@gdgoenka.ac.in";
 
     if (isMemberProposal) {
-      if (event.vpStatus !== "approved") {
+      if (event.vpStatus !== "approved" && event.vpStatus !== "in_coordination") {
         approvalCheck.passed = false;
         approvalCheck.error = `Vice President Approval Required: This event was proposed by an AVISHKAR Member and requires Vice President approval before publication. Current Vice President status: '${event.vpStatus || "pending"}'.`;
         errors.push(approvalCheck.error);
@@ -313,7 +313,8 @@ export async function verifyEventForPublishing(
   const envInfo = resolveAppBaseUrl(options?.req);
   const effectiveBaseUrl = (options?.baseUrl || envInfo.baseUrl).replace(/\/+$/, "");
   const isLocal = isLocalhostUrl(effectiveBaseUrl);
-  const enforceProd = Boolean(options?.enforceProductionUrl || envInfo.isProduction);
+  const isCloudDeployment = Boolean(process.env.VERCEL || process.env.CF_PAGES || process.env.AWS_EXECUTION_ENV);
+  const enforceProd = Boolean(options?.enforceProductionUrl || (isCloudDeployment && !isLocal));
 
   const envCheck: VerificationCheckItem & {
     baseUrl: string;

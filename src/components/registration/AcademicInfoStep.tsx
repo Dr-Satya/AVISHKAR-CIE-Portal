@@ -29,9 +29,15 @@ export function AcademicInfoStep({ formData, errors, onChange }: AcademicInfoSte
 
   return (
     <div className="space-y-6">
-      <div className="border-b border-[#D9E4F2] pb-3">
-        <h3 className="text-[20px] font-normal text-[#174789]">Academic Information</h3>
-        <p className="text-xs text-[#475569] mt-0.5">
+      <div className="border-b border-[#E2E8F0] pb-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-bold text-[#0A2047]">Academic Information</h3>
+          <span className="text-[11px] font-semibold text-[#0A2047] bg-[#0A2047]/5 px-2.5 py-1 rounded-md border border-[#0A2047]/10 hidden sm:inline-flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
+            GD Goenka University
+          </span>
+        </div>
+        <p className="text-xs text-[#64748B] mt-0.5">
           Select your official school and degree program at GD Goenka University.
         </p>
       </div>
@@ -40,12 +46,12 @@ export function AcademicInfoStep({ formData, errors, onChange }: AcademicInfoSte
       <div className="space-y-1.5">
         <label
           htmlFor="studentId"
-          className="block text-sm font-medium text-[#174789]"
+          className="block text-sm font-semibold text-[#0A2047]"
         >
           Enrolment / Student ID <span className="text-red-500" aria-hidden="true">*</span>
         </label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#475569]">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#64748B]">
             <IdCard className="w-4 h-4" />
           </div>
           <input
@@ -60,10 +66,10 @@ export function AcademicInfoStep({ formData, errors, onChange }: AcademicInfoSte
             value={formData.studentId}
             onChange={(e) => onChange("studentId", e.target.value)}
             className={cn(
-              "w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#334155] placeholder:text-slate-400 bg-white transition-all focus:outline-none focus:ring-2",
+              "w-full h-11 pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#172033] font-mono placeholder:text-[#94A3B8] bg-white transition-all focus:outline-none focus:ring-2",
               errors.studentId
                 ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                : "border-[#D9E4F2] hover:border-slate-300 focus:border-[#2563EB] focus:ring-blue-100"
+                : "border-[#E2E8F0] hover:border-slate-300 focus:border-[#0A2047] focus:ring-[#0A2047]/15"
             )}
           />
         </div>
@@ -79,12 +85,12 @@ export function AcademicInfoStep({ formData, errors, onChange }: AcademicInfoSte
       <div className="space-y-1.5">
         <label
           htmlFor="school"
-          className="block text-sm font-medium text-[#174789]"
+          className="block text-sm font-semibold text-[#0A2047]"
         >
           School <span className="text-red-500" aria-hidden="true">*</span>
         </label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#475569]">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#64748B]">
             <SchoolIcon className="w-4 h-4" />
           </div>
           <select
@@ -97,10 +103,10 @@ export function AcademicInfoStep({ formData, errors, onChange }: AcademicInfoSte
             value={formData.school || ""}
             onChange={(e) => handleSchoolChange(e.target.value)}
             className={cn(
-              "w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#334155] bg-white transition-all focus:outline-none focus:ring-2",
+              "w-full h-11 pl-10 pr-8 py-2.5 rounded-lg border text-sm text-[#172033] bg-white transition-all focus:outline-none focus:ring-2 appearance-none cursor-pointer",
               errors.school
                 ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                : "border-[#D9E4F2] hover:border-slate-300 focus:border-[#2563EB] focus:ring-blue-100"
+                : "border-[#E2E8F0] hover:border-slate-300 focus:border-[#0A2047] focus:ring-[#0A2047]/15"
             )}
           >
             <option value="">Select your School...</option>
@@ -123,12 +129,12 @@ export function AcademicInfoStep({ formData, errors, onChange }: AcademicInfoSte
       <div className="space-y-1.5">
         <label
           htmlFor="program"
-          className="block text-sm font-medium text-[#174789]"
+          className="block text-sm font-semibold text-[#0A2047]"
         >
           Department / Program <span className="text-red-500" aria-hidden="true">*</span>
         </label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#475569]">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#64748B]">
             <BookOpen className="w-4 h-4" />
           </div>
           <select
@@ -142,11 +148,13 @@ export function AcademicInfoStep({ formData, errors, onChange }: AcademicInfoSte
             value={formData.program || ""}
             onChange={(e) => onChange("program", e.target.value)}
             className={cn(
-              "w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#334155] bg-white transition-all focus:outline-none focus:ring-2",
-              !selectedSchool && "bg-slate-50 cursor-not-allowed opacity-75",
+              "w-full h-11 pl-10 pr-8 py-2.5 rounded-lg border text-sm text-[#172033] bg-white transition-all focus:outline-none focus:ring-2 appearance-none",
+              !selectedSchool
+                ? "bg-[#F5F7FA] text-[#64748B] cursor-not-allowed opacity-80"
+                : "cursor-pointer",
               errors.program
                 ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                : "border-[#D9E4F2] hover:border-slate-300 focus:border-[#2563EB] focus:ring-blue-100"
+                : "border-[#E2E8F0] hover:border-slate-300 focus:border-[#0A2047] focus:ring-[#0A2047]/15"
             )}
           >
             <option value="">
@@ -173,12 +181,12 @@ export function AcademicInfoStep({ formData, errors, onChange }: AcademicInfoSte
       <div className="space-y-1.5">
         <label
           htmlFor="yearOfJoining"
-          className="block text-sm font-medium text-[#174789]"
+          className="block text-sm font-semibold text-[#0A2047]"
         >
           Year of Joining University <span className="text-red-500" aria-hidden="true">*</span>
         </label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#475569]">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#64748B]">
             <Calendar className="w-4 h-4" />
           </div>
           <select
@@ -191,10 +199,10 @@ export function AcademicInfoStep({ formData, errors, onChange }: AcademicInfoSte
             value={formData.yearOfJoining || ""}
             onChange={(e) => onChange("yearOfJoining", e.target.value)}
             className={cn(
-              "w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#334155] bg-white transition-all focus:outline-none focus:ring-2",
+              "w-full h-11 pl-10 pr-8 py-2.5 rounded-lg border text-sm text-[#172033] bg-white transition-all focus:outline-none focus:ring-2 appearance-none cursor-pointer",
               errors.yearOfJoining
                 ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                : "border-[#D9E4F2] hover:border-slate-300 focus:border-[#2563EB] focus:ring-blue-100"
+                : "border-[#E2E8F0] hover:border-slate-300 focus:border-[#0A2047] focus:ring-[#0A2047]/15"
             )}
           >
             <option value="">Select Year of Joining...</option>

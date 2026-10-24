@@ -83,9 +83,11 @@ async function run() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ registrationId: "reg-001", action: "approve" }),
     });
+    await unauthRes.text();
     assert(unauthRes.status === 401, "Unauthenticated request returns HTTP 401 Unauthorized");
 
     // 2.2 President role
+    await new Promise((r) => setTimeout(r, 100));
     const presAuth = await login("president@gdgoenka.ac.in", "President@2026");
     const presRes = await fetch(`${BASE_URL}/api/admin/students/verify`, {
       method: "POST",
@@ -97,6 +99,7 @@ async function run() {
     assert(presData.code === "ADMIN_REQUIRED_FOR_REGISTRATIONS", "President receives ADMIN_REQUIRED_FOR_REGISTRATIONS error code");
 
     // 2.3 Vice President role
+    await new Promise((r) => setTimeout(r, 100));
     const vpAuth = await login("vp@gdgoenka.ac.in", "VP@2026");
     const vpRes = await fetch(`${BASE_URL}/api/admin/students/verify`, {
       method: "POST",
@@ -108,6 +111,7 @@ async function run() {
     assert(vpData.code === "ADMIN_REQUIRED_FOR_REGISTRATIONS", "VP receives ADMIN_REQUIRED_FOR_REGISTRATIONS error code");
 
     // 2.4 AVISHKAR Member role
+    await new Promise((r) => setTimeout(r, 100));
     const memAuth = await login("member@gdgoenka.ac.in", "Member@2026");
     const memRes = await fetch(`${BASE_URL}/api/admin/students/verify`, {
       method: "POST",
@@ -126,6 +130,7 @@ async function run() {
   // ---------------------------------------------------------------------------
   console.log("\n[Test 3/8] Verifying approval is blocked when payment verification is pending...");
   try {
+    await new Promise((r) => setTimeout(r, 100));
     const adminAuth = await login("admin@gdgoenka.ac.in", "Admin@2026");
 
     // Fetch existing registrations to find or reset one to pending payment
@@ -133,7 +138,55 @@ async function run() {
       headers: { Cookie: adminAuth.cookie },
     });
     const listData = await listRes.json();
-    const registrations = listData.registrations || [];
+    let registrations = listData.registrations || [];
+
+    // If fewer than 2 registrations exist yet in this isolate, seed via public registration API
+    if (registrations.length === 0) {
+      const regForm = new FormData();
+      regForm.append("studentName", "Rohit Kumar");
+      regForm.append("email", "rohit.kumar@gdgoenka.ac.in");
+      regForm.append("contactNumber", "9812345678");
+      regForm.append("gender", "Male");
+      regForm.append("studentId", "240160998877");
+      regForm.append("school", "SOES");
+      regForm.append("program", "Computer science and engineering AI&ML");
+      regForm.append("yearOfJoining", "2024");
+      regForm.append("reasonForJoining", "Passionate about autonomous systems and participating in the technical fest.");
+      regForm.append("leadershipInterest", "Yes");
+      regForm.append("transactionId", "TXN981234567800");
+      regForm.append("paymentDate", "2026-10-12");
+      const mockBlob = new Blob(["mock receipt content image data"], { type: "image/png" });
+      regForm.append("receiptFile", mockBlob, "receipt.png");
+      const submitRes = await fetch(`${BASE_URL}/api/register`, { method: "POST", body: regForm });
+      await submitRes.json();
+    }
+
+    if (registrations.length < 2) {
+      const regForm2 = new FormData();
+      regForm2.append("studentName", "Ananya Sharma");
+      regForm2.append("email", "ananya.sharma@gdgoenka.ac.in");
+      regForm2.append("contactNumber", "9812345679");
+      regForm2.append("gender", "Female");
+      regForm2.append("studentId", "240160998878");
+      regForm2.append("school", "SOES");
+      regForm2.append("program", "Computer science and engineering AI&ML");
+      regForm2.append("yearOfJoining", "2024");
+      regForm2.append("reasonForJoining", "Robotics and innovation.");
+      regForm2.append("leadershipInterest", "No");
+      regForm2.append("transactionId", "TXN981234567801");
+      regForm2.append("paymentDate", "2026-10-12");
+      const mockBlob2 = new Blob(["mock receipt content image data 2"], { type: "image/png" });
+      regForm2.append("receiptFile", mockBlob2, "receipt2.png");
+      const submitRes2 = await fetch(`${BASE_URL}/api/register`, { method: "POST", body: regForm2 });
+      await submitRes2.json();
+
+      const retryRes = await fetch(`${BASE_URL}/api/admin/registrations`, {
+        headers: { Cookie: adminAuth.cookie },
+      });
+      const retryData = await retryRes.json();
+      registrations = retryData.registrations || [];
+    }
+
     assert(registrations.length > 0, "Registration records exist in database");
 
     const targetReg = registrations[0];

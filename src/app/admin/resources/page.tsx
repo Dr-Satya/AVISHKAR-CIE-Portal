@@ -141,9 +141,9 @@ export default function AdminResourcesPage() {
   const getCategoryIcon = (cat: ResourceCategory) => {
     switch (cat) {
       case "rulebook":
-        return <BookOpen className="w-5 h-5 text-blue-600" />;
+        return <BookOpen className="w-5 h-5 text-[#0A2047]" />;
       case "photo":
-        return <ImageIcon className="w-5 h-5 text-purple-600" />;
+        return <ImageIcon className="w-5 h-5 text-[#D4AF37]" />;
       case "guide":
         return <FileText className="w-5 h-5 text-emerald-600" />;
       case "link":
@@ -159,7 +159,7 @@ export default function AdminResourcesPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-[#174789]">Competition Resources & Media</h2>
+          <h2 className="text-xl font-bold text-[#0A2047]">Competition Resources & Media</h2>
           <p className="text-xs text-slate-500 mt-0.5">
             Rulebooks, technical regulations, schedules, and promotional graphics organized by event.
           </p>
@@ -167,9 +167,9 @@ export default function AdminResourcesPage() {
 
         <button
           onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#0A2047] hover:bg-[#132E57] text-white text-xs sm:text-sm font-semibold shadow-xs border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-200"
         >
-          <PlusCircle className="w-4 h-4" />
+          <PlusCircle className="w-4 h-4 text-[#D4AF37]" />
           <span>Upload Event Resource</span>
         </button>
       </div>
@@ -182,14 +182,14 @@ export default function AdminResourcesPage() {
       )}
 
       {/* Filter Toolbar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="bg-white p-4 rounded-xl border border-[#E2E8F0] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-600">Filter Event:</span>
+            <span className="text-xs font-bold text-[#64748B]">Filter Event:</span>
             <select
               value={selectedEventId}
               onChange={(e) => setSelectedEventId(e.target.value)}
-              className="text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg bg-slate-50 text-slate-800 focus:outline-none"
+              className="text-xs px-2.5 py-1.5 border border-[#E2E8F0] rounded-lg bg-[#F5F7FA] text-[#172033] focus:border-[#0A2047] focus:ring-1 focus:ring-[#0A2047] focus:outline-none transition-colors"
             >
               <option value="ALL">All Competitions</option>
               {events.map((ev) => (
@@ -201,11 +201,11 @@ export default function AdminResourcesPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-600">Category:</span>
+            <span className="text-xs font-bold text-[#64748B]">Category:</span>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg bg-slate-50 text-slate-800 focus:outline-none"
+              className="text-xs px-2.5 py-1.5 border border-[#E2E8F0] rounded-lg bg-[#F5F7FA] text-[#172033] focus:border-[#0A2047] focus:ring-1 focus:ring-[#0A2047] focus:outline-none transition-colors"
             >
               <option value="ALL">All Categories</option>
               <option value="rulebook">Rulebooks</option>
@@ -217,17 +217,17 @@ export default function AdminResourcesPage() {
           </div>
         </div>
 
-        <span className="text-xs text-slate-400">
+        <span className="text-xs text-[#64748B]">
           Showing {filtered.length} of {resources.length} resources
         </span>
       </div>
 
       {/* Resources Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-slate-50/70 border-b border-slate-200 text-slate-600 uppercase tracking-wider text-[11px]">
+              <tr className="bg-[#F5F7FA] border-b border-[#E2E8F0] text-[#64748B] uppercase tracking-wider text-[11px]">
                 <th className="py-3 px-4 font-bold">Resource / Asset</th>
                 <th className="py-3 px-4 font-bold">Competition Track</th>
                 <th className="py-3 px-4 font-bold">Category</th>
@@ -236,31 +236,31 @@ export default function AdminResourcesPage() {
                 <th className="py-3 px-4 font-bold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[#E2E8F0]">
               {filtered.map((r) => (
-                <tr key={r.id} className="hover:bg-slate-50/50 transition-colors">
+                <tr key={r.id} className="hover:bg-[#F0F3F8] transition-colors">
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-slate-100 shrink-0">
+                      <div className="p-2 rounded-lg bg-[#F5F7FA] border border-[#E2E8F0] shrink-0">
                         {getCategoryIcon(r.category)}
                       </div>
                       <div>
-                        <div className="font-bold text-slate-900 text-sm">{r.title}</div>
-                        <div className="text-[11px] text-slate-400">
+                        <div className="font-bold text-[#0A2047] text-sm">{r.title}</div>
+                        <div className="text-[11px] text-[#64748B]">
                           {r.fileName} &bull; {r.fileSize}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="py-3 px-4">
-                    <span className="font-medium text-slate-800">{r.eventTitle}</span>
+                    <span className="font-medium text-[#172033]">{r.eventTitle}</span>
                   </td>
                   <td className="py-3 px-4">
-                    <span className="capitalize px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">
+                    <span className="capitalize px-2 py-0.5 rounded bg-[#F5F7FA] border border-[#E2E8F0] text-[#0A2047] font-semibold text-[11px]">
                       {r.category}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-slate-500">{r.uploadedBy}</td>
+                  <td className="py-3 px-4 text-[#64748B]">{r.uploadedBy}</td>
                   <td className="py-3 px-4">
                     {r.status === "approved" ? (
                       <span className="inline-flex items-center gap-1 text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[11px]">
@@ -287,7 +287,7 @@ export default function AdminResourcesPage() {
                       <a
                         href={r.fileUrl}
                         download
-                        className="p-1.5 text-slate-500 hover:text-slate-800 rounded hover:bg-slate-100 transition-colors"
+                        className="p-1.5 text-[#64748B] hover:text-[#0A2047] rounded hover:bg-[#F0F3F8] transition-colors"
                         title="Download file"
                       >
                         <Download className="w-4 h-4" />
@@ -303,13 +303,13 @@ export default function AdminResourcesPage() {
 
       {/* Upload Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-xl border border-slate-200">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-bold text-slate-900 text-base">Upload Event Resource</h3>
+        <div className="fixed inset-0 z-50 bg-[#0A2047]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E2E8F0]">
+            <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
+              <h3 className="font-bold text-[#0A2047] text-base">Upload Event Resource</h3>
               <button
                 onClick={() => setModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 font-bold"
+                className="text-slate-400 hover:text-[#0A2047] font-bold text-lg leading-none"
               >
                 &times;
               </button>
@@ -317,12 +317,12 @@ export default function AdminResourcesPage() {
 
             <form onSubmit={handleUploadSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Target Competition *</label>
+                <label className="block font-bold text-[#172033] mb-1">Target Competition *</label>
                 <select
                   required
                   value={uploadEventId}
                   onChange={(e) => setUploadEventId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg bg-[#F5F7FA] text-[#172033] focus:ring-2 focus:ring-[#0A2047]/20 focus:border-[#0A2047] focus:outline-none"
                 >
                   {events.map((ev) => (
                     <option key={ev.id} value={ev.id}>
@@ -333,24 +333,24 @@ export default function AdminResourcesPage() {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Resource Title *</label>
+                <label className="block font-bold text-[#172033] mb-1">Resource Title *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g., Official Arena Layout Diagram 2026"
                   value={uploadTitle}
                   onChange={(e) => setUploadTitle(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg bg-white text-[#172033] placeholder:text-[#64748B]/50 focus:ring-2 focus:ring-[#0A2047]/20 focus:border-[#0A2047] focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Category</label>
+                  <label className="block font-bold text-[#172033] mb-1">Category</label>
                   <select
                     value={uploadCategory}
                     onChange={(e) => setUploadCategory(e.target.value as ResourceCategory)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg bg-[#F5F7FA] text-[#172033] focus:ring-2 focus:ring-[#0A2047]/20 focus:border-[#0A2047] focus:outline-none"
                   >
                     <option value="rulebook">Rulebook</option>
                     <option value="document">Document</option>
@@ -361,40 +361,40 @@ export default function AdminResourcesPage() {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Estimated Size</label>
+                  <label className="block font-bold text-[#172033] mb-1">Estimated Size</label>
                   <input
                     type="text"
                     value={uploadFileSize}
                     onChange={(e) => setUploadFileSize(e.target.value)}
                     placeholder="e.g., 2.1 MB"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg bg-white text-[#172033] focus:ring-2 focus:ring-[#0A2047]/20 focus:border-[#0A2047] focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">File Name</label>
+                <label className="block font-bold text-[#172033] mb-1">File Name</label>
                 <input
                   type="text"
                   placeholder="e.g., robowars-arena-specs.pdf"
                   value={uploadFileName}
                   onChange={(e) => setUploadFileName(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg bg-white text-[#172033] focus:ring-2 focus:ring-[#0A2047]/20 focus:border-[#0A2047] focus:outline-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E2E8F0]">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-100 font-medium"
+                  className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F0F3F8] text-[#172033] font-medium transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={uploading}
-                  className="px-4 py-2 rounded-lg bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold shadow-xs disabled:opacity-50"
+                  className="px-4 py-2 rounded-lg bg-[#0A2047] hover:bg-[#132E57] text-white font-semibold shadow-xs border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-200 disabled:opacity-50"
                 >
                   {uploading ? "Uploading..." : "Save Resource"}
                 </button>

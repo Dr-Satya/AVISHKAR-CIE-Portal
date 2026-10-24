@@ -60,36 +60,36 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#F5F7FA] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Brand Lockup */}
         <div className="flex flex-col items-center text-center">
           {/* Logo on transparent background without container box/tile */}
           <div className="relative flex items-center justify-center">
             <Image
-              src="/images/avishkar-lotus-logo.png"
-              alt="AVISHKAR Lotus Logo"
-              width={160}
-              height={100}
+              src="/images/avishkar-logo.png"
+              alt="AVISHKAR — Center of Innovation and Entrepreneurship"
+              width={180}
+              height={120}
               priority
-              className="h-20 sm:h-24 w-auto object-contain transition-transform duration-200"
+              className="h-16 sm:h-20 w-auto object-contain transition-transform duration-200"
             />
           </div>
-          <h1 className="mt-3 text-2xl font-bold tracking-tight text-[#174789] uppercase">
+          <h1 className="mt-3 text-2xl font-bold tracking-tight text-[#0A2047] uppercase">
             AVISHKAR 2026
           </h1>
-          <p className="text-xs font-semibold text-slate-500 tracking-wider uppercase mt-0.5">
+          <p className="text-xs font-semibold text-[#64748B] tracking-wider uppercase mt-0.5">
             GD Goenka University &bull; Administrative Portal
           </p>
         </div>
 
         {/* Card */}
-        <div className="mt-7 bg-white py-8 px-6 shadow-xl rounded-xl border border-slate-200 sm:px-8">
+        <div className="mt-7 bg-white py-8 px-6 shadow-md rounded-xl border border-[#E2E8F0] sm:px-8">
           <div className="mb-6">
-            <h2 className="text-base font-bold text-slate-900">
+            <h2 className="text-base font-bold text-[#0A2047]">
               Staff & Organizer Sign In
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#64748B] mt-1">
               Authorized university administrators, committee leads and council members only.
             </p>
           </div>
@@ -106,7 +106,7 @@ export default function AdminLoginPage() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-[#172033] uppercase tracking-wider mb-1.5">
                 Official Email
               </label>
               <div className="relative">
@@ -117,14 +117,14 @@ export default function AdminLoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your official email"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-md text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white placeholder:text-slate-400"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-md text-sm border border-[#E2E8F0] focus:outline-none focus:ring-2 focus:ring-[#0A2047] focus:border-[#0A2047] bg-white placeholder:text-slate-400"
                   autoComplete="email"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-[#172033] uppercase tracking-wider mb-1.5">
                 Password
               </label>
               <div className="relative">
@@ -135,7 +135,7 @@ export default function AdminLoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-md text-sm border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white placeholder:text-slate-400"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-md text-sm border border-[#E2E8F0] focus:outline-none focus:ring-2 focus:ring-[#0A2047] focus:border-[#0A2047] bg-white placeholder:text-slate-400"
                   autoComplete="current-password"
                 />
                 <button
@@ -156,14 +156,14 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-bold text-white bg-[#193F88] hover:bg-[#14326D] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 shadow-md transition-all disabled:opacity-60 cursor-pointer"
+              className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-bold text-white bg-[#0A2047] hover:bg-[#132E57] active:bg-[#19365F] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0A2047] shadow-xs transition-all disabled:opacity-60 cursor-pointer"
             >
               {isLoading ? (
                 <span>Verifying credentials...</span>
               ) : (
                 <>
                   <span>Sign In as Admin</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
                 </>
               )}
             </button>
@@ -174,7 +174,7 @@ export default function AdminLoginPage() {
         <div className="mt-6 text-center">
           <Link
             href="/"
-            className="text-xs text-slate-500 hover:text-slate-800 transition-colors inline-flex items-center gap-1"
+            className="text-xs text-[#64748B] hover:text-[#0A2047] transition-colors inline-flex items-center gap-1"
           >
             &larr; Return to AVISHKAR public homepage
           </Link>

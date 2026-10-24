@@ -304,6 +304,7 @@ async function run() {
       headers: { "Content-Type": "application/json", Cookie: memberCookie },
       body: JSON.stringify({ eventId: "evt-test", action: "approve" }),
     });
+    await memberApproveRes.text();
     assert(memberApproveRes.status === 403, "Member is forbidden from approving proposals (HTTP 403)");
 
     // 6.2 Member forbidden from assigning tasks to others
@@ -316,23 +317,34 @@ async function run() {
         memberId: "usr_other",
       }),
     });
+    await memberTaskRes.text();
     assert(memberTaskRes.status === 403, "Member is forbidden from assigning tasks (HTTP 403)");
 
     // 6.3 VP forbidden from verifying payments
+    await new Promise((r) => setTimeout(r, 150));
     const vpPayRes = await fetch(`${BASE_URL}/api/admin/payments/verify`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Cookie: vpCookie },
       body: JSON.stringify({ registrationId: "reg-test", action: "approve" }),
     });
-    assert(vpPayRes.status === 403, "VP is forbidden from payment verification (HTTP 403 ADMIN_REQUIRED_FOR_PAYMENTS)");
+    const vpPayData = await vpPayRes.json();
+    assert(
+      vpPayRes.status === 403 && vpPayData.code === "ADMIN_REQUIRED_FOR_PAYMENTS",
+      "VP is forbidden from payment verification (HTTP 403 ADMIN_REQUIRED_FOR_PAYMENTS)"
+    );
 
     // 6.4 President forbidden from verifying payments
+    await new Promise((r) => setTimeout(r, 150));
     const presPayRes = await fetch(`${BASE_URL}/api/admin/payments/verify`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Cookie: presidentCookie },
       body: JSON.stringify({ registrationId: "reg-test", action: "approve" }),
     });
-    assert(presPayRes.status === 403, "President is forbidden from payment verification (HTTP 403 ADMIN_REQUIRED_FOR_PAYMENTS)");
+    const presPayData = await presPayRes.json();
+    assert(
+      presPayRes.status === 403 && presPayData.code === "ADMIN_REQUIRED_FOR_PAYMENTS",
+      "President is forbidden from payment verification (HTTP 403 ADMIN_REQUIRED_FOR_PAYMENTS)"
+    );
   } catch (err) {
     assert(false, `Cross-portal authorization boundary test error: ${err.message}`);
   }

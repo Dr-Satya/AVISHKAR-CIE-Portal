@@ -12,13 +12,13 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const variantStyles = {
-    navy: "bg-[#EFF6FF] text-[#174789] border border-[#D9E4F2]",
-    blue: "bg-[#EFF6FF] text-[#2563EB] border border-blue-200",
-    teal: "bg-[#F0FDFA] text-[#0D9488] border border-teal-200",
-    outline: "border border-[#D9E4F2] text-[#1E293B] bg-transparent",
-    neutral: "bg-slate-100 text-slate-700 border border-slate-200",
-    subtle: "bg-slate-50 text-slate-600 border border-slate-200/80",
-    provisional: "bg-[#EFF6FF] text-[#174789] border border-[#D9E4F2]",
+    navy: "bg-[#0A2047]/10 text-[#0A2047] border border-[#0A2047]/20",
+    blue: "bg-[#0A2047]/10 text-[#0A2047] border border-[#0A2047]/20",
+    teal: "bg-[#D4AF37]/15 text-[#967417] border border-[#D4AF37]/30",
+    outline: "border border-[#E2E8F0] text-[#172033] bg-transparent",
+    neutral: "bg-[#F5F7FA] text-[#64748B] border border-[#E2E8F0]",
+    subtle: "bg-[#F5F7FA] text-[#64748B] border border-[#E2E8F0]/80",
+    provisional: "bg-[#D4AF37]/15 text-[#967417] border border-[#D4AF37]/30",
     success: "bg-emerald-50 text-emerald-700 border border-emerald-200",
   };
 

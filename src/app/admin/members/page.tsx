@@ -240,26 +240,26 @@ export default function AdminMembersPage() {
     switch (r) {
       case "President":
         return (
-          <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-purple-50 text-purple-800 border border-purple-200">
+          <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-[#0A2047] text-[#D4AF37] border border-[#D4AF37]/40">
             President
           </span>
         );
       case "Vice President":
         return (
-          <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-indigo-50 text-indigo-800 border border-indigo-200">
+          <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-[#132E57] text-[#D4AF37] border border-[#D4AF37]/30">
             Vice President
           </span>
         );
       case "Admin":
         return (
-          <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200">
+          <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-[#0A2047] text-white border border-[#0A2047]">
             Admin
           </span>
         );
       case "AVISHKAR Member":
       default:
         return (
-          <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200">
+          <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-[#F0F3F8] text-[#0A2047] border border-[#E2E8F0]">
             Council Member
           </span>
         );
@@ -271,82 +271,85 @@ export default function AdminMembersPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-[#174789]">Organizing Council & Role Management</h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <h2 className="text-xl font-bold text-[#0A2047] tracking-tight flex items-center gap-2">
+            <UserCheck className="w-5 h-5 text-[#D4AF37]" />
+            Organizing Council & Role Management
+          </h2>
+          <p className="text-xs text-[#64748B] mt-0.5">
             Manage committee members, enforce server-side RBAC, and handle credential lifecycle.
           </p>
         </div>
 
         <button
           onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#174789] hover:bg-[#0E2A5C] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0A2047] hover:bg-[#132E57] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors cursor-pointer self-start sm:self-auto"
         >
-          <PlusCircle className="w-4 h-4" />
+          <PlusCircle className="w-4 h-4 text-[#D4AF37]" />
           <span>Add Council Member</span>
         </button>
       </div>
 
       {message && (
-        <div className="p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between">
+        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between shadow-2xs">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>{message}</span>
+            <span className="font-medium">{message}</span>
           </div>
-          <button onClick={() => setMessage(null)} className="font-bold">&times;</button>
+          <button onClick={() => setMessage(null)} className="font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer">&times;</button>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center justify-between">
+        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center justify-between shadow-2xs">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-            <span>{errorMessage}</span>
+            <span className="font-medium">{errorMessage}</span>
           </div>
-          <button onClick={() => setErrorMessage(null)} className="font-bold">&times;</button>
+          <button onClick={() => setErrorMessage(null)} className="font-bold text-rose-700 hover:text-rose-900 cursor-pointer">&times;</button>
         </div>
       )}
 
 
       {/* Filter / Search Bar */}
-      <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex justify-between items-center">
+      <div className="bg-white p-4 rounded-xl border border-[#E2E8F0] shadow-xs flex justify-between items-center">
         <div className="relative w-full max-w-sm">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by member name, email, or role..."
-            className="w-full pl-9 pr-3 py-1.5 rounded-lg text-xs border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#174789] bg-white placeholder:text-slate-400"
+            className="w-full pl-9 pr-3 py-2 rounded-lg text-xs border border-[#E2E8F0] focus:outline-none focus:ring-2 focus:ring-[#0A2047] bg-white placeholder:text-[#64748B] text-[#172033]"
           />
         </div>
       </div>
 
       {/* Members Roster Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider text-[11px]">
-                <th className="py-3 px-4 font-bold">Member Name & Email</th>
-                <th className="py-3 px-4 font-bold">Assigned Role</th>
-                <th className="py-3 px-4 font-bold">Department / Society</th>
-                <th className="py-3 px-4 font-bold">Assigned Tracks</th>
-                <th className="py-3 px-4 font-bold">Account Status</th>
-                <th className="py-3 px-4 font-bold text-right">Actions</th>
+              <tr className="bg-[#F5F7FA] border-b border-[#E2E8F0] text-[#64748B] uppercase tracking-wider text-[11px]">
+                <th className="py-3.5 px-4 font-bold">Member Name & Email</th>
+                <th className="py-3.5 px-4 font-bold">Assigned Role</th>
+                <th className="py-3.5 px-4 font-bold">Department / Society</th>
+                <th className="py-3.5 px-4 font-bold">Assigned Tracks</th>
+                <th className="py-3.5 px-4 font-bold">Account Status</th>
+                <th className="py-3.5 px-4 font-bold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[#E2E8F0]">
               {filteredMembers.map((m) => {
                 const assignedEvs = events.filter((e) => m.assignedEventIds?.includes(e.id));
                 const isDeactivated = m.status === "suspended";
 
                 return (
-                  <tr key={m.id} className="hover:bg-slate-50/50 transition-colors">
+                  <tr key={m.id} className="hover:bg-[#F0F3F8] transition-colors">
                     {/* Name & Email */}
                     <td className="py-3.5 px-4 min-w-[200px]">
-                      <div className="font-bold text-slate-900 text-sm">{m.fullName}</div>
-                      <div className="text-[11px] text-slate-400 flex items-center gap-1 font-mono mt-0.5">
-                        <Mail className="w-3 h-3 text-slate-400" />
+                      <div className="font-bold text-[#172033] text-sm">{m.fullName}</div>
+                      <div className="text-[11px] text-[#64748B] flex items-center gap-1 font-mono mt-0.5">
+                        <Mail className="w-3 h-3 text-[#64748B]" />
                         <span>{m.email}</span>
                       </div>
                     </td>
@@ -355,9 +358,9 @@ export default function AdminMembersPage() {
                     <td className="py-3.5 px-4 whitespace-nowrap">{getRoleBadge(m.role)}</td>
 
                     {/* Department */}
-                    <td className="py-3.5 px-4 text-slate-700">
+                    <td className="py-3.5 px-4 text-[#172033]">
                       <div className="flex items-center gap-1.5">
-                        <Building className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <Building className="w-3.5 h-3.5 text-[#64748B] shrink-0" />
                         <span>{m.department}</span>
                       </div>
                     </td>
@@ -369,14 +372,14 @@ export default function AdminMembersPage() {
                           {assignedEvs.map((ev) => (
                             <span
                               key={ev.id}
-                              className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-[10px] font-medium"
+                              className="px-2 py-0.5 rounded bg-[#F0F3F8] text-[#0A2047] border border-[#E2E8F0] text-[10px] font-medium"
                             >
                               {ev.title.split(":")[0]}
                             </span>
                           ))}
                         </div>
                       ) : (
-                        <span className="text-slate-400 italic text-[11px]">No tracks assigned</span>
+                        <span className="text-[#64748B] italic text-[11px]">No tracks assigned</span>
                       )}
                     </td>
 
@@ -405,7 +408,7 @@ export default function AdminMembersPage() {
                               setSelectedMember(m);
                               setRoleModalOpen(true);
                             }}
-                            className="p-1.5 rounded-md text-slate-600 hover:text-[#174789] hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
+                            className="p-1.5 rounded-md text-[#64748B] hover:text-[#0A2047] hover:bg-[#F0F3F8] border border-[#E2E8F0] transition-colors cursor-pointer"
                             title="Manage Member Role"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
@@ -415,10 +418,10 @@ export default function AdminMembersPage() {
                         {/* Reset Password */}
                         <button
                           onClick={() => handleResetPassword(m)}
-                          className="p-1.5 rounded-md text-slate-600 hover:text-amber-700 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-md text-[#64748B] hover:text-[#0A2047] hover:bg-[#F0F3F8] border border-[#E2E8F0] transition-colors cursor-pointer"
                           title="Generate Temporary Credential / Reset Password"
                         >
-                          <KeyRound className="w-3.5 h-3.5" />
+                          <KeyRound className="w-3.5 h-3.5 text-[#D4AF37]" />
                         </button>
 
                         {/* Toggle Activation / Deactivation */}
@@ -445,7 +448,7 @@ export default function AdminMembersPage() {
                                 targetStatus: "suspended",
                               })
                             }
-                            className="p-1.5 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-colors cursor-pointer"
+                            className="p-1.5 rounded-md text-[#64748B] hover:text-rose-600 hover:bg-rose-50 border border-[#E2E8F0] transition-colors cursor-pointer"
                             title="Deactivate Account"
                           >
                             <UserX className="w-3.5 h-3.5" />
@@ -463,19 +466,19 @@ export default function AdminMembersPage() {
 
       {/* Account Status Confirmation Modal (Anti-Lockout Protected) */}
       {confirmStatusModal && confirmStatusModal.open && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-xl border border-slate-200">
+        <div className="fixed inset-0 z-50 bg-[#0A2047]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-xl border border-[#E2E8F0]">
             <div className="flex items-center gap-3 text-amber-600">
               <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
                 <AlertTriangle className="w-5 h-5 text-amber-600" />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 text-base">
+                <h3 className="font-bold text-[#172033] text-base">
                   {confirmStatusModal.targetStatus === "suspended"
                     ? "Confirm Account Deactivation"
                     : "Confirm Account Reactivation"}
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-[#64748B]">
                   {confirmStatusModal.targetStatus === "suspended"
                     ? "Deactivating an account suspends login access while preserving historical assignments and proposals."
                     : "Reactivating will restore council login privileges."}
@@ -483,16 +486,16 @@ export default function AdminMembersPage() {
               </div>
             </div>
 
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs space-y-1">
-              <div>Member: <span className="font-bold text-slate-900">{confirmStatusModal.member.fullName}</span></div>
-              <div>Email: <span className="font-mono text-slate-800">{confirmStatusModal.member.email}</span></div>
-              <div>Role: <span className="font-bold text-[#174789]">{confirmStatusModal.member.role}</span></div>
+            <div className="p-3 bg-[#F5F7FA] rounded-lg border border-[#E2E8F0] text-xs space-y-1">
+              <div>Member: <span className="font-bold text-[#172033]">{confirmStatusModal.member.fullName}</span></div>
+              <div>Email: <span className="font-mono text-[#172033]">{confirmStatusModal.member.email}</span></div>
+              <div>Role: <span className="font-bold text-[#0A2047]">{confirmStatusModal.member.role}</span></div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#E2E8F0]">
               <button
                 onClick={() => setConfirmStatusModal(null)}
-                className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-100 text-xs font-semibold cursor-pointer"
+                className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F0F3F8] text-[#172033] text-xs font-semibold cursor-pointer"
               >
                 Cancel
               </button>
@@ -515,54 +518,54 @@ export default function AdminMembersPage() {
 
       {/* Password Reset Result Modal */}
       {resetModalOpen && selectedMember && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-xl border border-slate-200">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="fixed inset-0 z-50 bg-[#0A2047]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-xl border border-[#E2E8F0]">
+            <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
               <div className="flex items-center gap-2">
-                <KeyRound className="w-4 h-4 text-emerald-600" />
-                <h3 className="font-bold text-slate-900 text-base">Credential Reset Complete</h3>
+                <KeyRound className="w-4 h-4 text-[#D4AF37]" />
+                <h3 className="font-bold text-[#172033] text-base">Credential Reset Complete</h3>
               </div>
               <button
                 onClick={() => setResetModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 font-bold text-lg cursor-pointer"
+                className="text-[#64748B] hover:text-[#0A2047] font-bold text-lg cursor-pointer"
               >
                 &times;
               </button>
             </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-[#64748B] leading-relaxed">
               A temporary authentication credential has been securely provisioned for{" "}
-              <strong>{selectedMember.fullName}</strong>. Plaintext passwords are never stored.
+              <strong className="text-[#172033]">{selectedMember.fullName}</strong>. Plaintext passwords are never stored.
             </p>
 
             {temporaryToken && (
-              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-1.5">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+              <div className="p-3 bg-[#F5F7FA] rounded-lg border border-[#E2E8F0] space-y-1.5">
+                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">
                   Temporary Access Token
                 </span>
-                <div className="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-slate-300">
-                  <code className="text-xs font-mono font-bold text-slate-900 select-all">
+                <div className="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-[#E2E8F0]">
+                  <code className="text-xs font-mono font-bold text-[#0A2047] select-all">
                     {temporaryToken}
                   </code>
                   <button
                     onClick={() => copyToClipboard(temporaryToken)}
-                    className="p-1 text-slate-400 hover:text-slate-700 rounded transition-colors cursor-pointer"
+                    className="p-1 text-[#64748B] hover:text-[#0A2047] rounded transition-colors cursor-pointer"
                     title="Copy Temporary Password"
                   >
                     {copiedToken ? (
                       <Check className="w-3.5 h-3.5 text-emerald-600" />
                     ) : (
-                      <Copy className="w-3.5 h-3.5" />
+                      <Copy className="w-3.5 h-3.5 text-[#D4AF37]" />
                     )}
                   </button>
                 </div>
               </div>
             )}
 
-            <div className="flex items-center justify-end pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end pt-2 border-t border-[#E2E8F0]">
               <button
                 onClick={() => setResetModalOpen(false)}
-                className="px-4 py-2 rounded-lg bg-[#174789] text-white text-xs font-semibold cursor-pointer"
+                className="px-4 py-2 rounded-lg bg-[#0A2047] hover:bg-[#132E57] text-white text-xs font-semibold cursor-pointer transition-colors"
               >
                 Done
               </button>
@@ -573,25 +576,25 @@ export default function AdminMembersPage() {
 
       {/* Role Management Modal (President Only) */}
       {roleModalOpen && selectedMember && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-xl border border-slate-200 text-xs">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-bold text-slate-900 text-base">Assign Council Role</h3>
+        <div className="fixed inset-0 z-50 bg-[#0A2047]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-xl border border-[#E2E8F0] text-xs">
+            <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
+              <h3 className="font-bold text-[#172033] text-base">Assign Council Role</h3>
               <button
                 onClick={() => setRoleModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 font-bold text-lg cursor-pointer"
+                className="text-[#64748B] hover:text-[#0A2047] font-bold text-lg cursor-pointer"
               >
                 &times;
               </button>
             </div>
 
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-1">
-              <div>Member: <span className="font-bold text-slate-900">{selectedMember.fullName}</span></div>
-              <div>Current Role: <span className="font-bold text-[#174789]">{selectedMember.role}</span></div>
+            <div className="p-3 bg-[#F5F7FA] rounded-lg border border-[#E2E8F0] space-y-1">
+              <div>Member: <span className="font-bold text-[#172033]">{selectedMember.fullName}</span></div>
+              <div>Current Role: <span className="font-bold text-[#0A2047]">{selectedMember.role}</span></div>
             </div>
 
             <div className="space-y-2">
-              <label className="block font-bold text-slate-700">Select New Role</label>
+              <label className="block font-bold text-[#172033]">Select New Role</label>
               {(["President", "Vice President", "Admin", "AVISHKAR Member"] as AdminRole[]).map((r) => (
                 <button
                   key={r}
@@ -599,21 +602,21 @@ export default function AdminMembersPage() {
                   onClick={() => handleUpdateRole(selectedMember.id, r)}
                   className={`w-full p-2.5 rounded-lg border text-left flex items-center justify-between transition-colors cursor-pointer ${
                     selectedMember.role === r
-                      ? "border-[#174789] bg-blue-50/50 font-bold text-[#174789]"
-                      : "border-slate-200 hover:bg-slate-50 text-slate-700"
+                      ? "border-[#0A2047] bg-[#F0F3F8] font-bold text-[#0A2047]"
+                      : "border-[#E2E8F0] hover:bg-[#F0F3F8] text-[#172033]"
                   }`}
                 >
                   <span>{r}</span>
-                  {selectedMember.role === r && <Check className="w-4 h-4 text-[#174789]" />}
+                  {selectedMember.role === r && <Check className="w-4 h-4 text-[#D4AF37]" />}
                 </button>
               ))}
             </div>
 
-            <div className="flex items-center justify-end pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end pt-2 border-t border-[#E2E8F0]">
               <button
                 type="button"
                 onClick={() => setRoleModalOpen(false)}
-                className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-100 font-semibold cursor-pointer"
+                className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F0F3F8] text-[#172033] font-semibold cursor-pointer"
               >
                 Cancel
               </button>
@@ -624,13 +627,13 @@ export default function AdminMembersPage() {
 
       {/* Add Member Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-xl border border-slate-200 text-xs">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-bold text-slate-900 text-base">Add Organizing Member</h3>
+        <div className="fixed inset-0 z-50 bg-[#0A2047]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-xl border border-[#E2E8F0] text-xs">
+            <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
+              <h3 className="font-bold text-[#172033] text-base">Add Organizing Member</h3>
               <button
                 onClick={() => setModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 font-bold text-lg cursor-pointer"
+                className="text-[#64748B] hover:text-[#0A2047] font-bold text-lg cursor-pointer"
               >
                 &times;
               </button>
@@ -638,46 +641,46 @@ export default function AdminMembersPage() {
 
             <form onSubmit={handleAddMember} className="space-y-4">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Full Name *</label>
+                <label className="block font-bold text-[#172033] mb-1">Full Name *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g., Dr. Ananya Sharma"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#174789] focus:outline-none"
+                  className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047] focus:outline-none text-[#172033]"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Official University Email *</label>
+                <label className="block font-bold text-[#172033] mb-1">Official University Email *</label>
                 <input
                   type="email"
                   required
                   placeholder="name@gdgoenka.ac.in"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#174789] focus:outline-none"
+                  className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047] focus:outline-none text-[#172033]"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Department / Society</label>
+                <label className="block font-bold text-[#172033] mb-1">Department / Society</label>
                 <input
                   type="text"
                   placeholder="e.g., School of Engineering & Sciences (SOES)"
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#174789] focus:outline-none"
+                  className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047] focus:outline-none text-[#172033]"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Assigned Role</label>
+                <label className="block font-bold text-[#172033] mb-1">Assigned Role</label>
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value as AdminRole)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#174789] focus:outline-none bg-white font-medium"
+                  className="w-full px-3 py-2 text-xs border border-[#E2E8F0] rounded-lg focus:ring-2 focus:ring-[#0A2047] focus:outline-none bg-white font-medium text-[#172033]"
                 >
                   <option value="AVISHKAR Member">Council Member (Technical Track Lead)</option>
                   {userRole === "President" && (
@@ -689,24 +692,24 @@ export default function AdminMembersPage() {
                   )}
                 </select>
                 {userRole !== "President" && (
-                  <span className="text-[10px] text-slate-400 mt-0.5 block">
+                  <span className="text-[10px] text-[#64748B] mt-0.5 block">
                     Only President can grant executive council roles.
                   </span>
                 )}
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E2E8F0]">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-100 font-semibold cursor-pointer"
+                  className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F0F3F8] text-[#172033] font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 rounded-lg bg-[#174789] hover:bg-[#0E2A5C] text-white font-semibold shadow-xs disabled:opacity-50 cursor-pointer"
+                  className="px-4 py-2 rounded-lg bg-[#0A2047] hover:bg-[#132E57] text-white font-semibold shadow-xs disabled:opacity-50 cursor-pointer transition-colors"
                 >
                   {submitting ? "Adding..." : "Add Member"}
                 </button>

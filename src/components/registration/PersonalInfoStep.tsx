@@ -13,9 +13,9 @@ interface PersonalInfoStepProps {
 export function PersonalInfoStep({ formData, errors, onChange }: PersonalInfoStepProps) {
   return (
     <div className="space-y-6">
-      <div className="border-b border-[#D9E4F2] pb-3">
-        <h3 className="text-[20px] font-normal text-[#174789]">Personal Information</h3>
-        <p className="text-xs text-[#475569] mt-0.5">
+      <div className="border-b border-[#E2E8F0] pb-3">
+        <h3 className="text-xl font-bold text-[#0A2047]">Personal Information</h3>
+        <p className="text-xs text-[#64748B] mt-0.5">
           Enter your official contact and identity details as recorded in university records.
         </p>
       </div>
@@ -24,12 +24,12 @@ export function PersonalInfoStep({ formData, errors, onChange }: PersonalInfoSte
       <div className="space-y-1.5">
         <label
           htmlFor="studentName"
-          className="block text-sm font-medium text-[#174789]"
+          className="block text-sm font-semibold text-[#0A2047]"
         >
           Full Name <span className="text-red-500" aria-hidden="true">*</span>
         </label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#475569]">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#64748B]">
             <User className="w-4 h-4" />
           </div>
           <input
@@ -44,10 +44,10 @@ export function PersonalInfoStep({ formData, errors, onChange }: PersonalInfoSte
             value={formData.studentName}
             onChange={(e) => onChange("studentName", e.target.value)}
             className={cn(
-              "w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#153D73] placeholder:text-slate-400 bg-white transition-all focus:outline-none focus:ring-2",
+              "w-full h-11 pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#172033] placeholder:text-[#94A3B8] bg-white transition-all focus:outline-none focus:ring-2",
               errors.studentName
                 ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                : "border-[#D9E4F2] hover:border-slate-300 focus:border-[#2563EB] focus:ring-blue-100"
+                : "border-[#E2E8F0] hover:border-slate-300 focus:border-[#0A2047] focus:ring-[#0A2047]/15"
             )}
           />
         </div>
@@ -63,12 +63,12 @@ export function PersonalInfoStep({ formData, errors, onChange }: PersonalInfoSte
       <div className="space-y-1.5">
         <label
           htmlFor="email"
-          className="block text-sm font-medium text-[#174789]"
+          className="block text-sm font-semibold text-[#0A2047]"
         >
           Email Address <span className="text-red-500" aria-hidden="true">*</span>
         </label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#475569]">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#64748B]">
             <Mail className="w-4 h-4" />
           </div>
           <input
@@ -83,10 +83,10 @@ export function PersonalInfoStep({ formData, errors, onChange }: PersonalInfoSte
             value={formData.email}
             onChange={(e) => onChange("email", e.target.value)}
             className={cn(
-              "w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#153D73] placeholder:text-slate-400 bg-white transition-all focus:outline-none focus:ring-2",
+              "w-full h-11 pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#172033] placeholder:text-[#94A3B8] bg-white transition-all focus:outline-none focus:ring-2",
               errors.email
                 ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                : "border-[#D9E4F2] hover:border-slate-300 focus:border-[#2563EB] focus:ring-blue-100"
+                : "border-[#E2E8F0] hover:border-slate-300 focus:border-[#0A2047] focus:ring-[#0A2047]/15"
             )}
           />
         </div>
@@ -102,12 +102,12 @@ export function PersonalInfoStep({ formData, errors, onChange }: PersonalInfoSte
       <div className="space-y-1.5">
         <label
           htmlFor="contactNumber"
-          className="block text-sm font-medium text-[#174789]"
+          className="block text-sm font-semibold text-[#0A2047]"
         >
           Contact Number <span className="text-red-500" aria-hidden="true">*</span>
         </label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#475569]">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#64748B]">
             <Phone className="w-4 h-4" />
           </div>
           <input
@@ -118,14 +118,14 @@ export function PersonalInfoStep({ formData, errors, onChange }: PersonalInfoSte
             aria-required="true"
             aria-invalid={Boolean(errors.contactNumber)}
             aria-describedby={errors.contactNumber ? "contactNumber-error" : undefined}
-            placeholder="Enter your mobile number"
+            placeholder="Enter your contact number"
             value={formData.contactNumber}
             onChange={(e) => onChange("contactNumber", e.target.value)}
             className={cn(
-              "w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#153D73] placeholder:text-slate-400 bg-white transition-all focus:outline-none focus:ring-2",
+              "w-full h-11 pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#172033] placeholder:text-[#94A3B8] bg-white transition-all focus:outline-none focus:ring-2",
               errors.contactNumber
                 ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                : "border-[#D9E4F2] hover:border-slate-300 focus:border-[#2563EB] focus:ring-blue-100"
+                : "border-[#E2E8F0] hover:border-slate-300 focus:border-[#0A2047] focus:ring-[#0A2047]/15"
             )}
           />
         </div>
@@ -142,13 +142,13 @@ export function PersonalInfoStep({ formData, errors, onChange }: PersonalInfoSte
         <div className="flex items-center justify-between">
           <label
             htmlFor="gender"
-            className="block text-sm font-medium text-[#174789]"
+            className="block text-sm font-semibold text-[#0A2047]"
           >
             Gender
           </label>
-          <span className="text-xs text-slate-400">Optional</span>
+          <span className="text-xs text-[#64748B] font-normal">(Optional)</span>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5" role="radiogroup" aria-label="Gender">
           {GENDER_OPTIONS.map((option) => {
             const isSelected = formData.gender === option;
             return (
@@ -159,13 +159,14 @@ export function PersonalInfoStep({ formData, errors, onChange }: PersonalInfoSte
                 aria-checked={isSelected}
                 onClick={() => onChange("gender", isSelected ? "" : option)}
                 className={cn(
-                  "px-3 py-2 rounded-lg text-xs sm:text-sm font-medium border text-center transition-all focus:outline-none focus:ring-2 focus:ring-blue-100",
+                  "h-11 px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold border text-center transition-all focus:outline-none focus:ring-2 focus:ring-[#0A2047]/20 cursor-pointer flex items-center justify-center gap-1.5",
                   isSelected
-                    ? "bg-[#2563EB] text-white border-[#2563EB] shadow-2xs"
-                    : "bg-white text-[#334155] border-[#D9E4F2] hover:bg-[#EFF6FF] hover:border-blue-200"
+                    ? "bg-[#0A2047] text-white border-[#0A2047] shadow-xs"
+                    : "bg-white text-[#172033] border-[#E2E8F0] hover:bg-[#F5F7FA] hover:border-slate-300"
                 )}
               >
-                {option}
+                {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />}
+                <span>{option}</span>
               </button>
             );
           })}
@@ -183,14 +184,14 @@ export function PersonalInfoStep({ formData, errors, onChange }: PersonalInfoSte
         <div className="flex items-center justify-between">
           <label
             htmlFor="dob"
-            className="block text-sm font-medium text-[#174789]"
+            className="block text-sm font-semibold text-[#0A2047]"
           >
             Date of Birth
           </label>
-          <span className="text-xs text-slate-400">Optional</span>
+          <span className="text-xs text-[#64748B] font-normal">(Optional)</span>
         </div>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#475569]">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#64748B]">
             <Calendar className="w-4 h-4" />
           </div>
           <input
@@ -202,10 +203,10 @@ export function PersonalInfoStep({ formData, errors, onChange }: PersonalInfoSte
             value={formData.dob || ""}
             onChange={(e) => onChange("dob", e.target.value)}
             className={cn(
-              "w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#153D73] bg-white transition-all focus:outline-none focus:ring-2",
+              "w-full h-11 pl-10 pr-4 py-2.5 rounded-lg border text-sm text-[#172033] bg-white transition-all focus:outline-none focus:ring-2",
               errors.dob
                 ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                : "border-[#D9E4F2] hover:border-slate-300 focus:border-[#2563EB] focus:ring-blue-100"
+                : "border-[#E2E8F0] hover:border-slate-300 focus:border-[#0A2047] focus:ring-[#0A2047]/15"
             )}
           />
         </div>

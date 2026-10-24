@@ -134,11 +134,11 @@ export function AdminHeader({
       case "rejection":
         return <XCircle className="w-4 h-4 text-rose-600 shrink-0" />;
       case "proposal":
-        return <FileText className="w-4 h-4 text-purple-600 shrink-0" />;
+        return <FileText className="w-4 h-4 text-[#D4AF37] shrink-0" />;
       case "task":
-        return <Send className="w-4 h-4 text-indigo-600 shrink-0" />;
+        return <Send className="w-4 h-4 text-[#0A2047] shrink-0" />;
       case "publish":
-        return <Globe className="w-4 h-4 text-blue-600 shrink-0" />;
+        return <Globe className="w-4 h-4 text-[#0A2047] shrink-0" />;
       case "payment":
         return <CreditCard className="w-4 h-4 text-amber-600 shrink-0" />;
       default:
@@ -150,27 +150,27 @@ export function AdminHeader({
     switch (r) {
       case "President":
         return {
-          bg: "bg-purple-50 text-purple-800 border-purple-200",
-          dot: "bg-purple-600",
+          bg: "bg-[#0A2047]/10 text-[#0A2047] border-[#D4AF37]/50",
+          dot: "bg-[#D4AF37]",
           label: "President Council",
         };
       case "Vice President":
         return {
-          bg: "bg-indigo-50 text-indigo-800 border-indigo-200",
-          dot: "bg-indigo-600",
+          bg: "bg-[#132E57]/10 text-[#132E57] border-[#132E57]/30",
+          dot: "bg-[#132E57]",
           label: "Vice President Council",
         };
       case "AVISHKAR Member":
         return {
-          bg: "bg-teal-50 text-teal-800 border-teal-200",
-          dot: "bg-teal-600",
+          bg: "bg-[#0A2047]/5 text-[#0A2047] border-[#E2E8F0]",
+          dot: "bg-[#D4AF37]",
           label: "AVISHKAR Member",
         };
       case "Admin":
       default:
         return {
-          bg: "bg-blue-50 text-blue-800 border-blue-200",
-          dot: "bg-blue-600",
+          bg: "bg-[#0A2047]/10 text-[#0A2047] border-[#0A2047]/30",
+          dot: "bg-[#0A2047]",
           label: "Portal Administrator",
         };
     }
@@ -179,13 +179,13 @@ export function AdminHeader({
   const badge = getRoleBadge(role);
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-white/95 backdrop-blur-xs border-b border-slate-200 px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4 shadow-xs">
+    <header className="sticky top-0 z-30 w-full bg-white/95 backdrop-blur-xs border-b border-[#E2E8F0] px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4 shadow-xs">
       <div className="flex items-center gap-3 min-w-0">
         {/* Mobile menu button */}
         {onOpenMobile && (
           <button
             onClick={onOpenMobile}
-            className="lg:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="lg:hidden p-2 rounded-lg text-[#172033] hover:text-[#0A2047] hover:bg-[#F0F3F8] focus:outline-none focus:ring-2 focus:ring-[#0A2047]"
             aria-label="Open Navigation"
           >
             <Menu className="w-5 h-5" />
@@ -193,10 +193,10 @@ export function AdminHeader({
         )}
 
         <div className="min-w-0">
-          <span className="text-base sm:text-lg font-bold text-[#174789] leading-tight truncate block">
+          <span className="text-base sm:text-lg font-bold text-[#0A2047] leading-tight truncate block">
             {title}
           </span>
-          <p className="text-xs text-slate-500 hidden sm:block truncate">
+          <p className="text-xs text-[#64748B] hidden sm:block truncate">
             {subtitle}
           </p>
         </div>
@@ -211,12 +211,12 @@ export function AdminHeader({
               fetchNotifications();
             }}
             disabled={isRefreshing}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-slate-600 hover:text-[#174789] hover:bg-blue-50 border border-slate-200 transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold text-[#172033] hover:text-[#0A2047] hover:bg-[#F0F3F8] border border-[#E2E8F0] transition-colors disabled:opacity-50"
             title="Refresh database records"
           >
             <RefreshCw
               className={`w-3.5 h-3.5 ${
-                isRefreshing ? "animate-spin text-blue-600" : ""
+                isRefreshing ? "animate-spin text-[#0A2047]" : ""
               }`}
             />
             <span className="hidden sm:inline">
@@ -229,13 +229,13 @@ export function AdminHeader({
         <div className="relative" ref={notifRef}>
           <button
             onClick={() => setIsNotifOpen((prev) => !prev)}
-            className="relative p-2 rounded-lg text-slate-600 hover:text-[#174789] hover:bg-slate-100 border border-slate-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+            className="relative p-2 rounded-lg text-[#172033] hover:text-[#0A2047] hover:bg-[#F0F3F8] border border-[#E2E8F0] transition-colors focus:outline-none focus:ring-2 focus:ring-[#0A2047]/30"
             aria-label="Notifications"
             title="Council Notifications"
           >
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse shadow-xs">
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#DC2626] text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse shadow-xs">
                 {unreadCount > 9 ? "9+" : unreadCount}
               </span>
             )}
@@ -243,15 +243,15 @@ export function AdminHeader({
 
           {/* Notification Dropdown Popover */}
           {isNotifOpen && (
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl border border-slate-200 shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-1">
-              <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+            <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl border border-[#E2E8F0] shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-1">
+              <div className="px-4 py-3 bg-[#F5F7FA] border-b border-[#E2E8F0] flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-[#174789]" />
-                  <span className="text-xs sm:text-sm font-bold text-slate-900">
+                  <Bell className="w-4 h-4 text-[#0A2047]" />
+                  <span className="text-xs sm:text-sm font-bold text-[#172033]">
                     Council Notifications
                   </span>
                   {unreadCount > 0 && (
-                    <span className="px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-800 text-[10px] font-bold">
+                    <span className="px-1.5 py-0.5 rounded-md bg-[#0A2047]/10 text-[#0A2047] text-[10px] font-bold">
                       {unreadCount} unread
                     </span>
                   )}
@@ -259,7 +259,7 @@ export function AdminHeader({
                 {unreadCount > 0 && (
                   <button
                     onClick={handleMarkAllRead}
-                    className="text-[11px] text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
+                    className="text-[11px] text-[#0A2047] hover:text-[#D4AF37] font-bold cursor-pointer"
                   >
                     Mark all read
                   </button>
@@ -276,21 +276,21 @@ export function AdminHeader({
                     <div
                       key={notif.id}
                       onClick={() => handleItemClick(notif)}
-                      className={`p-3.5 hover:bg-blue-50/40 transition-colors cursor-pointer flex items-start gap-3 ${
-                        !notif.read ? "bg-blue-50/20" : ""
+                      className={`p-3.5 hover:bg-[#F0F3F8] transition-colors cursor-pointer flex items-start gap-3 ${
+                        !notif.read ? "bg-[#0A2047]/5" : ""
                       }`}
                     >
                       <div className="mt-0.5">{getNotificationIcon(notif.type)}</div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-xs font-bold text-slate-900 truncate">
+                          <p className="text-xs font-bold text-[#172033] truncate">
                             {notif.title}
                           </p>
                           {!notif.read && (
-                            <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0" />
+                            <span className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0" />
                           )}
                         </div>
-                        <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-2">
+                        <p className="text-[11px] text-[#64748B] mt-0.5 line-clamp-2">
                           {notif.message}
                         </p>
                         <div className="flex items-center justify-between mt-1 text-[10px] text-slate-400">
@@ -309,7 +309,7 @@ export function AdminHeader({
                                 e.stopPropagation();
                                 handleItemClick(notif);
                               }}
-                              className="text-blue-600 hover:underline flex items-center gap-0.5 font-medium"
+                              className="text-[#0A2047] hover:text-[#D4AF37] hover:underline flex items-center gap-0.5 font-medium transition-colors"
                             >
                               <span>View</span>
                               <ExternalLink className="w-2.5 h-2.5" />
@@ -322,8 +322,8 @@ export function AdminHeader({
                 )}
               </div>
 
-              <div className="p-2.5 bg-slate-50 border-t border-slate-100 text-center">
-                <span className="text-[11px] text-slate-400">
+              <div className="p-2.5 bg-[#F5F7FA] border-t border-[#E2E8F0] text-center">
+                <span className="text-[11px] text-[#64748B]">
                   Notifications refresh on page actions
                 </span>
               </div>
@@ -343,12 +343,12 @@ export function AdminHeader({
 
         {/* User profile (President, Vice President, and Member portals only) */}
         {!isAdminManagement && user?.email && (
-          <div className="hidden md:flex items-center gap-2 pl-2 border-l border-slate-200 text-xs text-slate-600">
-            <div className="w-7 h-7 rounded-full bg-[#174789]/10 text-[#174789] font-bold flex items-center justify-center">
+          <div className="hidden md:flex items-center gap-2 pl-2 border-l border-[#E2E8F0] text-xs text-[#64748B]">
+            <div className="w-7 h-7 rounded-full bg-[#0A2047]/10 text-[#0A2047] font-bold flex items-center justify-center">
               <User className="w-3.5 h-3.5" />
             </div>
             <span
-              className="max-w-[140px] truncate font-medium text-slate-700"
+              className="max-w-[140px] truncate font-semibold text-[#172033]"
               title={user.email}
             >
               {user.fullName || user.email.split("@")[0]}

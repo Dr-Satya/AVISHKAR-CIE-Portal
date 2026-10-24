@@ -38,6 +38,7 @@ export function RegistrationDecisionModal({
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
   const handleClose = () => {
     setRejectionReason("");
     setSelectedPresetReason("");
@@ -124,9 +125,9 @@ export function RegistrationDecisionModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0A2047]/60 backdrop-blur-xs animate-in fade-in">
       <div
-        className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]"
+        className="bg-white rounded-2xl border border-[#E2E8F0] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -146,16 +147,16 @@ export function RegistrationDecisionModal({
               }`}
             >
               {action === "approve" ? (
-                <CheckCircle2 className="w-5 h-5" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
               ) : (
-                <XCircle className="w-5 h-5" />
+                <XCircle className="w-5 h-5 text-rose-600" />
               )}
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">
+              <h3 className="text-base font-bold text-[#172033]">
                 {action === "approve" ? "Approve Student Registration" : "Reject Student Registration"}
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-[#64748B]">
                 {action === "approve"
                   ? "Confirm participant eligibility for AVISHKAR 2026"
                   : "Decline registration with recorded justification"}
@@ -164,7 +165,8 @@ export function RegistrationDecisionModal({
           </div>
           <button
             onClick={handleClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-white/80 transition-colors"
+            className="p-1.5 rounded-lg text-[#64748B] hover:text-[#0A2047] hover:bg-white/80 transition-colors cursor-pointer"
+            aria-label="Close modal"
           >
             <X className="w-4 h-4" />
           </button>
@@ -184,41 +186,41 @@ export function RegistrationDecisionModal({
           )}
 
           {/* Student Identity Card (Required before approving) */}
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-2.5">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5 border-b border-slate-200/80 pb-2">
-              <User className="w-3.5 h-3.5 text-[#153D73]" />
+          <div className="bg-[#F5F7FA] border border-[#E2E8F0] rounded-xl p-4 text-xs space-y-2.5">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-[#64748B] flex items-center gap-1.5 border-b border-[#E2E8F0] pb-2">
+              <User className="w-3.5 h-3.5 text-[#0A2047]" />
               <span>Student Registration Summary</span>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <span className="text-slate-500 block text-[11px]">Student Name</span>
-                <span className="font-bold text-slate-900 text-sm">{registration.student_name}</span>
+                <span className="text-[#64748B] block text-[11px]">Student Name</span>
+                <span className="font-bold text-[#172033] text-sm">{registration.student_name}</span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[11px]">Student ID / Roll No</span>
-                <span className="font-mono font-bold text-slate-800 text-sm">
+                <span className="text-[#64748B] block text-[11px]">Student ID / Roll No</span>
+                <span className="font-mono font-bold text-[#0A2047] text-sm">
                   {registration.student_id}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[11px]">Registration Reference</span>
-                <span className="font-mono text-slate-700">
+                <span className="text-[#64748B] block text-[11px]">Registration Reference</span>
+                <span className="font-mono text-[#0A2047] font-semibold">
                   {registration.registration_number || registration.id}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[11px]">Academic School</span>
-                <span className="font-medium text-slate-800 truncate block" title={registration.school}>
+                <span className="text-[#64748B] block text-[11px]">Academic School</span>
+                <span className="font-medium text-[#172033] truncate block" title={registration.school}>
                   {registration.school}
                 </span>
               </div>
             </div>
 
             {/* Payment Verification Status Display */}
-            <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between">
-              <span className="text-slate-600 font-medium flex items-center gap-1.5">
-                <CreditCard className="w-3.5 h-3.5 text-slate-500" />
+            <div className="pt-2 border-t border-[#E2E8F0] flex items-center justify-between">
+              <span className="text-[#64748B] font-medium flex items-center gap-1.5">
+                <CreditCard className="w-3.5 h-3.5 text-[#0A2047]" />
                 <span>Payment Verification Status:</span>
               </span>
               <span
@@ -266,11 +268,11 @@ export function RegistrationDecisionModal({
                       href={`/admin/payments?search=${encodeURIComponent(
                         registration.registration_number || registration.student_id
                       )}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs shadow-2xs transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0A2047] hover:bg-[#132E57] text-white font-semibold text-xs shadow-2xs transition-colors"
                       target="_blank"
                     >
                       <span>Review in Payments Module</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
+                      <ExternalLink className="w-3.5 h-3.5 text-[#D4AF37]" />
                     </Link>
                   </div>
                 </div>
@@ -289,15 +291,15 @@ export function RegistrationDecisionModal({
 
               {/* Administrative Notes (Optional) */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Administrative Notes <span className="text-slate-400 font-normal">(Optional)</span>
+                <label className="block text-xs font-semibold text-[#172033] mb-1.5">
+                  Administrative Notes <span className="text-[#64748B] font-normal">(Optional)</span>
                 </label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="e.g., Eligibility verified against ERP student roster. All prerequisites met."
+                  placeholder="e.g., Eligibility verified against university student roster. All prerequisites met."
                   rows={2}
-                  className="w-full p-2.5 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-600 focus:outline-none transition-colors"
+                  className="w-full p-2.5 text-xs bg-white border border-[#E2E8F0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#0A2047] focus:outline-none transition-colors text-[#172033]"
                 />
               </div>
             </div>
@@ -321,7 +323,7 @@ export function RegistrationDecisionModal({
                 <select
                   value={selectedPresetReason}
                   onChange={(e) => handlePresetChange(e.target.value)}
-                  className="w-full p-2.5 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-rose-500 focus:outline-none transition-colors mb-2"
+                  className="w-full p-2.5 text-xs bg-white border border-[#E2E8F0] rounded-xl focus:bg-white focus:ring-2 focus:ring-rose-500 focus:outline-none transition-colors mb-2 text-[#172033]"
                 >
                   <option value="">-- Select standard rejection reason --</option>
                   <option value="Student ID not found in university ERP database">
@@ -351,22 +353,22 @@ export function RegistrationDecisionModal({
                     onChange={(e) => handleCustomReasonChange(e.target.value)}
                     placeholder="Enter specific justification for registration rejection..."
                     rows={2}
-                    className="w-full p-2.5 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-rose-500 focus:outline-none transition-colors"
+                    className="w-full p-2.5 text-xs bg-white border border-[#E2E8F0] rounded-xl focus:bg-white focus:ring-2 focus:ring-rose-500 focus:outline-none transition-colors text-[#172033]"
                   />
                 )}
               </div>
 
               {/* Internal Notes */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Internal Council Notes <span className="text-slate-400 font-normal">(Optional)</span>
+                <label className="block text-xs font-semibold text-[#172033] mb-1.5">
+                  Internal Council Notes <span className="text-[#64748B] font-normal">(Optional)</span>
                 </label>
                 <input
                   type="text"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Notes for internal administrative audit..."
-                  className="w-full p-2.5 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-rose-500 focus:outline-none transition-colors"
+                  className="w-full p-2.5 text-xs bg-white border border-[#E2E8F0] rounded-xl focus:bg-white focus:ring-2 focus:ring-[#0A2047] focus:outline-none transition-colors text-[#172033]"
                 />
               </div>
             </div>
@@ -374,12 +376,12 @@ export function RegistrationDecisionModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs">
+        <div className="px-6 py-3.5 bg-[#F5F7FA] border-t border-[#E2E8F0] flex items-center justify-between text-xs">
           <button
             type="button"
             onClick={handleClose}
             disabled={isSubmitting}
-            className="px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-semibold transition-colors disabled:opacity-50"
+            className="px-4 py-2 rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F0F3F8] text-[#172033] font-semibold transition-colors disabled:opacity-50 cursor-pointer"
           >
             Cancel
           </button>
@@ -394,7 +396,7 @@ export function RegistrationDecisionModal({
                   ? "Approval unavailable: Payment Verification Pending"
                   : "Confirm and approve registration"
               }
-              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-white shadow-xs transition-all ${
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-white shadow-xs transition-all cursor-pointer ${
                 !isPaymentVerified
                   ? "bg-slate-400 cursor-not-allowed opacity-60"
                   : "bg-emerald-600 hover:bg-emerald-700 active:scale-98"
@@ -422,7 +424,7 @@ export function RegistrationDecisionModal({
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting || (!rejectionReason.trim() && !customReason.trim())}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-white bg-rose-600 hover:bg-rose-700 active:scale-98 shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-white bg-rose-600 hover:bg-rose-700 active:scale-98 shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {isSubmitting ? (
                 <>

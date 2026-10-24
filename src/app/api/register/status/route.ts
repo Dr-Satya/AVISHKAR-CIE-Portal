@@ -42,6 +42,14 @@ export async function GET(req: NextRequest) {
         paymentVerifiedAt: localMatch.verified_at || null,
         transactionId: localMatch.transaction_id,
         submittedAt: localMatch.payment_date,
+        hasStartupOrProject: localMatch.has_startup_or_project || null,
+        startupTitle: localMatch.startup_title || localMatch.project_name || null,
+        startupStage: localMatch.startup_stage || null,
+        studentRole: localMatch.student_role || localMatch.project_role || null,
+        teamStructure: localMatch.team_structure || null,
+        teamMembers: localMatch.team_members || [],
+        supportNeeded: localMatch.support_needed || [],
+        technologiesUsed: localMatch.technologies_used || null,
       },
     });
   }

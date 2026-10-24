@@ -43,7 +43,11 @@ export function EventLifecycleTimeline({
   const isProposed = event.status === "proposed";
   const isApproved = event.status === "approved";
   const isPublished = event.status === "published";
-  const isRejected = event.status === "rejected";
+  const isVpApproved = event.vpStatus === "approved";
+  const isVpRejected = event.vpStatus === "rejected";
+  const isPresidentApproved = event.presidentStatus === "approved" || isApproved || isPublished;
+  const isPresidentRejected = event.presidentStatus === "rejected";
+  const isRejected = event.status === "rejected" || isVpRejected || isPresidentRejected;
 
   const stages: TimelineStage[] = [
     {
@@ -67,24 +71,58 @@ export function EventLifecycleTimeline({
       icon: Send,
     },
     {
-      id: "president_review",
-      name: "President Review",
-      role: "President",
+      id: "vp_review",
+      name: "VP Logistical Review",
+      role: "Vice President",
       status: isDraft
         ? "upcoming"
+        : isVpRejected
+        ? "rejected"
+        : isVpApproved
+        ? "completed"
         : isProposed
         ? "current"
         : "completed",
-      timestamp: event.reviewedAt,
-      details: isProposed
-        ? "In executive queue awaiting decision"
-        : event.reviewedBy
-        ? `Reviewed by ${event.reviewedBy}`
-        : "Executive evaluation",
-      nextAction: isProposed
-        ? "President must inspect and Approve or Reject"
+      timestamp: event.vpDecidedAt || undefined,
+      details: isVpRejected
+        ? event.vpRejectionReason || "Logistical feasibility rejected by Vice President"
+        : isVpApproved
+        ? event.vpComment || "Logistical & operational feasibility approved"
+        : isProposed
+        ? "Awaiting Vice President logistical review"
+        : "Operational review",
+      nextAction: isProposed && !isVpApproved && !isVpRejected
+        ? "Vice President reviews venue and technical feasibility"
         : undefined,
       icon: Eye,
+    },
+    {
+      id: "president_review",
+      name: "President Executive Approval",
+      role: "President",
+      status: isDraft || (isProposed && !isVpApproved && !isVpRejected)
+        ? "upcoming"
+        : isPresidentRejected
+        ? "rejected"
+        : isPresidentApproved
+        ? "completed"
+        : isProposed && isVpApproved
+        ? "current"
+        : isRejected
+        ? "rejected"
+        : "upcoming",
+      timestamp: event.presidentDecidedAt || event.reviewedAt || undefined,
+      details: isPresidentRejected
+        ? event.presidentRejectionReason || event.rejectionReason || "Rejected by President Council"
+        : isPresidentApproved
+        ? event.presidentComment || event.reviewComment || "Executive constitutional approval granted"
+        : isProposed && isVpApproved
+        ? "In executive queue awaiting President decision"
+        : "Constitutional review",
+      nextAction: isProposed && isVpApproved && !isPresidentApproved && !isPresidentRejected
+        ? "President evaluates proposal for constitutional approval"
+        : undefined,
+      icon: CheckCircle2,
     },
   ];
 
@@ -92,28 +130,16 @@ export function EventLifecycleTimeline({
     stages.push({
       id: "decision_rejected",
       name: "Proposal Rejected",
-      role: "President",
+      role: isVpRejected ? "Vice President" : "President",
       status: "rejected",
-      timestamp: event.reviewedAt || event.updatedAt,
-      details: event.rejectionReason
-        ? `Reason: ${event.rejectionReason}`
+      timestamp: event.reviewedAt || event.vpDecidedAt || event.updatedAt,
+      details: event.rejectionReason || event.presidentRejectionReason || event.vpRejectionReason
+        ? `Reason: ${event.rejectionReason || event.presidentRejectionReason || event.vpRejectionReason}`
         : "Executive feedback logged",
       nextAction: "Member can review feedback and submit a revised draft",
       icon: XCircle,
     });
   } else {
-    stages.push({
-      id: "decision_approved",
-      name: "Executive Approval",
-      role: "President",
-      status: isDraft || isProposed ? "upcoming" : "completed",
-      timestamp: event.reviewedAt,
-      details: isApproved || isPublished
-        ? event.reviewComment || "Approved by President Council"
-        : "Pending executive sign-off",
-      icon: CheckCircle2,
-    });
-
     stages.push({
       id: "vp_coordination",
       name: "VP Coordination",
@@ -121,15 +147,17 @@ export function EventLifecycleTimeline({
       status:
         isDraft || isProposed
           ? "upcoming"
-          : isApproved
+          : isApproved && event.coordinationStatus !== "coordination_ready"
           ? "current"
           : "completed",
       details: event.coordinatorName
         ? `Lead: ${event.coordinatorName}`
         : event.coordinationStatus === "in_coordination"
         ? "In logistical coordination"
-        : "Awaiting duty assignment",
-      nextAction: isApproved
+        : isApproved
+        ? "Awaiting duty assignment"
+        : "Ready for coordination",
+      nextAction: isApproved && event.coordinationStatus !== "coordination_ready"
         ? "VP assigns coordinators and logistical tasks"
         : undefined,
       icon: Users,
@@ -177,21 +205,37 @@ export function EventLifecycleTimeline({
     }
   }
 
+  const getRoleBadge = (role: string) => {
+    switch (role) {
+      case "President":
+        return "bg-[#0A2047] text-[#D4AF37] border-[#0A2047]";
+      case "Vice President":
+        return "bg-[#0A2047]/10 text-[#0A2047] border-[#0A2047]/20";
+      case "Admin":
+        return "bg-[#132E57]/10 text-[#132E57] border-[#132E57]/20";
+      case "Student":
+        return "bg-slate-100 text-slate-700 border-slate-200";
+      case "Member":
+      default:
+        return "bg-slate-100 text-slate-700 border-slate-200";
+    }
+  };
+
   const getStatusColor = (status: TimelineStage["status"]) => {
     switch (status) {
       case "completed":
         return {
-          ring: "border-teal-500 bg-teal-50 text-teal-700",
-          badge: "bg-teal-50 text-teal-700 border-teal-200",
-          bar: "bg-teal-500",
-          dot: "bg-teal-500",
+          ring: "border-emerald-500 bg-emerald-50 text-emerald-700",
+          badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
+          bar: "bg-emerald-500",
+          dot: "bg-emerald-500",
         };
       case "current":
         return {
-          ring: "border-blue-600 bg-blue-50 text-blue-700 animate-pulse",
-          badge: "bg-blue-50 text-blue-700 border-blue-200",
-          bar: "bg-slate-200",
-          dot: "bg-blue-600",
+          ring: "border-[#D4AF37] bg-[#0A2047] text-[#D4AF37] shadow-xs",
+          badge: "bg-[#0A2047]/10 text-[#0A2047] border border-[#0A2047]/20",
+          bar: "bg-[#E2E8F0]",
+          dot: "bg-[#0A2047]",
         };
       case "rejected":
         return {
@@ -236,16 +280,20 @@ export function EventLifecycleTimeline({
             return (
               <React.Fragment key={stage.id}>
                 <div
-                  className={`flex items-center gap-1 px-2 py-1 rounded-md border text-[11px] font-medium shrink-0 ${colors.badge}`}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md border text-[11px] font-semibold shrink-0 transition-colors ${
+                    stage.status === "current"
+                      ? "bg-[#0A2047] text-white border-[#0A2047]"
+                      : colors.badge
+                  }`}
                   title={`${stage.name} (${stage.role}) - ${stage.status}`}
                 >
-                  <Icon className="w-3 h-3 shrink-0" />
+                  <Icon className={`w-3 h-3 shrink-0 ${stage.status === "current" ? "text-[#D4AF37]" : ""}`} />
                   <span>{stage.name}</span>
                 </div>
                 {idx < stages.length - 1 && (
                   <div
-                    className={`w-3 h-0.5 shrink-0 ${
-                      stage.status === "completed" ? "bg-teal-500" : "bg-slate-200"
+                    className={`w-3.5 h-0.5 shrink-0 ${
+                      stage.status === "completed" ? "bg-emerald-500" : "bg-[#E2E8F0]"
                     }`}
                   />
                 )}
@@ -258,21 +306,21 @@ export function EventLifecycleTimeline({
   }
 
   return (
-    <div className={`bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-xs ${className}`}>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
+    <div className={`bg-white rounded-xl border border-[#E2E8F0] p-5 sm:p-6 shadow-xs ${className}`}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-[#E2E8F0]">
         <div>
           <h4 className="text-sm sm:text-base font-bold text-[#0A2047] flex items-center gap-2">
             <span>Event Progress Lifecycle</span>
             <span
-              className={`px-2 py-0.5 rounded-md text-[11px] font-semibold border ${
+              className={`px-2.5 py-0.5 rounded-md text-[11px] font-bold border ${
                 isRejected
                   ? "bg-rose-50 text-rose-700 border-rose-200"
                   : isPublished
                   ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                   : isApproved
-                  ? "bg-teal-50 text-teal-700 border-teal-200"
+                  ? "bg-[#0A2047]/10 text-[#0A2047] border-[#0A2047]/20"
                   : isProposed
-                  ? "bg-purple-50 text-purple-700 border-purple-200"
+                  ? "bg-amber-50 text-amber-800 border-amber-200"
                   : "bg-slate-100 text-slate-700 border-slate-200"
               }`}
             >
@@ -287,7 +335,7 @@ export function EventLifecycleTimeline({
                 : "Draft"}
             </span>
           </h4>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#64748B] mt-0.5">
             Institutional event governance, approval gate & publication pipeline
           </p>
         </div>
@@ -299,17 +347,18 @@ export function EventLifecycleTimeline({
           {stages.map((stage) => {
             const colors = getStatusColor(stage.status);
             const Icon = stage.icon;
+            const roleBadgeStyle = getRoleBadge(stage.role);
             return (
               <div
                 key={stage.id}
-                className={`relative rounded-xl border p-3.5 transition-all ${
+                className={`relative rounded-xl border p-4 transition-all ${
                   stage.status === "current"
-                    ? "border-blue-300 bg-blue-50/40 shadow-xs"
+                    ? "border-[#D4AF37]/60 bg-gradient-to-br from-white to-[#FDFBF7] shadow-sm ring-1 ring-[#D4AF37]/20"
                     : stage.status === "rejected"
                     ? "border-rose-300 bg-rose-50/40"
                     : stage.status === "completed"
-                    ? "border-teal-200 bg-teal-50/20"
-                    : "border-slate-200 bg-slate-50/50 opacity-70"
+                    ? "border-emerald-200 bg-emerald-50/20"
+                    : "border-[#E2E8F0] bg-slate-50/50 opacity-70"
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -320,33 +369,33 @@ export function EventLifecycleTimeline({
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-1">
-                      <span className="text-xs font-bold text-slate-900 truncate">
+                      <span className="text-xs font-bold text-[#172033] truncate">
                         {stage.name}
                       </span>
                       <span
-                        className={`text-[10px] px-1.5 py-0.5 rounded font-semibold border ${colors.badge}`}
+                        className={`text-[10px] px-1.5 py-0.5 rounded font-bold border shrink-0 ${roleBadgeStyle}`}
                       >
                         {stage.role}
                       </span>
                     </div>
 
                     {stage.timestamp && (
-                      <p className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1">
-                        <Clock className="w-2.5 h-2.5 shrink-0" />
+                      <p className="text-[10px] text-[#64748B] mt-0.5 flex items-center gap-1 font-mono">
+                        <Clock className="w-2.5 h-2.5 shrink-0 text-slate-400" />
                         <span>{formatDate(stage.timestamp)}</span>
                       </p>
                     )}
 
                     {stage.details && (
-                      <p className="text-[11px] text-slate-600 mt-1 line-clamp-2">
+                      <p className="text-[11px] text-[#64748B] mt-1 line-clamp-2 leading-relaxed">
                         {stage.details}
                       </p>
                     )}
 
                     {stage.nextAction && (
-                      <div className="mt-2 pt-2 border-t border-slate-200/60 flex items-start gap-1 text-[10px] text-blue-700 font-medium">
-                        <ArrowRight className="w-3 h-3 shrink-0 mt-0.5" />
-                        <span>{stage.nextAction}</span>
+                      <div className="mt-2.5 pt-2 border-t border-[#E2E8F0] flex items-start gap-1 text-[10px] text-[#0A2047] font-semibold">
+                        <ArrowRight className="w-3 h-3 shrink-0 mt-0.5 text-[#D4AF37]" />
+                        <span className="leading-tight">{stage.nextAction}</span>
                       </div>
                     )}
                   </div>

@@ -60,7 +60,9 @@ async function run() {
     assert(loginRes.status === 200, "/admin/management/login returns HTTP 200");
     assert(loginHtml.includes("AVISHKAR 2026"), "Renders AVISHKAR 2026 branding");
     assert(loginHtml.includes("Administrative Management"), "Renders heading 'Administrative Management'");
-    assert(loginHtml.includes("Sign in to access the administration dashboard."), "Renders subtitle 'Sign in to access the administration dashboard.'");
+    assert(!loginHtml.includes("Sign in to access the administration dashboard."), "Subtitle 'Sign in to access the administration dashboard.' is removed");
+    assert(loginHtml.includes("/images/avishkar-logo.png"), "Renders official AVISHKAR logo (/images/avishkar-logo.png)");
+    assert(!loginHtml.includes("/images/avishkar-lotus-logo.png"), "Does NOT use generic lotus logo");
     assert(loginHtml.includes("Official Email"), "Renders Official Email field label");
     assert(loginHtml.includes("Password"), "Renders Password field label");
     assert(loginHtml.includes("Back to Portal Selection"), "Renders Back to Portal Selection link");

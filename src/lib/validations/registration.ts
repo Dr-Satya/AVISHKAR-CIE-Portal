@@ -3,6 +3,10 @@ import {
   RegistrationValidationErrors,
   GenderOption,
   AcademicYearOption,
+  STARTUP_STATUS_OPTIONS,
+  STUDENT_PROJECT_ROLE_OPTIONS,
+  TEAM_STRUCTURE_OPTIONS,
+  STARTUP_STAGE_OPTIONS,
 } from "@/types/registration";
 import {
   APPROVED_SCHOOLS,
@@ -241,52 +245,167 @@ export function validatePaymentInfo(
  *   - technologiesUsed: max 500 characters
  *   - projectLink: max 500 characters, valid http/https URL only when provided
  */
-export function validatePreviousWork(
-  data: Partial<
-    Pick<
-      StudentRegistrationInput,
-      | "previousWorkDescription"
-      | "projectName"
-      | "projectRole"
-      | "technologiesUsed"
-      | "projectLink"
-    >
-  >
+/**
+ * Validates Startup & Innovation Details (Step 3 - Strictly Optional)
+ *
+ * Rules:
+ * - The entire section and all fields are strictly optional.
+ * - If status is "No, not yet." or empty, zero validation errors are produced.
+ * - If status is "Yes, I have started a startup." or "I am currently developing a startup or project.":
+ *   - Fields remain optional to submit, but when provided, bounds and formats are validated.
+ *   - teamLeaderEmail: valid email format when non-empty
+ *   - teamLeaderContact: 10-digit mobile number when non-empty
+ *   - startupTitle: max 200 chars
+ *   - startupDetails: max 3,000 chars
+ *   - technologiesUsed: max 1,000 chars
+ *   - projectLink: max 500 chars, valid http/https URL only when provided
+ *   - otherSupportDetails: max 500 chars
+ *   - teamMembers: for any partially completed team member row, requires name, enrollment, role
+ */
+export function validateStartupDetails(
+  data: Partial<StudentRegistrationInput>
 ): RegistrationValidationErrors {
   const errors: RegistrationValidationErrors = {};
 
-  // Field 1: Previous Work or Project Details (Optional, max 2000 chars)
-  if (data.previousWorkDescription) {
-    if (data.previousWorkDescription.length > 2000) {
-      errors.previousWorkDescription =
-        "Previous Work or Project Details cannot exceed 2,000 characters.";
+  // If no startup / project, or "No, not yet.", or empty, skip all startup validation
+  if (!data.hasStartupOrProject || data.hasStartupOrProject === "No, not yet.") {
+    // Check legacy fields only if someone provided legacy inputs directly
+    if (data.projectLink && data.projectLink.trim()) {
+      const trimmedUrl = data.projectLink.trim();
+      if (trimmedUrl.length > 500) {
+        errors.projectLink = "Project Link or Portfolio URL cannot exceed 500 characters.";
+      } else {
+        try {
+          const parsed = new URL(trimmedUrl);
+          if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+            errors.projectLink = "Please enter a valid web URL starting with http:// or https://";
+          } else if (!parsed.hostname || !parsed.hostname.includes(".")) {
+            errors.projectLink = "Please enter a valid URL with a proper domain name.";
+          }
+        } catch {
+          errors.projectLink = "Please enter a valid URL (e.g., https://github.com/username/project).";
+        }
+      }
+    }
+    return errors;
+  }
+
+  // Validate status option if provided
+  if (
+    data.hasStartupOrProject &&
+    !STARTUP_STATUS_OPTIONS.includes(data.hasStartupOrProject as any)
+  ) {
+    errors.hasStartupOrProject = "Please select a valid startup status option.";
+  }
+
+  // 1. Student's Role in Project (if provided, must be valid)
+  if (
+    data.studentRole &&
+    !STUDENT_PROJECT_ROLE_OPTIONS.includes(data.studentRole as any)
+  ) {
+    errors.studentRole = "Please select a valid role in the project.";
+  }
+
+  // 2. Startup Stage (if provided, must be valid)
+  if (
+    data.startupStage &&
+    !STARTUP_STAGE_OPTIONS.includes(data.startupStage as any)
+  ) {
+    errors.startupStage = "Please select a valid startup stage.";
+  }
+
+  // 3. Team Structure (if provided, must be valid)
+  if (
+    data.teamStructure &&
+    !TEAM_STRUCTURE_OPTIONS.includes(data.teamStructure as any)
+  ) {
+    errors.teamStructure = "Please select a valid team structure.";
+  }
+
+  // 4. Team Leader / Founder Information (Optional, but validated if provided)
+  if (data.teamLeaderName && data.teamLeaderName.length > 150) {
+    errors.teamLeaderName = "Team Leader / Founder Name cannot exceed 150 characters.";
+  }
+
+  if (data.teamLeaderEnrollment && data.teamLeaderEnrollment.length > 50) {
+    errors.teamLeaderEnrollment = "Enrollment Number cannot exceed 50 characters.";
+  }
+
+  if (data.teamLeaderEmail && data.teamLeaderEmail.trim()) {
+    const trimmedEmail = data.teamLeaderEmail.trim();
+    if (!EMAIL_REGEX.test(trimmedEmail)) {
+      errors.teamLeaderEmail = "Please enter a valid email address for Team Leader.";
     }
   }
 
-  // Field 2: Project or Startup Name (Optional, max 150 chars)
-  if (data.projectName) {
-    if (data.projectName.length > 150) {
-      errors.projectName =
-        "Project or Startup Name cannot exceed 150 characters.";
+  if (data.teamLeaderContact && data.teamLeaderContact.trim()) {
+    const trimmedPhone = data.teamLeaderContact.trim().replace(/\D/g, "");
+    if (!PHONE_REGEX.test(trimmedPhone)) {
+      errors.teamLeaderContact = "Please enter a valid 10-digit mobile number for Team Leader.";
     }
   }
 
-  // Field 3: Your Role (Optional, max 100 chars)
-  if (data.projectRole) {
-    if (data.projectRole.length > 100) {
-      errors.projectRole = "Your Role cannot exceed 100 characters.";
+  // 5. Team Members (if Team Project)
+  if (data.teamStructure === "Team Project" && Array.isArray(data.teamMembers)) {
+    for (let i = 0; i < data.teamMembers.length; i++) {
+      const member = data.teamMembers[i];
+      const hasAnyField = Boolean(
+        (member.fullName && member.fullName.trim()) ||
+        (member.enrollmentNumber && member.enrollmentNumber.trim()) ||
+        (member.roleInTeam && member.roleInTeam.trim())
+      );
+
+      if (hasAnyField) {
+        if (!member.fullName || member.fullName.trim().length < 2) {
+          errors.teamMembers = `Member #${i + 1}: Please provide a valid Full Name (at least 2 characters).`;
+          break;
+        }
+        if (!member.enrollmentNumber || !member.enrollmentNumber.trim()) {
+          errors.teamMembers = `Member #${i + 1}: Enrollment Number is required.`;
+          break;
+        }
+        if (!member.roleInTeam || !member.roleInTeam.trim()) {
+          errors.teamMembers = `Member #${i + 1}: Role in Team is required.`;
+          break;
+        }
+      }
     }
   }
 
-  // Field 4: Technologies Used (Optional, max 500 chars)
-  if (data.technologiesUsed) {
-    if (data.technologiesUsed.length > 500) {
-      errors.technologiesUsed =
-        "Technologies Used cannot exceed 500 characters.";
-    }
+  // 6. Startup / Product / Project Title
+  const effectiveTitle = (data.startupTitle || data.projectName || "").trim();
+  if (effectiveTitle && effectiveTitle.length > 200) {
+    errors.startupTitle = "Project / Startup Title cannot exceed 200 characters.";
+    errors.projectName = "Project / Startup Title cannot exceed 200 characters.";
   }
 
-  // Field 5: Project Link / Portfolio URL (Optional, validate only when non-empty)
+  // 7. Startup / Product / Project Details
+  const effectiveDetails = (data.startupDetails || data.previousWorkDescription || "").trim();
+  if (effectiveDetails && effectiveDetails.length > 3000) {
+    errors.startupDetails = "Startup / Project Details cannot exceed 3,000 characters.";
+    errors.previousWorkDescription = "Startup / Project Details cannot exceed 3,000 characters.";
+  }
+
+  // 8. Technologies Used
+  const effectiveTech = (data.technologiesUsed || "").trim();
+  if (effectiveTech && effectiveTech.length > 1000) {
+    errors.technologiesUsed = "Technology Stack cannot exceed 1,000 characters.";
+  }
+
+  // 9. Support Needed & Other Details
+  if (
+    Array.isArray(data.supportNeeded) &&
+    data.supportNeeded.includes("Other") &&
+    (!data.otherSupportDetails || !data.otherSupportDetails.trim())
+  ) {
+    errors.otherSupportDetails = "Please describe the other kind of support needed.";
+  }
+
+  if (data.otherSupportDetails && data.otherSupportDetails.length > 500) {
+    errors.otherSupportDetails = "Other Support Details cannot exceed 500 characters.";
+  }
+
+  // 7. Project Link / Portfolio URL
   if (data.projectLink && data.projectLink.trim()) {
     const trimmedUrl = data.projectLink.trim();
     if (trimmedUrl.length > 500) {
@@ -312,6 +431,41 @@ export function validatePreviousWork(
 }
 
 /**
+ * Validates Previous Work / Startup Details (Backward compatible helper)
+ */
+export function validatePreviousWork(
+  data: Partial<StudentRegistrationInput>
+): RegistrationValidationErrors {
+  const startupErrors = validateStartupDetails(data);
+  const legacyErrors: RegistrationValidationErrors = {};
+
+  // Maintain backward-compatible checks for legacy fields if directly passed
+  if (data.previousWorkDescription && data.previousWorkDescription.length > 2000) {
+    legacyErrors.previousWorkDescription =
+      "Previous Work or Project Details cannot exceed 2,000 characters.";
+  }
+
+  if (data.projectName && data.projectName.length > 150) {
+    legacyErrors.projectName =
+      "Project or Startup Name cannot exceed 150 characters.";
+  }
+
+  if (data.projectRole && data.projectRole.length > 100) {
+    legacyErrors.projectRole = "Your Role cannot exceed 100 characters.";
+  }
+
+  if (data.technologiesUsed && data.technologiesUsed.length > 500) {
+    legacyErrors.technologiesUsed =
+      "Technologies Used cannot exceed 500 characters.";
+  }
+
+  return {
+    ...legacyErrors,
+    ...startupErrors,
+  };
+}
+
+/**
  * Full validation across all steps
  */
 export function validateAllRegistration(
@@ -321,7 +475,7 @@ export function validateAllRegistration(
   const errors = {
     ...validatePersonalInfo(data),
     ...validateAcademicInfo(data),
-    ...validatePreviousWork(data),
+    ...validateStartupDetails(data),
     ...validateClubEngagement(data),
   };
 
