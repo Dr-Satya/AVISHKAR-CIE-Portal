@@ -272,7 +272,7 @@ export async function POST(req: NextRequest) {
     });
 
     // 9. Automated Student Email Notification (Decoupled & Non-blocking)
-    let emailStatusInfo: { status: "sent" | "simulated" | "failed" | "skipped"; recipient?: string } | undefined;
+    let emailStatusInfo: { status: "pending" | "sent" | "simulated" | "failed" | "skipped"; recipient?: string } | undefined;
     try {
       const emailResult = await sendRegistrationRejectedEmail(
         {

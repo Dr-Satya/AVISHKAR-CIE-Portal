@@ -65,28 +65,33 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // -------------------------------------------------------------------------
-    // TIER 2: Local Disk Storage (.data/id_cards)
-    // -------------------------------------------------------------------------
     const cleanBasename = path.basename(
       idCardPath.replace(/^(local:(id_cards|receipts)\/|student-id-cards\/|\/)+/, "")
     );
-    const localFilePath = path.join(process.cwd(), ".data", "id_cards", cleanBasename);
-    if (fs.existsSync(localFilePath)) {
-      const fileBuffer = fs.readFileSync(localFilePath);
-      const detected = detectBufferMimeType(fileBuffer, cleanBasename);
-      if (!detected.isCorruptedOrTruncated && detected.isValidSignature) {
-        return new NextResponse(fileBuffer, {
-          status: 200,
-          headers: {
-            "Content-Type": detected.mimeType,
-            "Content-Length": String(fileBuffer.byteLength),
-            "Cache-Control": "private, no-store, max-age=0",
-            "Content-Disposition": `inline; filename="${cleanBasename}"`,
-            "X-Content-Type-Options": "nosniff",
-          },
-        });
+
+    // -------------------------------------------------------------------------
+    // TIER 2: Local Disk Storage (.data/id_cards) - Optional Local Fallback
+    // -------------------------------------------------------------------------
+    try {
+      const localFilePath = path.join(process.cwd(), ".data", "id_cards", cleanBasename);
+      if (fs.existsSync(localFilePath)) {
+        const fileBuffer = fs.readFileSync(localFilePath);
+        const detected = detectBufferMimeType(fileBuffer, cleanBasename);
+        if (!detected.isCorruptedOrTruncated && detected.isValidSignature) {
+          return new NextResponse(fileBuffer, {
+            status: 200,
+            headers: {
+              "Content-Type": detected.mimeType,
+              "Content-Length": String(fileBuffer.byteLength),
+              "Cache-Control": "private, no-store, max-age=0",
+              "Content-Disposition": `inline; filename="${cleanBasename}"`,
+              "X-Content-Type-Options": "nosniff",
+            },
+          });
+        }
       }
+    } catch {
+      // Local disk unavailable on Cloudflare Workers / serverless edge runtime; fall through to Tier 3
     }
 
     // -------------------------------------------------------------------------

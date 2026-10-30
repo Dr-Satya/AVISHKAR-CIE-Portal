@@ -5,6 +5,21 @@ AVISHKAR-v2 is an enterprise-grade university event management platform engineer
 
 ---
 
+## 📚 Technical Documentation Quick Links
+
+| Guide | Description |
+| :--- | :--- |
+| 🏛️ [System Architecture](docs/ARCHITECTURE.md) | High-level topology, edge runtime model, dual-persistence, and security boundaries. |
+| ⚡ [Local Setup Guide](docs/SETUP.md) | Step-by-step installation, environment variables, and local simulation servers. |
+| 🚀 [Production Deployment](docs/DEPLOYMENT.md) | Cloudflare Workers edge deployment (`avishkar-v2`), secrets, and verification. |
+| 💾 [Database & Storage](docs/DATABASE.md) | Supabase PostgreSQL schema, migrations 002–012, and private storage policies. |
+| 🗺️ [REST API Specification](docs/API.md) | Detailed specifications for public student endpoints and administrative APIs. |
+| 🤝 [Contributing Guidelines](CONTRIBUTING.md) | Git branching, Conventional Commits, PR lifecycle, and quality gates. |
+| 🔒 [Security Policy](SECURITY.md) | Vulnerability disclosure, student PII protection, and credential hygiene. |
+| ⚖️ [License & IP Notice](LICENSE_NOTICE.md) | Intellectual property reservation and mentor authorization terms. |
+
+---
+
 ## 🏛️ 1. System Architecture
 
 The platform uses a modular Next.js App Router architecture with strict boundary isolation between public visitor workflows and authorized administrative governance:
@@ -249,3 +264,14 @@ npm run lint
 # 3. Verify production compilation
 npm run build:vinext
 ```
+
+---
+
+## 🤝 11. Repository Governance & Collaboration
+
+- **Repository Lead & Owner**: Dr. Satya (`@Dr-Satya`)
+- **Branching Strategy**: Protected `main` (production), `develop` (integration), `feature/*`, `fix/*`, `docs/*`.
+- **Continuous Integration**: Automated GitHub Actions workflow (`.github/workflows/ci.yml`) runs linting, 73 automated test checks, and edge compilation on all PRs.
+- **Contribution Standards**: See [CONTRIBUTING.md](CONTRIBUTING.md) for Conventional Commits and PR instructions.
+- **Security & Privacy**: See [SECURITY.md](SECURITY.md) for vulnerability reporting and student PII policies.
+- **Licensing**: See [LICENSE_NOTICE.md](LICENSE_NOTICE.md) for intellectual property and ownership terms.

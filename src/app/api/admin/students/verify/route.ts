@@ -143,6 +143,7 @@ export async function POST(req: NextRequest) {
       ? registrationId
       : null;
     const targetRegNum = currentRecord?.registration_number || registrationId;
+    const targetDbId = currentRecord?.id || registrationId;
     const patchUrl = targetByUuid
       ? `${config.url}/rest/v1/registrations?id=eq.${encodeURIComponent(targetByUuid)}`
       : `${config.url}/rest/v1/registrations?registration_number=eq.${encodeURIComponent(targetRegNum)}`;
