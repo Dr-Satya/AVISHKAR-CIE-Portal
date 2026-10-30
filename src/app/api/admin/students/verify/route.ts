@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminSessionFromRequest, getAdminSupabaseConfig, getAuthorizedSupabaseHeaders, logAdminAction } from "@/lib/adminAuth";
+import {
+  getAdminSessionFromRequest,
+  getAdminSupabaseConfig,
+  getAuthorizedSupabaseHeaders,
+  logAdminAction,
+  isValidUuid,
+  getSafeUuid,
+  sanitizeDatabaseError,
+} from "@/lib/adminAuth";
 import { StudentVerificationPayload } from "@/types/admin";
 import { getStoredRegistrationById, updateStoredRegistrationStudent, saveStoredNotification } from "@/lib/dataStore";
 
@@ -31,7 +39,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body: StudentVerificationPayload = await req.json();
-    const { registrationId, action, rejectionReason, notes } = body;
+    const { registrationId, action, rejectionReason, notes, requirePaymentVerified } = body;
 
     if (!registrationId) {
       return NextResponse.json(
@@ -44,11 +52,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (action !== "approve" && action !== "reject") {
+    if (action !== "approve" && action !== "verify" && action !== "reject" && action !== "pending") {
       return NextResponse.json(
         {
           success: false,
-          error: "Invalid verification action. Must be 'approve' or 'reject'.",
+          error: "Invalid verification action. Must be 'approve', 'verify', 'reject', or 'pending'.",
           code: "INVALID_ACTION",
         },
         { status: 400 }
@@ -70,13 +78,14 @@ export async function POST(req: NextRequest) {
     const headers = getAuthorizedSupabaseHeaders(session.token);
 
     // Look up existing registration to verify existence and payment status
-    let currentRecord = getStoredRegistrationById(registrationId);
-    if (!currentRecord && config.isConfigured) {
+    let currentRecord: any = null;
+    if (config.isConfigured) {
       try {
-        const fetchRes = await fetch(
-          `${config.url}/rest/v1/registrations?id=eq.${encodeURIComponent(registrationId)}&select=*`,
-          { headers }
-        );
+        const queryUrl = isValidUuid(registrationId)
+          ? `${config.url}/rest/v1/registrations?id=eq.${encodeURIComponent(registrationId)}&select=*`
+          : `${config.url}/rest/v1/registrations?registration_number=eq.${encodeURIComponent(registrationId)}&select=*`;
+
+        const fetchRes = await fetch(queryUrl, { headers });
         if (fetchRes.ok) {
           const rows = await fetchRes.json();
           if (Array.isArray(rows) && rows.length > 0) {
@@ -86,6 +95,10 @@ export async function POST(req: NextRequest) {
       } catch (err) {
         console.error("Error looking up registration in Supabase:", err);
       }
+    }
+
+    if (!currentRecord) {
+      currentRecord = getStoredRegistrationById(registrationId);
     }
 
     if (!currentRecord) {
@@ -99,8 +112,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // MANDATORY PREREQUISITE: If approving, payment MUST already be verified
-    if (action === "approve") {
+    // MANDATORY PREREQUISITE: If action is "approve" (final registration approval), payment MUST already be verified
+    if (action === "approve" || (requirePaymentVerified && action === "verify")) {
       if (currentRecord.payment_status !== "verified") {
         return NextResponse.json(
           {
@@ -115,90 +128,145 @@ export async function POST(req: NextRequest) {
     }
 
     const nowIso = new Date().toISOString();
-    const newStudentStatus = action === "approve" ? "verified" : "rejected";
+    const newStudentStatus = action === "approve" || action === "verify" ? "verified" : action === "pending" ? "pending" : "rejected";
 
     const studentNote =
       action === "reject"
         ? `[Student Rejected]: ${rejectionReason?.trim()}${notes ? ` | Notes: ${notes.trim()}` : ""}`
-        : `[Student Verified by ${session.user.email}]${notes ? ` | Notes: ${notes.trim()}` : ""}`;
+        : action === "approve" || action === "verify"
+        ? `[Student Verified by ${session.user.email}]${notes ? ` | Notes: ${notes.trim()}` : ""}`
+        : `[Student Verification Reset to Pending by ${session.user.email}]${notes ? ` | Notes: ${notes.trim()}` : ""}`;
 
-    const patchUrl = `${config.url}/rest/v1/registrations?id=eq.${encodeURIComponent(registrationId)}`;
+    const targetByUuid = isValidUuid(currentRecord?.id)
+      ? currentRecord.id
+      : isValidUuid(registrationId)
+      ? registrationId
+      : null;
+    const targetRegNum = currentRecord?.registration_number || registrationId;
+    const patchUrl = targetByUuid
+      ? `${config.url}/rest/v1/registrations?id=eq.${encodeURIComponent(targetByUuid)}`
+      : `${config.url}/rest/v1/registrations?registration_number=eq.${encodeURIComponent(targetRegNum)}`;
 
-    // Try updating student_verification_status column (from Migration 004)
-    let patchRes = await fetch(patchUrl, {
-      method: "PATCH",
-      headers: {
-        ...headers,
-        "Content-Type": "application/json",
-        Prefer: "return=representation",
-      },
-      body: JSON.stringify({
-        student_verification_status: newStudentStatus,
-        student_verified_at: nowIso,
-        student_verified_by: session.user.id,
-        student_verification_notes: studentNote,
-        updated_at: nowIso,
-      }),
-    });
+    let supabasePersisted = false;
+    let updatedRecord = currentRecord;
+    let patchErrText: string | undefined;
 
-    // If column student_verification_status does not exist yet, fallback to storing in admin_review_notes
-    if (!patchRes.ok) {
-      const errText = await patchRes.text();
-      if (errText.includes("student_verification_status") || errText.includes("42703")) {
-        const fetchCurrent = await fetch(
-          `${config.url}/rest/v1/registrations?id=eq.${encodeURIComponent(registrationId)}&select=admin_review_notes`,
-          { headers }
-        );
-        let existingNotes = "";
-        if (fetchCurrent.ok) {
-          const rows = await fetchCurrent.json();
-          existingNotes = rows[0]?.admin_review_notes || "";
+    if (config.isConfigured) {
+      const safeStudentVerifiedBy = action === "pending" ? null : getSafeUuid(session.user.id);
+      // Try updating student_verification_status column (from Migration 004)
+      let patchRes = await fetch(patchUrl, {
+        method: "PATCH",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+          Prefer: "return=representation",
+        },
+        body: JSON.stringify({
+          student_verification_status: newStudentStatus,
+          student_verified_at: action === "pending" ? null : nowIso,
+          student_verified_by: safeStudentVerifiedBy,
+          student_verification_notes: studentNote,
+          updated_at: nowIso,
+        }),
+      });
+
+      // If column student_verification_status does not exist yet, fallback to storing in admin_review_notes
+      if (!patchRes.ok) {
+        const errText = await patchRes.text();
+        if (
+          errText.includes("student_verification_status") ||
+          errText.includes("student_verified") ||
+          errText.includes("42703") ||
+          errText.includes("PGRST204")
+        ) {
+          const fetchCurrentUrl = targetByUuid
+            ? `${config.url}/rest/v1/registrations?id=eq.${encodeURIComponent(targetByUuid)}&select=admin_review_notes`
+            : `${config.url}/rest/v1/registrations?registration_number=eq.${encodeURIComponent(targetRegNum)}&select=admin_review_notes`;
+
+          const fetchCurrent = await fetch(fetchCurrentUrl, { headers });
+          let existingNotes = "";
+          if (fetchCurrent.ok) {
+            const rows = await fetchCurrent.json();
+            existingNotes = rows[0]?.admin_review_notes || "";
+          }
+
+          const cleanedNotes = existingNotes
+            .replace(/\[STUDENT_STATUS:\s*(verified|rejected|pending)\]/g, "")
+            .trim();
+
+          const combinedNotes = `${cleanedNotes ? cleanedNotes + " | " : ""}[STUDENT_STATUS: ${newStudentStatus}] ${studentNote}`.trim();
+
+          patchRes = await fetch(patchUrl, {
+            method: "PATCH",
+            headers: {
+              ...headers,
+              "Content-Type": "application/json",
+              Prefer: "return=representation",
+            },
+            body: JSON.stringify({
+              admin_review_notes: combinedNotes,
+              updated_at: nowIso,
+            }),
+          });
+          if (!patchRes.ok) {
+            patchErrText = await patchRes.text();
+          }
+        } else {
+          patchErrText = errText;
         }
+      }
 
-        const cleanedNotes = existingNotes
-          .replace(/\[STUDENT_STATUS:\s*(verified|rejected|pending)\]/g, "")
-          .trim();
+      if (patchRes.ok) {
+        const updatedRows = await patchRes.json();
+        if (Array.isArray(updatedRows) && updatedRows.length > 0) {
+          updatedRecord = updatedRows[0];
+          supabasePersisted = true;
+        }
+      }
 
-        const combinedNotes = `${cleanedNotes ? cleanedNotes + " | " : ""}[STUDENT_STATUS: ${newStudentStatus}] ${studentNote}`.trim();
-
-        patchRes = await fetch(patchUrl, {
-          method: "PATCH",
-          headers: {
-            ...headers,
-            "Content-Type": "application/json",
-            Prefer: "return=representation",
+      if (!supabasePersisted) {
+        const rawErr = patchErrText || "Database update failed";
+        const sanitized = sanitizeDatabaseError(rawErr, 502);
+        console.error("Failed to persist student verification in Supabase:", sanitized);
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Database update failed: ${sanitized}`,
+            code: "DATABASE_UPDATE_FAILED",
+            detail: sanitized,
           },
-          body: JSON.stringify({
-            admin_review_notes: combinedNotes,
-            updated_at: nowIso,
-          }),
-        });
+          { status: 502 }
+        );
       }
     }
 
+    const normalizedAction: "approve" | "reject" | "pending" =
+      action === "verify" ? "approve" : action;
+
     const localUpdated = updateStoredRegistrationStudent(
-      registrationId,
-      action,
+      targetDbId,
+      normalizedAction,
       rejectionReason,
       notes,
       session.user.email
     );
 
-    let updatedRecord = localUpdated;
-    if (patchRes.ok) {
-      const updatedRows = await patchRes.json();
-      if (Array.isArray(updatedRows) && updatedRows.length > 0) {
-        updatedRecord = updatedRows[0];
-      }
+    if (localUpdated && !supabasePersisted) {
+      updatedRecord = localUpdated;
     }
+
+    // Determine whether final registration is now approved (requires BOTH verified)
+    const isBothVerified =
+      (updatedRecord.payment_status === "verified") &&
+      (newStudentStatus === "verified");
 
     // Record audit trail
     await logAdminAction({
-      action: action === "approve" ? "STUDENT_VERIFIED" : "STUDENT_REJECTED",
+      action: action === "approve" ? "STUDENT_VERIFIED" : action === "pending" ? "STUDENT_RESET_PENDING" : "STUDENT_REJECTED",
       actor: session.user,
       targetType: "registration",
       targetId: registrationId,
-      metadata: { action, rejectionReason, notes, studentName: currentRecord.student_name, studentId: currentRecord.student_id },
+      metadata: { action, rejectionReason, notes, studentName: currentRecord.student_name, studentId: currentRecord.student_id, isBothVerified },
       token: session.token,
     });
 
@@ -208,10 +276,21 @@ export async function POST(req: NextRequest) {
         id: `notif-reg-${Date.now()}`,
         targetRole: "Admin",
         targetEmail: session.user.email,
-        title: action === "approve" ? "Student Registration Approved" : "Student Registration Rejected",
+        title:
+          action === "approve"
+            ? isBothVerified
+              ? "Registration Fully Approved"
+              : "Student Identity Verified (Payment Pending)"
+            : action === "pending"
+            ? "Student Verification Reset"
+            : "Student Registration Rejected",
         message:
           action === "approve"
-            ? `Registration for ${currentRecord.student_name} (${currentRecord.student_id}) has been approved.`
+            ? isBothVerified
+              ? `Registration for ${currentRecord.student_name} (${currentRecord.student_id}) is now fully approved (payment & identity verified).`
+              : `Student identity for ${currentRecord.student_name} was verified. Final registration approval requires payment verification.`
+            : action === "pending"
+            ? `Student verification for ${currentRecord.student_name} was reset to pending.`
             : `Registration for ${currentRecord.student_name} (${currentRecord.student_id}) was rejected: ${rejectionReason}`,
         type: action === "approve" ? "approval" : "rejection",
         read: false,
@@ -222,14 +301,30 @@ export async function POST(req: NextRequest) {
       // Non-blocking notification
     }
 
-    return NextResponse.json({
-      success: true,
-      message: `Student verification successfully ${action === "approve" ? "approved" : "rejected"}.`,
-      registration: updatedRecord,
-      action,
-      verifiedAt: nowIso,
-      verifiedBy: session.user.email,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message:
+          action === "approve"
+            ? isBothVerified
+              ? "Student identity verified and registration fully approved!"
+              : "Student identity verified. Final registration approval requires payment verification."
+            : action === "pending"
+            ? "Student verification reset to pending."
+            : "Student registration rejected.",
+        registration: updatedRecord,
+        action,
+        student_verification_status: newStudentStatus,
+        isRegistrationApproved: isBothVerified,
+        verifiedAt: action === "pending" ? null : nowIso,
+        verifiedBy: action === "pending" ? null : session.user.email,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+        },
+      }
+    );
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Internal server error";
     console.error("Student verification API error:", message);

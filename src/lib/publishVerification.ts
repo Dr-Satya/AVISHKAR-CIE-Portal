@@ -304,7 +304,7 @@ export async function verifyEventForPublishing(
     } else {
       const requiredCount = activeForm.fields.filter((f) => f.required).length;
       formCheck.message = `Form configured: ${activeForm.fields.length} questions (${requiredCount} required), Registration active, Fee: ₹${
-        activeForm.feeAmount ?? 500
+        activeForm.feeAmount ?? 100
       }.`;
     }
   }

@@ -415,11 +415,13 @@ export default function MemberPortalPage() {
     }
   };
 
+  const [currentTimestamp] = useState(() => Date.now());
+
   const isTaskOverdue = (task: MemberTaskRecord): boolean => {
     if (!task.dueDate || task.status === "completed") return false;
     try {
       const due = new Date(task.dueDate + "T23:59:59").getTime();
-      return due < Date.now();
+      return due < currentTimestamp;
     } catch {
       return false;
     }

@@ -215,7 +215,7 @@ export async function POST(req: NextRequest) {
         ? Number(feeAmount)
         : existing?.feeAmount !== undefined
         ? existing.feeAmount
-        : 500;
+        : 100;
 
     if (existing) {
       const historyList: FormVersionSnapshot[] = Array.isArray(existing.history) ? [...existing.history] : [];

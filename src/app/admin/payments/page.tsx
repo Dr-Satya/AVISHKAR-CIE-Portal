@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   CreditCard,
   AlertTriangle,
@@ -24,10 +25,28 @@ import { RegistrationRecord } from "@/types/admin";
 import { RegistrationDetailModal } from "@/components/admin/RegistrationDetailModal";
 import { PAYMENT_STATUS_LABELS } from "@/config/admin";
 
-export default function PaymentReviewQueuePage() {
-  const [filterTab, setFilterTab] = useState<"pending_verification" | "verified" | "rejected" | "ALL">(
-    "pending_verification"
-  );
+function PaymentReviewQueueContent() {
+  const searchParams = useSearchParams();
+
+  const getInitialTab = (): "pending_verification" | "verified" | "rejected" | "ALL" => {
+    const s = searchParams.get("status") || searchParams.get("paymentStatus");
+    if (s === "verified") return "verified";
+    if (s === "rejected") return "rejected";
+    if (s === "pending" || s === "pending_verification") return "pending_verification";
+    if (s === "ALL" || s === "all") return "ALL";
+    return "pending_verification";
+  };
+
+  const [filterTab, setFilterTab] = useState<"pending_verification" | "verified" | "rejected" | "ALL">(getInitialTab);
+
+  // Synchronize when query params change dynamically
+  useEffect(() => {
+    const s = searchParams.get("status") || searchParams.get("paymentStatus");
+    if (s === "verified") setFilterTab("verified");
+    else if (s === "rejected") setFilterTab("rejected");
+    else if (s === "pending" || s === "pending_verification") setFilterTab("pending_verification");
+    else if (s === "ALL" || s === "all") setFilterTab("ALL");
+  }, [searchParams]);
   const [search, setSearch] = useState("");
   const [registrations, setRegistrations] = useState<RegistrationRecord[]>([]);
   const [allRegistrations, setAllRegistrations] = useState<RegistrationRecord[]>([]);
@@ -54,7 +73,9 @@ export default function PaymentReviewQueuePage() {
   // Fetch all registrations to compute authentic, live KPI metrics
   const fetchAllForMetrics = useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/registrations");
+      const res = await fetch("/api/admin/registrations", {
+        cache: "no-store",
+      });
       if (res.ok) {
         const data = await res.json();
         setAllRegistrations(data.registrations || []);
@@ -73,7 +94,9 @@ export default function PaymentReviewQueuePage() {
       if (filterTab !== "ALL") params.set("paymentStatus", filterTab);
       if (search) params.set("search", search);
 
-      const res = await fetch(`/api/admin/registrations?${params.toString()}`);
+      const res = await fetch(`/api/admin/registrations?${params.toString()}`, {
+        cache: "no-store",
+      });
       if (!res.ok) {
         const data = await res.json();
         setErrorMessage(data.error || "Failed to load payment review queue.");
@@ -81,7 +104,12 @@ export default function PaymentReviewQueuePage() {
       }
 
       const data = await res.json();
-      setRegistrations(data.registrations || []);
+      let list: RegistrationRecord[] = data.registrations || [];
+      // Requirement 2 & 3: Remove from pending review if overall registration is rejected
+      if (filterTab === "pending_verification") {
+        list = list.filter((r) => r.student_verification_status !== "rejected");
+      }
+      setRegistrations(list);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Network error loading payments.";
       setErrorMessage(message);
@@ -108,13 +136,15 @@ export default function PaymentReviewQueuePage() {
   const metrics = {
     total: allRegistrations.length,
     pending: allRegistrations.filter(
-      (r) => r.payment_status === "pending_verification" || !r.payment_status
+      (r) =>
+        (r.payment_status === "pending_verification" || !r.payment_status) &&
+        r.student_verification_status !== "rejected"
     ).length,
     verified: allRegistrations.filter((r) => r.payment_status === "verified").length,
     rejected: allRegistrations.filter((r) => r.payment_status === "rejected").length,
     verifiedRevenue: allRegistrations
       .filter((r) => r.payment_status === "verified")
-      .reduce((sum, r) => sum + (r.fee_amount !== null && r.fee_amount !== undefined ? r.fee_amount : 500), 0),
+      .reduce((sum, r) => sum + (r.fee_amount !== null && r.fee_amount !== undefined ? r.fee_amount : 100), 0),
   };
 
   const copyToClipboard = (text: string) => {
@@ -545,7 +575,7 @@ export default function PaymentReviewQueuePage() {
 
                       {/* Submitted Amount */}
                       <td className="py-3.5 px-4 whitespace-nowrap font-mono font-bold text-[#0A2047]">
-                        ₹{reg.fee_amount !== null && reg.fee_amount !== undefined ? reg.fee_amount : 500}
+                        ₹{reg.fee_amount !== null && reg.fee_amount !== undefined ? reg.fee_amount : 100}
                       </td>
 
                       {/* UTR with copy */}
@@ -708,7 +738,7 @@ export default function PaymentReviewQueuePage() {
               <div className="flex justify-between">
                 <span className="text-[#64748B]">Fee Amount:</span>
                 <span className="font-mono font-bold text-emerald-700">
-                  ₹{verifyModalRecord.fee_amount ?? 500}
+                  ₹{verifyModalRecord.fee_amount ?? 100}
                 </span>
               </div>
             </div>
@@ -989,5 +1019,19 @@ export default function PaymentReviewQueuePage() {
         }}
       />
     </div>
+  );
+}
+
+export default function PaymentReviewQueuePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="w-8 h-8 border-3 border-[#0A2047] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <PaymentReviewQueueContent />
+    </Suspense>
   );
 }

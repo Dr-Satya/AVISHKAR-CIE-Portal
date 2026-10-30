@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import {
   Users,
@@ -8,35 +8,22 @@ import {
   Clock,
   XCircle,
   Calendar,
+  Layers,
   ArrowRight,
   AlertCircle,
   ChevronRight,
   ClipboardList,
+  RefreshCw,
+  ExternalLink,
+  ShieldCheck,
+  FileSpreadsheet,
 } from "lucide-react";
-import { AdminUser, EventRecord } from "@/types/admin";
+import { AdminUser, EventRecord, DashboardStats, RegistrationRecord } from "@/types/admin";
 import {
   getPresidentDecision,
   getVicePresidentDecision,
   getOverallApprovalStatus,
 } from "@/components/admin/EventApprovalTracker";
-
-interface ReportsData {
-  totalRegistrations: number;
-  paymentCounts: {
-    pending: number;
-    verified: number;
-    rejected: number;
-    total: number;
-  };
-  registrationsByEvent: Array<{
-    eventId: string;
-    eventTitle: string;
-    category: string;
-    status: string;
-    count: number;
-    verifiedCount: number;
-  }>;
-}
 
 export default function AdministrativeOverviewPage() {
   const [user, setUser] = useState<AdminUser | null>(null);
@@ -44,7 +31,8 @@ export default function AdministrativeOverviewPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [reportsData, setReportsData] = useState<ReportsData | null>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [recentRegistrations, setRecentRegistrations] = useState<RegistrationRecord[]>([]);
   const [events, setEvents] = useState<EventRecord[]>([]);
   const [lastRefreshed, setLastRefreshed] = useState<string>("");
 
@@ -55,31 +43,28 @@ export default function AdministrativeOverviewPage() {
       setError(null);
 
       // 1. Session verification
-      const userRes = await fetch("/api/admin/auth/me");
+      const userRes = await fetch("/api/admin/auth/me", { cache: "no-store" });
       if (!userRes.ok) {
         throw new Error("Unable to verify administrative session.");
       }
       const userData = await userRes.json();
       setUser(userData.user || null);
 
-      // 2. Fetch live data concurrently from existing endpoints
-      const [reportsRes, eventsRes] = await Promise.allSettled([
-        fetch("/api/admin/reports"),
-        fetch("/api/admin/events"),
+      // 2. Fetch live data concurrently from authentic API endpoints
+      const timestamp = Date.now();
+      const [statsRes, eventsRes] = await Promise.allSettled([
+        fetch(`/api/admin/stats?t=${timestamp}`, { cache: "no-store" }),
+        fetch(`/api/admin/events?t=${timestamp}`, { cache: "no-store" }),
       ]);
 
-      if (reportsRes.status === "fulfilled" && reportsRes.value.ok) {
-        const repData = await reportsRes.value.json();
-        setReportsData({
-          totalRegistrations: repData.totalRegistrations || 0,
-          paymentCounts: repData.paymentCounts || {
-            pending: 0,
-            verified: 0,
-            rejected: 0,
-            total: 0,
-          },
-          registrationsByEvent: repData.registrationsByEvent || [],
-        });
+      if (statsRes.status === "fulfilled" && statsRes.value.ok) {
+        const statsData = await statsRes.value.json();
+        if (statsData.success && statsData.stats) {
+          setStats(statsData.stats);
+        }
+        if (Array.isArray(statsData.recentRegistrations)) {
+          setRecentRegistrations(statsData.recentRegistrations);
+        }
       }
 
       if (eventsRes.status === "fulfilled" && eventsRes.value.ok) {
@@ -107,13 +92,10 @@ export default function AdministrativeOverviewPage() {
     fetchData();
   }, [fetchData]);
 
-  // Derived event statistics
+  // Derived event statistics for pipeline
   const totalEvents = events.length;
-  const publishedEventsCount = events.filter((e) => e.status === "published").length;
-  const approvedEventsCount = events.filter((e) => e.status === "approved").length;
-  const proposedEventsCount = events.filter((e) => e.status === "proposed").length;
 
-  const approvalStats = React.useMemo(() => {
+  const approvalStats = useMemo(() => {
     let pendingPresident = 0;
     let pendingVp = 0;
     let readyForPublication = 0;
@@ -148,20 +130,68 @@ export default function AdministrativeOverviewPage() {
     };
   }, [events]);
 
-  const totalRegistrations = reportsData?.paymentCounts?.total ?? 0;
-  const pendingPayments = reportsData?.paymentCounts?.pending ?? 0;
-  const verifiedPayments = reportsData?.paymentCounts?.verified ?? 0;
-  const rejectedPayments = reportsData?.paymentCounts?.rejected ?? 0;
-
+  // Format payment status badge
+  const renderPaymentBadge = (status?: string) => {
+    switch (status) {
+      case "verified":
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <CheckCircle2 className="w-2.5 h-2.5" />
+            <span>Verified</span>
+          </span>
+        );
+      case "rejected":
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+            <XCircle className="w-2.5 h-2.5" />
+            <span>Rejected</span>
+          </span>
+        );
+      case "pending_verification":
+      default:
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+            <Clock className="w-2.5 h-2.5" />
+            <span>Pending</span>
+          </span>
+        );
+    }
+  };
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="bg-[#0A2047] text-white rounded-xl py-6 px-4 sm:px-8 shadow-xs border border-[#D4AF37]/30 border-b-2 border-b-[#D4AF37] flex flex-col items-center justify-center text-center relative overflow-hidden">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white text-center">
-          Administrative Management Overview
-        </h1>
-        <div className="w-16 h-0.5 bg-[#D4AF37] mt-2.5 rounded-full" />
+      {/* Top Banner with Administrative Identity */}
+      <div className="bg-[#0A2047] text-white rounded-xl py-6 px-4 sm:px-8 shadow-xs border border-[#D4AF37]/30 border-b-2 border-b-[#D4AF37] flex flex-col md:flex-row items-center justify-between text-center md:text-left relative overflow-hidden gap-4">
+        <div>
+          <div className="flex items-center justify-center md:justify-start gap-2 text-xs font-semibold uppercase tracking-widest text-[#D4AF37]">
+            <span>GD Goenka University</span>
+            <span>•</span>
+            <span>Official Admin Portal</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white mt-1">
+            Administrative Management Overview
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
+            Live operations monitor for student registrations, fee verification, and executive event approval workflows.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0">
+          {lastRefreshed && (
+            <span className="text-xs text-slate-300 hidden sm:inline-block font-mono">
+              Synced: {lastRefreshed}
+            </span>
+          )}
+          <button
+            onClick={() => fetchData(true)}
+            disabled={refreshing || loading}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold backdrop-blur-sm transition-colors disabled:opacity-50 cursor-pointer"
+            title="Refresh dashboard metrics"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin text-[#D4AF37]" : ""}`} />
+            <span>{refreshing ? "Refreshing..." : "Sync Live Data"}</span>
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -179,160 +209,252 @@ export default function AdministrativeOverviewPage() {
         </div>
       )}
 
-      {/* KPI Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        {/* Total Registrations */}
-        <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 shadow-xs hover:border-[#D4AF37]/60 transition-colors flex flex-col justify-between">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
-                Total Registrations
-              </p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2047] mt-1.5 font-mono">
-                {totalRegistrations}
-              </h2>
+      {/*
+        ========================================================================
+        1. TOP SUMMARY CARDS (6 Clickable Cards in a Responsive Grid)
+        - Every card is fully clickable (entire card wrapped in a Link)
+        - Connected to existing routes with proper query filters
+        - Live authentic counts from /api/admin/stats
+        ========================================================================
+      */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        {/* Card 1: Total Registered Students */}
+        <Link
+          href="/admin/registrations"
+          className="group block bg-white rounded-xl border border-[#E2E8F0] hover:border-[#0A2047]/60 p-4 sm:p-5 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col justify-between"
+          title="Click to view all registered students"
+        >
+          <div>
+            <div className="flex items-start justify-between gap-2">
+              <span className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
+                Total Registered Students
+              </span>
+              <div className="w-9 h-9 rounded-lg bg-[#0A2047]/5 border border-[#0A2047]/15 flex items-center justify-center text-[#0A2047] shrink-0 group-hover:bg-[#0A2047] group-hover:text-white transition-colors">
+                <Users className="w-4 h-4" />
+              </div>
             </div>
-            <div className="w-10 h-10 rounded-lg bg-[#0A2047]/5 border border-[#0A2047]/15 flex items-center justify-center text-[#D4AF37]">
-              <Users className="w-5 h-5" />
+            <div className="mt-2">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2047] font-mono tracking-tight">
+                {stats?.totalRegistrations ?? 0}
+              </h2>
+              <p className="text-[11px] text-[#64748B] mt-1">
+                All student registrations
+              </p>
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
-            <span className="text-[#64748B]">All submissions</span>
-            <Link
-              href="/admin/reports"
-              className="font-semibold text-[#0A2047] hover:text-[#D4AF37] flex items-center gap-1 transition-colors"
-            >
-              Reports <ChevronRight className="w-3 h-3 text-[#D4AF37]" />
-            </Link>
+            <span className="text-[#64748B] font-medium">Show all</span>
+            <span className="font-semibold text-[#0A2047] group-hover:text-[#D4AF37] flex items-center gap-1 transition-colors">
+              <span>View</span>
+              <ChevronRight className="w-3.5 h-3.5 text-[#D4AF37] group-hover:translate-x-0.5 transition-transform" />
+            </span>
           </div>
-        </div>
+        </Link>
 
-        {/* Pending Payment Verifications */}
-        <div className="bg-white rounded-xl border border-[#E2E8F0] hover:border-amber-400 p-5 shadow-xs transition-colors flex flex-col justify-between">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-1.5">
-                <p className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
-                  Pending Payments
-                </p>
-                {pendingPayments > 0 && (
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
+        {/* Card 2: Pending Registrations */}
+        <Link
+          href="/admin/registrations?status=pending"
+          className="group block bg-white rounded-xl border border-[#E2E8F0] hover:border-amber-400 p-4 sm:p-5 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col justify-between"
+          title="Click to view pending registrations awaiting admin review"
+        >
+          <div>
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
+                  Pending Registrations
+                </span>
+                {(stats?.pendingRegistrations ?? 0) > 0 && (
+                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200">
                     Review
                   </span>
                 )}
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2047] mt-1.5 font-mono">
-                {pendingPayments}
-              </h2>
+              <div className="w-9 h-9 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-[#D97706] shrink-0 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                <Clock className="w-4 h-4" />
+              </div>
             </div>
-            <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-[#D97706]">
-              <Clock className="w-5 h-5" />
+            <div className="mt-2">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2047] font-mono tracking-tight">
+                {stats?.pendingRegistrations ?? 0}
+              </h2>
+              <p className="text-[11px] text-[#64748B] mt-1">
+                Awaiting admin review
+              </p>
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
-            <span className="text-amber-700/80 font-medium">Awaiting review</span>
-            <Link
-              href="/admin/payments"
-              className="font-semibold text-[#0A2047] hover:text-amber-700 flex items-center gap-1 transition-colors"
-            >
-              Verify <ChevronRight className="w-3 h-3 text-[#D4AF37]" />
-            </Link>
+            <span className="text-amber-700/80 font-medium">Filtered review</span>
+            <span className="font-semibold text-[#0A2047] group-hover:text-amber-700 flex items-center gap-1 transition-colors">
+              <span>Inspect</span>
+              <ChevronRight className="w-3.5 h-3.5 text-amber-600 group-hover:translate-x-0.5 transition-transform" />
+            </span>
           </div>
-        </div>
+        </Link>
 
-        {/* Approved Payments */}
-        <div className="bg-white rounded-xl border border-[#E2E8F0] hover:border-emerald-400 p-5 shadow-xs transition-colors flex flex-col justify-between">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-1.5">
-                <p className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
-                  Approved Payments
-                </p>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+        {/* Card 3: Payments Approved */}
+        <Link
+          href="/admin/payments?status=verified"
+          className="group block bg-white rounded-xl border border-[#E2E8F0] hover:border-emerald-400 p-4 sm:p-5 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col justify-between"
+          title="Click to view approved & verified payments"
+        >
+          <div>
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
+                  Payments Approved
+                </span>
+                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
                   Verified
                 </span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2047] mt-1.5 font-mono">
-                {verifiedPayments}
-              </h2>
+              <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#16A34A] shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                <CheckCircle2 className="w-4 h-4" />
+              </div>
             </div>
-            <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#16A34A]">
-              <CheckCircle2 className="w-5 h-5" />
+            <div className="mt-2">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2047] font-mono tracking-tight">
+                {stats?.paymentsApproved ?? 0}
+              </h2>
+              <p className="text-[11px] text-[#64748B] mt-1">
+                Admin-verified payments
+              </p>
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
-            <span className="text-[#64748B]">Confirmed seats</span>
-            <Link
-              href="/admin/payments"
-              className="font-semibold text-[#0A2047] hover:text-emerald-700 flex items-center gap-1 transition-colors"
-            >
-              Queue <ChevronRight className="w-3 h-3 text-[#D4AF37]" />
-            </Link>
+            <span className="text-emerald-700/80 font-medium">Verified list</span>
+            <span className="font-semibold text-[#0A2047] group-hover:text-emerald-700 flex items-center gap-1 transition-colors">
+              <span>View</span>
+              <ChevronRight className="w-3.5 h-3.5 text-emerald-600 group-hover:translate-x-0.5 transition-transform" />
+            </span>
           </div>
-        </div>
+        </Link>
 
-        {/* Rejected Payments */}
-        <div className="bg-white rounded-xl border border-[#E2E8F0] hover:border-rose-400 p-5 shadow-xs transition-colors flex flex-col justify-between">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-1.5">
-                <p className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
-                  Rejected Payments
-                </p>
-                {rejectedPayments > 0 && (
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200">
+        {/* Card 4: Payments Rejected */}
+        <Link
+          href="/admin/payments?status=rejected"
+          className="group block bg-white rounded-xl border border-[#E2E8F0] hover:border-rose-400 p-4 sm:p-5 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col justify-between"
+          title="Click to view rejected payments"
+        >
+          <div>
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
+                  Payments Rejected
+                </span>
+                {(stats?.paymentsRejected ?? 0) > 0 && (
+                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-rose-50 text-rose-700 border border-rose-200">
                     Audit
                   </span>
                 )}
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2047] mt-1.5 font-mono">
-                {rejectedPayments}
+              <div className="w-9 h-9 rounded-lg bg-rose-50 border border-rose-200 flex items-center justify-center text-[#DC2626] shrink-0 group-hover:bg-rose-600 group-hover:text-white transition-colors">
+                <XCircle className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-2">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2047] font-mono tracking-tight">
+                {stats?.paymentsRejected ?? 0}
               </h2>
-            </div>
-            <div className="w-10 h-10 rounded-lg bg-rose-50 border border-rose-200 flex items-center justify-center text-[#DC2626]">
-              <XCircle className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-4 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
-            <span className="text-[#64748B]">Invalid UTR / slips</span>
-            <Link
-              href="/admin/payments"
-              className="font-semibold text-[#0A2047] hover:text-rose-700 flex items-center gap-1 transition-colors"
-            >
-              Audits <ChevronRight className="w-3 h-3 text-[#D4AF37]" />
-            </Link>
-          </div>
-        </div>
-
-        {/* Events Publication */}
-        <div className="bg-white rounded-xl border border-[#E2E8F0] hover:border-[#D4AF37]/60 p-5 shadow-xs transition-colors flex flex-col justify-between">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
-                Published Events
+              <p className="text-[11px] text-[#64748B] mt-1">
+                Declined or invalid slips
               </p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2047] mt-1.5 font-mono">
-                {publishedEventsCount}{" "}
-                <span className="text-sm font-semibold text-[#64748B]">/ {totalEvents}</span>
-              </h2>
-            </div>
-            <div className="w-10 h-10 rounded-lg bg-[#0A2047]/5 border border-[#0A2047]/15 flex items-center justify-center text-[#D4AF37]">
-              <Calendar className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
-            <span className="text-[#64748B]">{approvedEventsCount} approved</span>
-            <Link
-              href="/admin/events"
-              className="font-semibold text-[#0A2047] hover:text-[#D4AF37] flex items-center gap-1 transition-colors"
-            >
-              Events <ChevronRight className="w-3 h-3 text-[#D4AF37]" />
-            </Link>
+            <span className="text-rose-700/80 font-medium">Rejected list</span>
+            <span className="font-semibold text-[#0A2047] group-hover:text-rose-700 flex items-center gap-1 transition-colors">
+              <span>Inspect</span>
+              <ChevronRight className="w-3.5 h-3.5 text-rose-600 group-hover:translate-x-0.5 transition-transform" />
+            </span>
           </div>
-        </div>
+        </Link>
+
+        {/* Card 5: Published Events */}
+        <Link
+          href="/admin/events?status=published"
+          className="group block bg-white rounded-xl border border-[#E2E8F0] hover:border-blue-400 p-4 sm:p-5 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col justify-between"
+          title="Click to view published events visible to students"
+        >
+          <div>
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
+                  Published Events
+                </span>
+                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                  Live
+                </span>
+              </div>
+              <div className="w-9 h-9 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                <Calendar className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-2">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0A2047] font-mono tracking-tight">
+                {stats?.publishedEvents ?? 0}{" "}
+                <span className="text-xs font-normal text-[#64748B]">
+                  / {stats?.totalEvents ?? totalEvents}
+                </span>
+              </h2>
+              <p className="text-[11px] text-[#64748B] mt-1">
+                Visible to students
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
+            <span className="text-blue-700/80 font-medium">Published view</span>
+            <span className="font-semibold text-[#0A2047] group-hover:text-blue-700 flex items-center gap-1 transition-colors">
+              <span>View</span>
+              <ChevronRight className="w-3.5 h-3.5 text-blue-600 group-hover:translate-x-0.5 transition-transform" />
+            </span>
+          </div>
+        </Link>
+
+        {/* Card 6: Main / Events Management */}
+        <Link
+          href="/admin/events"
+          className="group block bg-gradient-to-br from-white to-[#F8FAFC] rounded-xl border border-[#E2E8F0] hover:border-[#D4AF37] p-4 sm:p-5 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col justify-between"
+          title="Click to open the main Events Management page"
+        >
+          <div>
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-semibold text-[#0A2047] uppercase tracking-wider">
+                  Events Management
+                </span>
+                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-[#D4AF37]/15 text-[#0A2047] border border-[#D4AF37]/40">
+                  Main Hub
+                </span>
+              </div>
+              <div className="w-9 h-9 rounded-lg bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center text-[#0A2047] shrink-0 group-hover:bg-[#0A2047] group-hover:text-[#D4AF37] transition-colors">
+                <Layers className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-2">
+              <h2 className="text-lg sm:text-xl font-bold text-[#0A2047] tracking-tight mt-1">
+                Full Control
+              </h2>
+              <p className="text-[11px] text-[#64748B] mt-1 line-clamp-2">
+                Create, edit, publish & manage all events
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
+            <span className="text-[#0A2047] font-semibold">Manage events</span>
+            <span className="font-semibold text-[#0A2047] group-hover:text-[#D4AF37] flex items-center gap-1 transition-colors">
+              <span>Open</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#D4AF37] group-hover:translate-x-0.5 transition-transform" />
+            </span>
+          </div>
+        </Link>
       </div>
 
-      {/* Event Approval Pipeline Tracker Section */}
+      {/*
+        ========================================================================
+        2. EVENT APPROVAL PIPELINE TRACKER SECTION
+        - Retains executive tracking for President and Vice President sign-offs
+        ========================================================================
+      */}
       <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden">
         <div className="p-4 sm:p-5 border-b border-[#E2E8F0] bg-[#F5F7FA] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
@@ -340,7 +462,7 @@ export default function AdministrativeOverviewPage() {
               <ClipboardList className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="font-bold text-[#0A2047] text-base">
                   Event Approval Pipeline
                 </h2>
@@ -498,7 +620,196 @@ export default function AdministrativeOverviewPage() {
         </div>
       </div>
 
+      {/*
+        ========================================================================
+        3. LOWER SECTION: RECENT REGISTRATIONS & QUICK ACTIONS
+        ========================================================================
+      */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent Registrations Table (2 Cols) */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-[#E2E8F0] shadow-xs overflow-hidden flex flex-col justify-between">
+          <div>
+            <div className="p-4 sm:p-5 border-b border-[#E2E8F0] bg-[#F5F7FA] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-[#0A2047]" />
+                <h3 className="font-bold text-[#0A2047] text-sm sm:text-base">
+                  Recent Student Registrations
+                </h3>
+              </div>
+              <Link
+                href="/admin/registrations"
+                className="text-xs font-semibold text-[#0A2047] hover:text-[#D4AF37] flex items-center gap-1 transition-colors"
+              >
+                <span>View All ({stats?.totalRegistrations ?? 0})</span>
+                <ChevronRight className="w-3.5 h-3.5 text-[#D4AF37]" />
+              </Link>
+            </div>
 
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[#64748B] font-semibold uppercase tracking-wider text-[10px]">
+                    <th className="py-3 px-4">Student</th>
+                    <th className="py-3 px-3">Roll / ID</th>
+                    <th className="py-3 px-3">School</th>
+                    <th className="py-3 px-3">Payment</th>
+                    <th className="py-3 px-3">Student Status</th>
+                    <th className="py-3 px-4 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E2E8F0]">
+                  {recentRegistrations.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center text-[#64748B]">
+                        No student registrations recorded yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    recentRegistrations.slice(0, 5).map((reg) => (
+                      <tr key={reg.id} className="hover:bg-[#F8FAFC] transition-colors">
+                        <td className="py-3 px-4">
+                          <div className="font-semibold text-[#172033]">
+                            {reg.student_name}
+                          </div>
+                          <div className="text-[11px] text-[#64748B]">
+                            {reg.email}
+                          </div>
+                        </td>
+                        <td className="py-3 px-3 font-mono text-[#0A2047]">
+                          {reg.student_id || "—"}
+                        </td>
+                        <td className="py-3 px-3">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#0A2047]/5 text-[#0A2047] border border-[#0A2047]/10 uppercase">
+                            {reg.school || "GDGU"}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3">
+                          {renderPaymentBadge(reg.payment_status)}
+                        </td>
+                        <td className="py-3 px-3">
+                          {reg.student_verification_status === "verified" ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              <CheckCircle2 className="w-2.5 h-2.5" />
+                              <span>Verified</span>
+                            </span>
+                          ) : reg.student_verification_status === "rejected" ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                              <XCircle className="w-2.5 h-2.5" />
+                              <span>Rejected</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                              <Clock className="w-2.5 h-2.5" />
+                              <span>Pending</span>
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <Link
+                            href="/admin/registrations"
+                            className="font-semibold text-xs text-[#0A2047] hover:text-[#D4AF37] transition-colors"
+                          >
+                            Review
+                          </Link>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="p-3 border-t border-[#E2E8F0] bg-[#F8FAFC] text-right">
+            <Link
+              href="/admin/registrations"
+              className="text-xs font-semibold text-[#0A2047] hover:text-[#D4AF37] inline-flex items-center gap-1"
+            >
+              <span>Manage all student registrations</span>
+              <ArrowRight className="w-3 h-3 text-[#D4AF37]" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Quick Administrative Shortcuts (1 Col) */}
+        <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-xs p-5 flex flex-col justify-between space-y-4">
+          <div>
+            <div className="flex items-center gap-2 border-b border-[#E2E8F0] pb-3">
+              <ShieldCheck className="w-4 h-4 text-[#D4AF37]" />
+              <h3 className="font-bold text-[#0A2047] text-sm sm:text-base">
+                Administrative Shortcuts
+              </h3>
+            </div>
+
+            <div className="mt-4 space-y-2.5">
+              <Link
+                href="/admin/events"
+                className="group p-3 rounded-lg border border-[#E2E8F0] hover:border-[#0A2047] hover:bg-[#F8FAFC] transition-all flex items-center justify-between text-xs cursor-pointer"
+              >
+                <div>
+                  <div className="font-bold text-[#0A2047] group-hover:text-[#0A2047]">
+                    Manage Events & Competitions
+                  </div>
+                  <div className="text-[11px] text-[#64748B]">
+                    Create, edit, and publish technical fests
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-[#64748B] group-hover:text-[#0A2047] group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+
+              <Link
+                href="/admin/payments?status=pending"
+                className="group p-3 rounded-lg border border-[#E2E8F0] hover:border-amber-400 hover:bg-amber-50/30 transition-all flex items-center justify-between text-xs cursor-pointer"
+              >
+                <div>
+                  <div className="font-bold text-[#0A2047] group-hover:text-amber-800">
+                    Verify Student Payments
+                  </div>
+                  <div className="text-[11px] text-[#64748B]">
+                    Process UTR numbers and receipt slips
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-[#64748B] group-hover:text-amber-600 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+
+              <Link
+                href="/admin/registrations"
+                className="group p-3 rounded-lg border border-[#E2E8F0] hover:border-[#0A2047] hover:bg-[#F8FAFC] transition-all flex items-center justify-between text-xs cursor-pointer"
+              >
+                <div>
+                  <div className="font-bold text-[#0A2047]">
+                    Student Registration Directory
+                  </div>
+                  <div className="text-[11px] text-[#64748B]">
+                    Search and filter enrolled participants
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-[#64748B] group-hover:text-[#0A2047] group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+
+              <Link
+                href="/admin/reports"
+                className="group p-3 rounded-lg border border-[#E2E8F0] hover:border-emerald-500 hover:bg-emerald-50/30 transition-all flex items-center justify-between text-xs cursor-pointer"
+              >
+                <div>
+                  <div className="font-bold text-[#0A2047] group-hover:text-emerald-800">
+                    Export Reports & CSVs
+                  </div>
+                  <div className="text-[11px] text-[#64748B]">
+                    Download sanitized university audit sheets
+                  </div>
+                </div>
+                <FileSpreadsheet className="w-4 h-4 text-emerald-600 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+          </div>
+
+          <div className="pt-3 border-t border-[#E2E8F0] text-[11px] text-[#64748B] flex items-center justify-between">
+            <span>AVISHKAR 2026 Engine</span>
+            <span className="font-semibold text-[#0A2047]">GD Goenka University</span>
+          </div>
+        </div>
+      </div>
 
       {/* Footer Timestamp */}
       {lastRefreshed && (

@@ -504,6 +504,11 @@ export interface RegistrationRecord {
   course: string | null;
   branch: string | null;
   academic_year: string | null;
+  admission_number?: string | null;
+  id_card_file_path?: string | null;
+  id_card_file_name?: string | null;
+  id_card_file_size?: number | null;
+  id_card_mime_type?: string | null;
 
   // Event association (optional, for event-specific registrations)
   event_id?: string | null;
@@ -547,10 +552,12 @@ export interface RegistrationRecord {
   remarks: string | null;
   payment_status: PaymentVerificationStatus;
   admin_review_notes: string | null;
+  rejection_reason?: string | null;
+  student_rejection_reason?: string | null;
   verified_at: string | null;
   verified_by: string | null;
   verification_history?: Array<{
-    action: "approve" | "reject";
+    action: "approve" | "verify" | "reject" | "pending";
     actorEmail: string;
     timestamp: string;
     reason?: string;
@@ -570,10 +577,13 @@ export interface RegistrationRecord {
 
 export interface DashboardStats {
   totalRegistrations: number;
+  pendingRegistrations: number;
   pendingStudentVerification: number;
   pendingPaymentVerification: number;
   approvedRegistrations: number;
   rejectedRegistrations: number;
+  paymentsApproved: number;
+  paymentsRejected: number;
   totalEvents: number;
   pendingEventApprovals: number;
   publishedEvents: number;
@@ -597,14 +607,44 @@ export interface AdminFilterState {
 
 export interface PaymentVerificationPayload {
   registrationId: string;
-  action: "approve" | "reject";
+  action: "approve" | "verify" | "reject" | "pending";
   rejectionReason?: string;
   notes?: string;
 }
 
 export interface StudentVerificationPayload {
   registrationId: string;
-  action: "approve" | "reject";
+  action: "approve" | "verify" | "reject" | "pending";
   rejectionReason?: string;
   notes?: string;
+  requirePaymentVerified?: boolean;
+}
+
+// ============================================================================
+// Automated Student Email Notification System Models
+// ============================================================================
+
+export type EmailNotificationEventType =
+  | "registration_submitted"
+  | "registration_approved"
+  | "registration_rejected";
+
+export type EmailNotificationStatus = "pending" | "sent" | "failed" | "simulated";
+
+export interface StudentEmailNotificationRecord {
+  id: string;
+  registrationId: string;
+  registrationNumber: string;
+  recipientEmail: string;
+  recipientName: string;
+  eventType: EmailNotificationEventType;
+  subject: string;
+  status: EmailNotificationStatus;
+  provider: "resend" | "sandbox";
+  providerMessageId?: string | null;
+  errorMessage?: string | null;
+  attempts: number;
+  idempotencyKey: string;
+  createdAt: string;
+  lastAttemptAt: string;
 }

@@ -122,7 +122,7 @@ export async function GET(req: NextRequest) {
         r.program,
         r.year_of_joining,
         r.transaction_id,
-        r.fee_amount !== null && r.fee_amount !== undefined ? r.fee_amount : 500,
+        r.fee_amount !== null && r.fee_amount !== undefined ? r.fee_amount : 100,
         r.payment_status,
         r.payment_date,
         r.verified_by || "",

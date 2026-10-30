@@ -99,6 +99,7 @@ export function RegistrationDecisionModal({
         body: JSON.stringify({
           registrationId: registration.id,
           action,
+          requirePaymentVerified: true,
           rejectionReason: action === "reject" ? finalReason : undefined,
           notes: notes.trim() || undefined,
         }),

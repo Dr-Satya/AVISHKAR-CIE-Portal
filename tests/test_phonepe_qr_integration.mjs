@@ -29,8 +29,8 @@ const paymentConfigPath = path.resolve("src/config/payment.ts");
 const paymentConfigContent = fs.readFileSync(paymentConfigPath, "utf8");
 
 assert(
-  paymentConfigContent.includes("feeAmount: 500"),
-  "paymentConfig defines registration fee prominently as 500"
+  paymentConfigContent.includes("feeAmount: 100"),
+  "paymentConfig defines registration fee prominently as 100"
 );
 assert(
   paymentConfigContent.includes('qrSectionLabel: "AVISHKAR Official Payment QR"'),
@@ -41,12 +41,12 @@ assert(
   "paymentConfig sets qrCodeUrl to the supplied original AVISHKAR payment QR"
 );
 assert(
-  paymentConfigContent.includes("Scan the QR code to pay the registration fee of ₹500."),
-  "paymentConfig includes instruction: 'Scan the QR code to pay the registration fee of ₹500.'"
+  paymentConfigContent.includes("Scan the QR code to pay the registration fee of ₹100."),
+  "paymentConfig includes instruction: 'Scan the QR code to pay the registration fee of ₹100.'"
 );
 assert(
-  paymentConfigContent.includes("feeAmount: 500"),
-  "Registration fee is configured as ₹500"
+  paymentConfigContent.includes("feeAmount: 100"),
+  "Registration fee is configured as ₹100"
 );
 assert(
   paymentConfigContent.includes("openingDate:") &&
@@ -70,11 +70,11 @@ assert(
 assert(
   paymentStepContent.includes("paymentConfig.feeAmount") &&
   paymentStepContent.includes("₹{paymentConfig.feeAmount}"),
-  "PaymentStep displays the registration fee of ₹500 prominently"
+  "PaymentStep displays the registration fee of ₹100 prominently"
 );
 assert(
-  paymentStepContent.includes("Scan the QR code to pay the registration fee of ₹500."),
-  "PaymentStep displays the exact instruction: 'Scan the QR code to pay the registration fee of ₹500.'"
+  paymentStepContent.includes("Scan the QR code to pay the registration fee of ₹100."),
+  "PaymentStep displays the exact instruction: 'Scan the QR code to pay the registration fee of ₹100.'"
 );
 assert(
   !paymentStepContent.includes("Beneficiary &amp; Recipient Verification Status") &&

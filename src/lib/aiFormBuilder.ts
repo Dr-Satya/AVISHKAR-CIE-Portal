@@ -527,7 +527,7 @@ async function callGroqApi(
             content: `Event Name: "${params.eventTitle || "AVISHKAR Event"}".
 Category: ${params.category || "General"}.
 Team Capacity Requirement: ${teamRule}
-Registration Fee: INR ${params.feeAmount ?? 500}.
+Registration Fee: INR ${params.feeAmount ?? 100}.
 Registration Schedule: ${params.registrationStartDate || "Immediate"} to ${params.registrationEndDate || "Until event"}.
 Additional Instructions: ${params.prompt || "Generate appropriate registration questionnaire for this competition"}`,
           },

@@ -10,6 +10,7 @@ import {
   User,
   GraduationCap,
   CreditCard,
+  FileText,
 } from "lucide-react";
 import { RegistrationRecord } from "@/types/admin";
 import { PAYMENT_STATUS_LABELS, STUDENT_STATUS_LABELS } from "@/config/admin";
@@ -68,6 +69,7 @@ export function RegistrationTable({
               <th className="py-3.5 px-4">Academic Program</th>
               <th className="py-3.5 px-4 text-center">Registration Status</th>
               <th className="py-3.5 px-4 text-center">Payment Status</th>
+              <th className="py-3.5 px-4 text-center">Overall Status</th>
               <th className="py-3.5 px-4">Submitted</th>
               <th className="py-3.5 px-4 text-right min-w-[210px]">Actions</th>
             </tr>
@@ -84,6 +86,13 @@ export function RegistrationTable({
                 variant: "neutral",
               };
 
+              const isOverallApproved =
+                reg.payment_status === "verified" &&
+                reg.student_verification_status === "verified";
+              const isOverallRejected =
+                reg.payment_status === "rejected" ||
+                reg.student_verification_status === "rejected";
+
               return (
                 <tr
                   key={reg.id}
@@ -99,6 +108,11 @@ export function RegistrationTable({
                       <span className="font-mono text-[11px] text-[#64748B] mt-0.5">
                         ID: <strong className="text-[#0A2047] font-bold">{reg.student_id}</strong>
                       </span>
+                      {reg.admission_number && (
+                        <span className="font-mono text-[10px] text-[#64748B]">
+                          Adm: {reg.admission_number}
+                        </span>
+                      )}
                       {reg.registration_number && (
                         <span className="text-[10px] text-[#64748B]/80 font-mono">
                           {reg.registration_number}
@@ -134,43 +148,93 @@ export function RegistrationTable({
                     </div>
                   </td>
 
-                  {/* 4. Student Verification Status */}
+                  {/* 4. Student Verification Status & ID Card Indicator */}
                   <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold border ${
-                        studentMeta.variant === "success"
-                          ? "bg-emerald-50 text-emerald-800 border-emerald-300"
-                          : studentMeta.variant === "danger"
-                          ? "bg-rose-50 text-rose-800 border-rose-300"
-                          : "bg-amber-50 text-amber-800 border-amber-300"
-                      }`}
-                    >
-                      {studentMeta.variant === "success" && <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />}
-                      {studentMeta.variant === "danger" && <XCircle className="w-3.5 h-3.5 text-rose-600" />}
-                      {studentMeta.variant === "warning" && <Clock className="w-3.5 h-3.5 text-amber-600" />}
-                      <span>{studentMeta.label}</span>
-                    </span>
+                    <div className="inline-flex flex-col items-center gap-1">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold border ${
+                          studentMeta.variant === "success"
+                            ? "bg-emerald-50 text-emerald-800 border-emerald-300"
+                            : studentMeta.variant === "danger"
+                            ? "bg-rose-50 text-rose-800 border-rose-300"
+                            : "bg-amber-50 text-amber-800 border-amber-300"
+                        }`}
+                      >
+                        {studentMeta.variant === "success" && <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />}
+                        {studentMeta.variant === "danger" && <XCircle className="w-3.5 h-3.5 text-rose-600" />}
+                        {studentMeta.variant === "warning" && <Clock className="w-3.5 h-3.5 text-amber-600" />}
+                        <span>{studentMeta.label}</span>
+                      </span>
+                      {reg.id_card_file_path && (
+                        <span className="text-[10px] text-[#0A2047] flex items-center gap-1 font-semibold">
+                          <FileText className="w-3 h-3 text-[#D4AF37]" />
+                          <span>ID Card Uploaded</span>
+                        </span>
+                      )}
+                    </div>
                   </td>
 
-                  {/* 5. Payment Verification Status */}
+                  {/* 5. Payment Verification Status & Fee */}
                   <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold border ${
-                        paymentMeta.variant === "success"
-                          ? "bg-emerald-50 text-emerald-800 border-emerald-300"
-                          : paymentMeta.variant === "danger"
-                          ? "bg-rose-50 text-rose-800 border-rose-300"
-                          : "bg-amber-50 text-amber-800 border-amber-300"
-                      }`}
-                    >
-                      {paymentMeta.variant === "success" && <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />}
-                      {paymentMeta.variant === "danger" && <XCircle className="w-3.5 h-3.5 text-rose-600" />}
-                      {paymentMeta.variant === "warning" && <Clock className="w-3.5 h-3.5 text-amber-600" />}
-                      <span>{paymentMeta.label}</span>
-                    </span>
+                    <div className="inline-flex flex-col items-center gap-1">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold border ${
+                          paymentMeta.variant === "success"
+                            ? "bg-emerald-50 text-emerald-800 border-emerald-300"
+                            : paymentMeta.variant === "danger"
+                            ? "bg-rose-50 text-rose-800 border-rose-300"
+                            : "bg-amber-50 text-amber-800 border-amber-300"
+                        }`}
+                      >
+                        {paymentMeta.variant === "success" && <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />}
+                        {paymentMeta.variant === "danger" && <XCircle className="w-3.5 h-3.5 text-rose-600" />}
+                        {paymentMeta.variant === "warning" && <Clock className="w-3.5 h-3.5 text-amber-600" />}
+                        <span>{paymentMeta.label}</span>
+                      </span>
+                      <span className="font-mono text-[10px] text-[#64748B]">
+                        Fee: <strong className="text-[#0A2047]">₹{reg.fee_amount ?? 100}</strong>
+                        {reg.transaction_id ? ` • UTR: ${reg.transaction_id.slice(0, 10)}${reg.transaction_id.length > 10 ? "…" : ""}` : ""}
+                      </span>
+                      {reg.receipt_file_path && (
+                        <span className="text-[10px] text-[#0A2047] flex items-center gap-1 font-semibold">
+                          <FileText className="w-3 h-3 text-[#D4AF37]" />
+                          <span>Receipt Uploaded</span>
+                        </span>
+                      )}
+                    </div>
                   </td>
 
-                  {/* 6. Registration Submission Date */}
+                  {/* 6. Overall Status */}
+                  <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                    {isOverallApproved ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Approved</span>
+                      </span>
+                    ) : isOverallRejected ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-rose-50 text-rose-800 border border-rose-300">
+                        <XCircle className="w-3.5 h-3.5 text-rose-600" />
+                        <span>Rejected</span>
+                      </span>
+                    ) : reg.payment_status === "verified" ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-300">
+                        <Clock className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Pending Student</span>
+                      </span>
+                    ) : reg.student_verification_status === "verified" ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-300">
+                        <Clock className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Pending Payment</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-300">
+                        <Clock className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Pending Verification</span>
+                      </span>
+                    )}
+                  </td>
+
+                  {/* 7. Registration Submission Date */}
                   <td className="py-3.5 px-4 text-[#64748B] whitespace-nowrap">
                     <div className="font-medium text-[#172033]">{new Date(reg.created_at).toLocaleDateString()}</div>
                     <div className="text-[10px] text-[#64748B]/70 font-mono">
@@ -178,13 +242,13 @@ export function RegistrationTable({
                     </div>
                   </td>
 
-                  {/* 7. Action Column */}
+                  {/* 8. Action Column */}
                   <td className="py-3.5 px-4 text-right">
                     <div
                       className="flex items-center justify-end gap-1.5 flex-wrap"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {reg.student_verification_status === "pending" ? (
+                      {!isOverallApproved && !isOverallRejected ? (
                         <>
                           {/* Approve Registration Button */}
                           <button
@@ -221,12 +285,12 @@ export function RegistrationTable({
                       ) : (
                         <span
                           className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold border ${
-                            reg.student_verification_status === "verified"
+                            isOverallApproved
                               ? "bg-emerald-50 text-emerald-800 border-emerald-300"
                               : "bg-rose-50 text-rose-800 border-rose-300"
                           }`}
                         >
-                          {reg.student_verification_status === "verified" ? (
+                          {isOverallApproved ? (
                             <>
                               <CheckCircle className="w-3 h-3 text-emerald-600" />
                               <span>Approved</span>

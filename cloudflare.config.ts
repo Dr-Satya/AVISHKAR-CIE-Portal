@@ -16,6 +16,8 @@ export default defineConfig({
       VINEXT_KV_CACHE: bindings.kv({
         id: process.env.VINEXT_KV_CACHE_ID || "2083fc10537141e8846b03e2f31e0125",
       }),
+      EMAIL_PROVIDER: bindings.text("resend"),
+      EMAIL_FROM: bindings.text("onboarding@resend.dev"),
     },
   }),
 });

@@ -117,6 +117,7 @@ export function testProjectSanity(): {
     contactNumber: "9145372100",
     gender: "Male",
     dob: "2004-06-15",
+    admissionNumber: "240160226299",
     studentId: "240160226299",
     school: "SOES",
     program: "Computer science and engineering AI&ML",

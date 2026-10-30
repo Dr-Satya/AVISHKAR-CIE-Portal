@@ -44,6 +44,8 @@ export function RegistrationWizard() {
     gender: "",
     dob: "",
     studentId: "",
+    admissionNumber: "",
+    idCardFile: null,
     school: "",
     program: "",
     yearOfJoining: "",
@@ -104,6 +106,7 @@ export function RegistrationWizard() {
               gender: parsed.gender || "",
               dob: parsed.dob || "",
               studentId: parsed.studentId || "",
+              admissionNumber: parsed.admissionNumber || "",
               school: parsed.school || "",
               program: parsed.program || "",
               yearOfJoining: parsed.yearOfJoining || "",
@@ -149,7 +152,7 @@ export function RegistrationWizard() {
   const saveDraft = (data: StudentRegistrationInput) => {
     try {
       if (typeof window !== "undefined") {
-        const { receiptFile: _receiptFile, ...serializable } = data;
+        const { receiptFile: _receiptFile, idCardFile: _idCardFile, ...serializable } = data;
         localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(serializable));
       }
     } catch {
@@ -197,6 +200,21 @@ export function RegistrationWizard() {
     }
   };
 
+  // Student ID card selection handler
+  const handleIdCardSelect = (file: File | null) => {
+    setFormData((prev) => ({ ...prev, idCardFile: file }));
+    if (errors.idCardFile) {
+      setErrors((prev) => {
+        const updated = { ...prev };
+        delete updated.idCardFile;
+        return updated;
+      });
+    }
+    if (submissionError) {
+      setSubmissionError(null);
+    }
+  };
+
   // Form submission handler (Step 5 -> Server API)
   const handleSubmit = async () => {
     if (!isPaymentOpen) {
@@ -225,7 +243,7 @@ export function RegistrationWizard() {
       // Route user back to the earliest step with errors
       if (allErrors.studentName || allErrors.email || allErrors.contactNumber || allErrors.gender || allErrors.dob) {
         setCurrentStep(1);
-      } else if (allErrors.studentId || allErrors.school || allErrors.program || allErrors.yearOfJoining) {
+      } else if (allErrors.studentId || allErrors.admissionNumber || allErrors.idCardFile || allErrors.school || allErrors.program || allErrors.yearOfJoining) {
         setCurrentStep(2);
       } else if (
         allErrors.hasStartupOrProject ||
@@ -265,9 +283,14 @@ export function RegistrationWizard() {
       payload.append("gender", formData.gender || "");
       payload.append("dob", formData.dob || "");
       payload.append("studentId", formData.studentId);
+      payload.append("admissionNumber", (formData.admissionNumber || "").trim());
       payload.append("school", formData.school);
       payload.append("program", formData.program);
       payload.append("yearOfJoining", formData.yearOfJoining);
+
+      if (formData.idCardFile) {
+        payload.append("idCardFile", formData.idCardFile);
+      }
 
       // Startup & Innovation Details (Optional)
       payload.append("hasStartupOrProject", formData.hasStartupOrProject || "");
@@ -387,7 +410,7 @@ export function RegistrationWizard() {
         setErrors(combinedErrors);
         if (combinedErrors.studentName || combinedErrors.email || combinedErrors.contactNumber) {
           setCurrentStep(1);
-        } else if (combinedErrors.studentId || combinedErrors.school || combinedErrors.program || combinedErrors.yearOfJoining) {
+        } else if (combinedErrors.studentId || combinedErrors.admissionNumber || combinedErrors.idCardFile || combinedErrors.school || combinedErrors.program || combinedErrors.yearOfJoining) {
           setCurrentStep(2);
         } else if (
           combinedErrors.hasStartupOrProject ||
@@ -455,6 +478,7 @@ export function RegistrationWizard() {
       gender: "",
       dob: "",
       studentId: "",
+      admissionNumber: "",
       school: "",
       program: "",
       yearOfJoining: "",
@@ -471,6 +495,7 @@ export function RegistrationWizard() {
       transactionId: "",
       paymentDate: "",
       receiptFile: null,
+      idCardFile: null,
       remarks: "",
     });
     setErrors({});
@@ -565,6 +590,7 @@ export function RegistrationWizard() {
             formData={formData}
             errors={errors}
             onChange={handleFieldChange}
+            onIdCardSelect={handleIdCardSelect}
           />
         )}
 
@@ -637,7 +663,7 @@ export function RegistrationWizard() {
                 onClick={handleContinue}
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#0A2047] hover:bg-[#132E57] active:bg-[#19365F] text-white font-semibold text-sm shadow-xs hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-[#0A2047] focus:ring-offset-2 cursor-pointer"
               >
-                <span>Continue to Startup &amp; Innovation</span>
+                <span>Continue to Startup</span>
                 <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
               </button>
             )}
@@ -665,11 +691,7 @@ export function RegistrationWizard() {
                   onClick={handleContinue}
                   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#0A2047] hover:bg-[#132E57] active:bg-[#19365F] text-white font-semibold text-sm shadow-xs hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-[#0A2047] focus:ring-offset-2 cursor-pointer"
                 >
-                  <span>
-                    {hasPreviousWorkDetails
-                      ? "Continue to Club & Review"
-                      : "Continue to Club & Review"}
-                  </span>
+                  <span>Continue to Review</span>
                   <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
                 </button>
               </div>
@@ -682,7 +704,7 @@ export function RegistrationWizard() {
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#0A2047] hover:bg-[#132E57] active:bg-[#19365F] text-white font-semibold text-sm shadow-xs hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-[#0A2047] focus:ring-offset-2 cursor-pointer"
               >
                 <CreditCard className="w-4 h-4 text-[#D4AF37]" />
-                <span>Proceed to Payment Status</span>
+                <span>Proceed to Payment</span>
               </button>
             )}
 

@@ -103,7 +103,10 @@ export function validatePersonalInfo(
  * Strictly nonblank student ID; School & Program grounded in official source
  */
 export function validateAcademicInfo(
-  data: Pick<StudentRegistrationInput, "studentId" | "school" | "program" | "yearOfJoining">
+  data: Pick<StudentRegistrationInput, "studentId" | "school" | "program" | "yearOfJoining"> & {
+    admissionNumber?: string;
+    idCardFile?: File | null;
+  }
 ): RegistrationValidationErrors {
   const errors: RegistrationValidationErrors = {};
 
@@ -113,21 +116,62 @@ export function validateAcademicInfo(
     errors.studentId = "Student ID / Enrolment Number is required.";
   }
 
-  // School (Required: SOES, SOHAS, SOAS)
-  const validSchoolCodes = APPROVED_SCHOOLS.map((s) => s.code);
+  // Admission Number (Compulsory: strictly nonblank after trimming)
+  const trimmedAdm = (data.admissionNumber || "").trim();
+  if (!trimmedAdm || trimmedAdm.length === 0) {
+    errors.admissionNumber = "Admission Number is required.";
+  } else if (trimmedAdm.length > 100) {
+    errors.admissionNumber = "Admission Number cannot exceed 100 characters.";
+  }
+
+  // Student ID Card Document (Compulsory: JPG, JPEG, PNG, WebP, or PDF up to 5 MB)
+  if (!data.idCardFile) {
+    errors.idCardFile = "Student ID card document is required.";
+  } else {
+    const file = data.idCardFile;
+    if (file.size === 0) {
+      errors.idCardFile = "The uploaded file is empty.";
+    } else if (file.size > 5 * 1024 * 1024) {
+      errors.idCardFile = `File size (${(file.size / (1024 * 1024)).toFixed(
+        2
+      )} MB) exceeds the 5 MB limit.`;
+    } else {
+      const allowedExtensions = [".jpg", ".jpeg", ".png", ".webp", ".pdf"];
+      const ext = `.${file.name.split(".").pop()?.toLowerCase()}`;
+      const allowedMimes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "application/pdf",
+      ];
+      if (
+        !allowedExtensions.includes(ext) ||
+        (file.type && !allowedMimes.includes(file.type))
+      ) {
+        errors.idCardFile =
+          "Invalid file type. Please upload a JPG, JPEG, PNG, WebP, or PDF file.";
+      }
+    }
+  }
+
+  // School (Required)
+  const validSchoolCodes = APPROVED_SCHOOLS.map((s) => s.code as string);
+  const legacyCodes = ["SOES", "SOHAS", "SOAS", "SOM", "SOL", "SMAS", "SOHSS", "UID"];
+  const allAllowedSchools = [...validSchoolCodes, ...legacyCodes];
+
   if (!data.school || !data.school.trim()) {
     errors.school = "Please select your School.";
-  } else if (!validSchoolCodes.includes(data.school as SchoolCode)) {
-    errors.school = "Please select an approved School (SOES, SOHAS, SOAS).";
+  } else if (!allAllowedSchools.includes(data.school)) {
+    errors.school = "Please select an approved School.";
   }
 
   // Program / Department (Required: dynamic based on selected School)
   const trimmedProgram = (data.program || "").trim();
   if (!trimmedProgram) {
     errors.program = "Please select your Program / Department.";
-  } else if (data.school && validSchoolCodes.includes(data.school as SchoolCode)) {
-    const validPrograms = PROGRAMS_BY_SCHOOL[data.school as SchoolCode] || [];
-    if (!validPrograms.includes(trimmedProgram)) {
+  } else if (data.school) {
+    const validPrograms = PROGRAMS_BY_SCHOOL[data.school] || [];
+    if (validPrograms.length > 0 && !validPrograms.includes(trimmedProgram) && trimmedProgram !== "Others") {
       errors.program = "Please select a valid program for the chosen school.";
     }
   }

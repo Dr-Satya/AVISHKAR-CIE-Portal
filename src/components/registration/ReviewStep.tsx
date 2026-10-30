@@ -1,7 +1,7 @@
 import React from "react";
 import { StudentRegistrationInput, RegistrationValidationErrors } from "@/types/registration";
 import { LEADERSHIP_INTEREST_OPTIONS } from "@/config/academic";
-import { Edit2, Sparkles, AlertCircle, Briefcase, ExternalLink } from "lucide-react";
+import { Edit2, Sparkles, AlertCircle, Briefcase, ExternalLink, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ReviewStepProps {
@@ -42,18 +42,18 @@ export function ReviewStep({
   return (
     <div className="space-y-6">
       <div className="border-b border-[#E2E8F0] pb-3">
-        <h3 className="text-xl font-bold text-[#0A2047]">Club Engagement &amp; Review</h3>
+        <h3 className="text-xl font-bold text-[#0A2047]">Engagement &amp; Review</h3>
         <p className="text-xs text-[#64748B] mt-0.5">
           Tell us about your interests in AVISHKAR and verify your registration details.
         </p>
       </div>
 
-      {/* Club Engagement Questions */}
+      {/* Engagement Questions */}
       <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-xs space-y-5">
         <div className="flex items-center gap-2 border-b border-[#E2E8F0] pb-3">
           <Sparkles className="w-4 h-4 text-[#D4AF37]" />
           <span className="text-xs font-semibold uppercase tracking-wider text-[#0A2047]">
-            Club Engagement Questions
+            Engagement Questions
           </span>
         </div>
 
@@ -206,6 +206,28 @@ export function ReviewStep({
             <dt className="text-[#64748B] font-medium">Enrolment / Student ID</dt>
             <dd className="text-[#0A2047] font-semibold mt-0.5 text-sm font-mono break-words [overflow-wrap:anywhere]">
               {formData.studentId || "—"}
+            </dd>
+          </div>
+          <div className="min-w-0">
+            <dt className="text-[#64748B] font-medium">Admission Number</dt>
+            <dd className="text-[#0A2047] font-semibold mt-0.5 text-sm font-mono break-words [overflow-wrap:anywhere]">
+              {formData.admissionNumber || "—"}
+            </dd>
+          </div>
+          <div className="min-w-0 sm:col-span-2">
+            <dt className="text-[#64748B] font-medium">Student ID Card</dt>
+            <dd className="text-[#0A2047] font-medium mt-0.5 flex items-center gap-1.5 break-words [overflow-wrap:anywhere]">
+              {formData.idCardFile ? (
+                <>
+                  <FileText className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                  <span className="font-semibold text-xs text-[#0A2047] truncate">{formData.idCardFile.name}</span>
+                  <span className="text-[#64748B] text-[11px] shrink-0">
+                    ({(formData.idCardFile.size / 1024).toFixed(1)} KB)
+                  </span>
+                </>
+              ) : (
+                <span className="text-[#64748B] italic">Not uploaded</span>
+              )}
             </dd>
           </div>
           <div className="min-w-0">

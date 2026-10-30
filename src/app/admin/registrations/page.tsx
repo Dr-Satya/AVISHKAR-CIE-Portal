@@ -17,12 +17,52 @@ function RegistrationsContent() {
   const [school, setSchool] = useState(() => searchParams.get("school") || "ALL");
   const [program, setProgram] = useState("ALL");
   const [year, setYear] = useState("ALL");
-  const [studentStatus, setStudentStatus] = useState(
-    () => searchParams.get("studentStatus") || "ALL"
-  );
-  const [paymentStatus, setPaymentStatus] = useState(
-    () => searchParams.get("paymentStatus") || "ALL"
-  );
+  const [overallStatus, setOverallStatus] = useState(() => {
+    const o = searchParams.get("overallStatus");
+    if (o) return o;
+    const s = searchParams.get("status");
+    if (s === "pending" || s === "approved" || s === "rejected") return s;
+    return "ALL";
+  });
+  const [studentStatus, setStudentStatus] = useState(() => {
+    const s = searchParams.get("studentStatus");
+    if (s) return s;
+    return "ALL";
+  });
+  const [paymentStatus, setPaymentStatus] = useState(() => {
+    const p = searchParams.get("paymentStatus");
+    if (p) return p;
+    return "ALL";
+  });
+
+  // Synchronize filter states if query parameters change
+  useEffect(() => {
+    const statusParam = searchParams.get("status");
+    const overallParam = searchParams.get("overallStatus");
+    const payStatusParam = searchParams.get("paymentStatus");
+    const stuStatusParam = searchParams.get("studentStatus");
+    const schoolParam = searchParams.get("school");
+
+    if (statusParam === "pending" || overallParam === "pending") {
+      setOverallStatus("pending");
+      setPaymentStatus("ALL");
+      setStudentStatus("ALL");
+    } else if (statusParam === "verified" || statusParam === "approved" || overallParam === "approved") {
+      setOverallStatus("approved");
+    } else if (statusParam === "rejected" || overallParam === "rejected") {
+      setOverallStatus("rejected");
+    }
+
+    if (payStatusParam) {
+      setPaymentStatus(payStatusParam);
+    }
+    if (stuStatusParam) {
+      setStudentStatus(stuStatusParam);
+    }
+    if (schoolParam) {
+      setSchool(schoolParam);
+    }
+  }, [searchParams]);
 
   // Data State
   const [registrations, setRegistrations] = useState<RegistrationRecord[]>([]);
@@ -54,10 +94,13 @@ function RegistrationsContent() {
       if (school && school !== "ALL") params.set("school", school);
       if (program && program !== "ALL") params.set("program", program);
       if (year && year !== "ALL") params.set("year", year);
+      if (overallStatus && overallStatus !== "ALL") params.set("overallStatus", overallStatus);
       if (studentStatus && studentStatus !== "ALL") params.set("studentStatus", studentStatus);
       if (paymentStatus && paymentStatus !== "ALL") params.set("paymentStatus", paymentStatus);
 
-      const res = await fetch(`/api/admin/registrations?${params.toString()}`);
+      const res = await fetch(`/api/admin/registrations?${params.toString()}`, {
+        cache: "no-store",
+      });
       if (!res.ok) {
         const data = await res.json();
         setErrorMessage(data.error || "Failed to load registrations.");
@@ -74,7 +117,7 @@ function RegistrationsContent() {
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  }, [search, school, program, year, studentStatus, paymentStatus]);
+  }, [search, school, program, year, overallStatus, studentStatus, paymentStatus]);
 
   useEffect(() => {
     let ignore = false;
@@ -94,26 +137,19 @@ function RegistrationsContent() {
     setSchool("ALL");
     setProgram("ALL");
     setYear("ALL");
+    setOverallStatus("ALL");
     setStudentStatus("ALL");
     setPaymentStatus("ALL");
   };
 
   const handleApproveRegistration = (reg: RegistrationRecord) => {
     setErrorMessage("");
-    setDecisionModal({
-      isOpen: true,
-      registration: reg,
-      action: "approve",
-    });
+    setSelectedRecord(reg);
   };
 
   const handleRejectRegistration = (reg: RegistrationRecord) => {
     setErrorMessage("");
-    setDecisionModal({
-      isOpen: true,
-      registration: reg,
-      action: "reject",
-    });
+    setSelectedRecord(reg);
   };
 
   const handleDecisionSuccess = (updatedRecord: RegistrationRecord) => {
@@ -255,6 +291,8 @@ function RegistrationsContent() {
         onProgramChange={setProgram}
         year={year}
         onYearChange={setYear}
+        overallStatus={overallStatus}
+        onOverallStatusChange={setOverallStatus}
         studentStatus={studentStatus}
         onStudentStatusChange={setStudentStatus}
         paymentStatus={paymentStatus}

@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminSessionFromRequest, getAdminSupabaseConfig, getAuthorizedSupabaseHeaders } from "@/lib/adminAuth";
+import {
+  getAdminSessionFromRequest,
+  getAdminSupabaseConfig,
+  getAuthorizedSupabaseHeaders,
+  isValidUuid,
+} from "@/lib/adminAuth";
 import { RegistrationRecord } from "@/types/admin";
 import { getStoredRegistrations } from "@/lib/dataStore";
 
@@ -43,7 +48,10 @@ export async function GET(
     if (config.isConfigured) {
       try {
         const headers = getAuthorizedSupabaseHeaders(session.token);
-        const restUrl = `${config.url}/rest/v1/registrations?or=(id.eq.${encodeURIComponent(id)},registration_number.eq.${encodeURIComponent(id)})&select=*`;
+        const isUuid = isValidUuid(id);
+        const restUrl = isUuid
+          ? `${config.url}/rest/v1/registrations?id=eq.${encodeURIComponent(id)}&select=*`
+          : `${config.url}/rest/v1/registrations?registration_number=eq.${encodeURIComponent(id)}&select=*`;
         const res = await fetch(restUrl, { method: "GET", headers });
         if (res.ok) {
           const records = await res.json();

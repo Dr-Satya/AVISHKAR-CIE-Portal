@@ -2,7 +2,7 @@
  * AVISHKAR 2026 — Payment & Registration Fee Configuration
  *
  * Institutional guidelines & mentor specifications:
- * - Registration Fee: ₹500
+ * - Registration Fee: ₹100
  * - QR Asset: AVISHKAR Official Payment QR (/images/phonepe-test-qr.png)
  * - Beneficiary / Recipient: Unverified pending formal committee check
  * - Registration Dates: Unconfigured pending mentor confirmation
@@ -48,7 +48,7 @@ export const paymentRecipientConfig: PaymentRecipientConfig = {
 };
 
 export const paymentConfig: PaymentConfig = {
-  feeAmount: 500, // Official registration fee confirmed as ₹500
+  feeAmount: 100, // Official registration fee confirmed as ₹100
   currencySymbol: "₹",
   currencyCode: "INR",
   upiId: null, // Unverified pending committee check
@@ -56,7 +56,7 @@ export const paymentConfig: PaymentConfig = {
   qrCodeUrl: "/images/phonepe-test-qr.png", // Supplied original AVISHKAR payment QR
   qrSectionLabel: "AVISHKAR Official Payment QR",
   instructions: [
-    "Scan the QR code to pay the registration fee of ₹500.",
+    "Scan the QR code to pay the registration fee of ₹100.",
     "Pay via PhonePe, Google Pay, Paytm, BHIM, or any UPI application.",
     "Save the transaction receipt screenshot or official payment confirmation PDF.",
     "Enter the exact 12-digit UTR / Transaction Reference ID provided by your UPI app.",

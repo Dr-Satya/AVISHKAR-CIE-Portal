@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
-import {
+import type {
   EventRecord,
   EventFormRecord,
   EventFormSubmission,
@@ -19,7 +19,8 @@ import {
   EventReadinessSummary,
   OperationalBlockerRecord,
   ReadinessCategory,
-} from "@/types/admin";
+  StudentEmailNotificationRecord,
+} from "../types/admin.ts";
 
 export interface CouncilCredential {
   email: string;
@@ -44,6 +45,18 @@ export interface StoreData {
   photos?: EventPhotoRecord[];
   readinessItems?: EventReadinessItem[];
   blockers?: OperationalBlockerRecord[];
+  documents?: Record<string, StoredDocument>;
+  emailNotifications?: StudentEmailNotificationRecord[];
+}
+
+export interface StoredDocument {
+  id: string;
+  type: "id_card" | "receipt";
+  fileName: string;
+  mimeType: string;
+  dataBase64: string;
+  fileSize: number;
+  uploadedAt: string;
 }
 
 const DATA_DIR = path.join(process.cwd(), ".data");
@@ -935,6 +948,7 @@ function getInitialStore(): StoreData {
     photos: [],
     readinessItems: initialReadinessItems,
     blockers: initialBlockers,
+    emailNotifications: [],
   };
 }
 
@@ -1201,6 +1215,8 @@ export function readDataStore(): StoreData {
         parsed.blockers && parsed.blockers.length > 0
           ? parsed.blockers
           : initial.blockers || [],
+      documents: parsed.documents || {},
+      emailNotifications: parsed.emailNotifications || [],
     };
     globalThis.__avishkar_memory_store = finalStore;
     return finalStore;
@@ -1532,7 +1548,7 @@ export function saveStoredRegistration(reg: RegistrationRecord): void {
 
 export function updateStoredRegistrationPayment(
   registrationId: string,
-  action: "approve" | "reject",
+  action: "approve" | "verify" | "reject" | "pending",
   rejectionReason?: string,
   notes?: string,
   actorEmail?: string
@@ -1545,19 +1561,21 @@ export function updateStoredRegistrationPayment(
   if (!reg) return null;
 
   const nowIso = new Date().toISOString();
-  reg.payment_status = action === "approve" ? "verified" : "rejected";
-  reg.verified_at = nowIso;
-  reg.verified_by = actorEmail || "admin";
+  reg.payment_status = (action === "approve" || action === "verify") ? "verified" : action === "pending" ? "pending_verification" : "rejected";
+  reg.verified_at = action === "pending" ? null : nowIso;
+  reg.verified_by = action === "pending" ? null : (actorEmail || "admin");
   reg.admin_review_notes =
     action === "reject"
       ? `[Payment Rejected]: ${rejectionReason || ""}${notes ? ` | Notes: ${notes}` : ""}`
-      : `[Payment Approved by ${actorEmail || "admin"}]${notes ? ` | Notes: ${notes}` : ""}`;
+      : (action === "approve" || action === "verify")
+      ? `[Payment Approved by ${actorEmail || "admin"}]${notes ? ` | Notes: ${notes}` : ""}`
+      : `[Payment Status Reset to Pending by ${actorEmail || "admin"}]${notes ? ` | Notes: ${notes}` : ""}`;
   
   if (!reg.verification_history) {
     reg.verification_history = [];
   }
   reg.verification_history.unshift({
-    action,
+    action: action === "pending" ? "pending" : (action === "verify" ? "approve" : action),
     actorEmail: actorEmail || "admin",
     timestamp: nowIso,
     reason: rejectionReason,
@@ -1581,10 +1599,11 @@ export function getStoredRegistrationById(registrationId: string): RegistrationR
 
 export function updateStoredRegistrationStudent(
   registrationId: string,
-  action: "approve" | "reject",
+  action: "approve" | "verify" | "reject" | "pending",
   rejectionReason?: string,
   notes?: string,
-  actorEmail?: string
+  actorEmail?: string,
+  requirePaymentVerified?: boolean
 ): RegistrationRecord | null {
   const store = readDataStore();
   if (!store.registrations) return null;
@@ -1593,20 +1612,28 @@ export function updateStoredRegistrationStudent(
   );
   if (!reg) return null;
 
+  if ((action === "approve" || (requirePaymentVerified && action === "verify")) && reg.payment_status !== "verified") {
+    const error: any = new Error("Payment Verification Pending. Final registration approval requires a verified payment. Please verify the payment in the Payments module first.");
+    error.code = "PAYMENT_NOT_VERIFIED";
+    throw error;
+  }
+
   const nowIso = new Date().toISOString();
-  reg.student_verification_status = action === "approve" ? "verified" : "rejected";
-  reg.student_verified_at = nowIso;
-  reg.student_verified_by = actorEmail || "admin";
+  reg.student_verification_status = (action === "approve" || action === "verify") ? "verified" : action === "pending" ? "pending" : "rejected";
+  reg.student_verified_at = action === "pending" ? null : nowIso;
+  reg.student_verified_by = action === "pending" ? null : (actorEmail || "admin");
   reg.student_verification_notes =
     action === "reject"
       ? `[Student Rejected]: ${rejectionReason || ""}${notes ? ` | Notes: ${notes}` : ""}`
-      : `[Student Verified by ${actorEmail || "admin"}]${notes ? ` | Notes: ${notes}` : ""}`;
+      : (action === "approve" || action === "verify")
+      ? `[Student Verified by ${actorEmail || "admin"}]${notes ? ` | Notes: ${notes}` : ""}`
+      : `[Student Verification Reset to Pending by ${actorEmail || "admin"}]${notes ? ` | Notes: ${notes}` : ""}`;
 
   if (!reg.verification_history) {
     reg.verification_history = [];
   }
   reg.verification_history.unshift({
-    action,
+    action: action === "pending" ? "pending" : (action === "verify" ? "approve" : action),
     actorEmail: actorEmail || "admin",
     timestamp: nowIso,
     reason: rejectionReason,
@@ -1616,6 +1643,119 @@ export function updateStoredRegistrationStudent(
   reg.updated_at = nowIso;
   writeDataStore(store);
   return reg;
+}
+
+export function approveStoredRegistration(params: {
+  registrationId: string;
+  actorEmail?: string;
+  notes?: string;
+}): RegistrationRecord | null {
+  const store = readDataStore();
+  if (!store.registrations) return null;
+  const reg = store.registrations.find(
+    (r) => r.id === params.registrationId || r.registration_number === params.registrationId
+  );
+  if (!reg) return null;
+
+  const nowIso = new Date().toISOString();
+  reg.student_verification_status = "verified";
+  reg.payment_status = "verified";
+  reg.verified_by = params.actorEmail || "admin";
+  reg.verified_at = nowIso;
+  reg.student_verified_at = nowIso;
+  reg.student_verified_by = params.actorEmail || "admin";
+  reg.student_verification_notes = params.notes || "Student ID card and university affiliation verified.";
+
+  const combinedNotes = `[STUDENT_STATUS: verified]\n[PAYMENT_STATUS: verified]\n[VERIFIED_BY: ${params.actorEmail || "admin"}]\n[VERIFIED_AT: ${nowIso}]\n${params.notes ? `[NOTES: ${params.notes}]` : ""}`;
+  reg.admin_review_notes = reg.admin_review_notes ? `${reg.admin_review_notes}\n${combinedNotes}` : combinedNotes;
+
+  if (!reg.verification_history) reg.verification_history = [];
+  reg.verification_history.unshift({
+    action: "approve",
+    actorEmail: params.actorEmail || "admin",
+    timestamp: nowIso,
+    notes: params.notes || "Dual approval confirmed (Student Affiliation & Payment verified).",
+  });
+
+  reg.updated_at = nowIso;
+  writeDataStore(store);
+  return reg;
+}
+
+export function rejectStoredRegistration(params: {
+  registrationId: string;
+  rejectionReason: string;
+  actorEmail?: string;
+  notes?: string;
+  rejectPaymentToo?: boolean;
+}): RegistrationRecord | null {
+  const store = readDataStore();
+  if (!store.registrations) return null;
+  const reg = store.registrations.find(
+    (r) => r.id === params.registrationId || r.registration_number === params.registrationId
+  );
+  if (!reg) return null;
+
+  const nowIso = new Date().toISOString();
+  reg.student_verification_status = "rejected";
+  if (params.rejectPaymentToo) {
+    reg.payment_status = "rejected";
+  }
+  reg.verified_by = params.actorEmail || "admin";
+  reg.verified_at = nowIso;
+  reg.student_verified_at = nowIso;
+  reg.student_verified_by = params.actorEmail || "admin";
+  reg.rejection_reason = params.rejectionReason;
+  reg.student_rejection_reason = params.rejectionReason;
+
+  const combinedNotes = `[STUDENT_STATUS: rejected]\n[PAYMENT_STATUS: ${reg.payment_status}]\n[REJECTION_REASON: ${params.rejectionReason}]\n[REJECTED_BY: ${params.actorEmail || "admin"}]\n[REJECTED_AT: ${nowIso}]${params.notes ? `\n[NOTES: ${params.notes}]` : ""}`;
+  reg.admin_review_notes = reg.admin_review_notes ? `${reg.admin_review_notes}\n${combinedNotes}` : combinedNotes;
+
+  if (!reg.verification_history) reg.verification_history = [];
+  reg.verification_history.unshift({
+    action: "reject",
+    actorEmail: params.actorEmail || "admin",
+    timestamp: nowIso,
+    reason: params.rejectionReason,
+    notes: params.notes,
+  });
+
+  reg.updated_at = nowIso;
+  writeDataStore(store);
+  return reg;
+}
+
+export function saveStoredDocument(doc: StoredDocument): void {
+  const store = readDataStore();
+  if (!store.documents) store.documents = {};
+  store.documents[doc.id] = doc;
+  const cleanId = doc.id.replace(/^(local:(id_cards|receipts)\/|student-id-cards\/|payment-receipts\/|\/)+/, "");
+  const base = path.basename(cleanId);
+  store.documents[base] = doc;
+  store.documents[cleanId] = doc;
+  writeDataStore(store);
+}
+
+export function getStoredDocument(idOrPath: string): StoredDocument | null {
+  if (!idOrPath) return null;
+  const store = readDataStore();
+  if (!store.documents) return null;
+
+  if (store.documents[idOrPath]) return store.documents[idOrPath];
+
+  const clean = idOrPath.replace(/^(local:(id_cards|receipts)\/|student-id-cards\/|payment-receipts\/|\/)+/, "");
+  if (store.documents[clean]) return store.documents[clean];
+
+  const base = path.basename(clean);
+  if (store.documents[base]) return store.documents[base];
+
+  for (const [key, doc] of Object.entries(store.documents)) {
+    if (key.includes(base) || (doc.fileName && doc.fileName === base)) {
+      return doc;
+    }
+  }
+
+  return null;
 }
 
 // -----------------------------------------------------------------------------
@@ -2197,5 +2337,78 @@ export function hasCircularDependency(
   return false;
 }
 
+// -----------------------------------------------------------------------------
+// STUDENT REGISTRATION EMAIL NOTIFICATION STORAGE HELPERS
+// -----------------------------------------------------------------------------
 
+export function getStoredEmailNotifications(
+  registrationIdOrNumber?: string
+): StudentEmailNotificationRecord[] {
+  const store = readDataStore();
+  const all = store.emailNotifications || [];
+  if (!registrationIdOrNumber) return all;
+  const query = registrationIdOrNumber.trim().toLowerCase();
+  return all.filter(
+    (n) =>
+      n.registrationId.toLowerCase() === query ||
+      n.registrationNumber.toLowerCase() === query
+  );
+}
+
+export function getStoredEmailNotificationByIdempotencyKey(
+  idempotencyKey: string
+): StudentEmailNotificationRecord | null {
+  const store = readDataStore();
+  const all = store.emailNotifications || [];
+  return all.find((n) => n.idempotencyKey === idempotencyKey) || null;
+}
+
+export function getStoredEmailNotificationById(
+  id: string
+): StudentEmailNotificationRecord | null {
+  const store = readDataStore();
+  const all = store.emailNotifications || [];
+  return all.find((n) => n.id === id) || null;
+}
+
+export function saveStoredEmailNotification(
+  record: StudentEmailNotificationRecord
+): boolean {
+  const store = readDataStore();
+  if (!store.emailNotifications) {
+    store.emailNotifications = [];
+  }
+
+  const existingIdx = store.emailNotifications.findIndex(
+    (n) => n.id === record.id || n.idempotencyKey === record.idempotencyKey
+  );
+
+  if (existingIdx >= 0) {
+    store.emailNotifications[existingIdx] = {
+      ...store.emailNotifications[existingIdx],
+      ...record,
+    };
+  } else {
+    store.emailNotifications.unshift(record);
+  }
+
+  writeDataStore(store);
+  return true;
+}
+
+export function updateStoredEmailNotification(
+  id: string,
+  updates: Partial<StudentEmailNotificationRecord>
+): boolean {
+  const store = readDataStore();
+  if (!store.emailNotifications) return false;
+
+  const target = store.emailNotifications.find((n) => n.id === id);
+  if (!target) return false;
+
+  Object.assign(target, updates);
+  target.lastAttemptAt = new Date().toISOString();
+  writeDataStore(store);
+  return true;
+}
 

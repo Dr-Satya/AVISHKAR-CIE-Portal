@@ -13,6 +13,8 @@ interface FilterBarProps {
   onProgramChange: (val: string) => void;
   year: string;
   onYearChange: (val: string) => void;
+  overallStatus: string;
+  onOverallStatusChange: (val: string) => void;
   studentStatus: string;
   onStudentStatusChange: (val: string) => void;
   paymentStatus: string;
@@ -31,6 +33,8 @@ export function RegistrationFilterBar({
   onProgramChange,
   year,
   onYearChange,
+  overallStatus,
+  onOverallStatusChange,
   studentStatus,
   onStudentStatusChange,
   paymentStatus,
@@ -57,6 +61,7 @@ export function RegistrationFilterBar({
     Boolean(school && school !== "ALL") ||
     Boolean(program && program !== "ALL") ||
     Boolean(year && year !== "ALL") ||
+    Boolean(overallStatus && overallStatus !== "ALL") ||
     Boolean(studentStatus && studentStatus !== "ALL") ||
     Boolean(paymentStatus && paymentStatus !== "ALL");
 
@@ -97,7 +102,7 @@ export function RegistrationFilterBar({
       </div>
 
       {/* Bottom Row: Filter Dropdowns */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 pt-1">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-1">
         {/* School Dropdown */}
         <div>
           <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
@@ -170,10 +175,31 @@ export function RegistrationFilterBar({
           </select>
         </div>
 
+        {/* Overall Status */}
+        <div>
+          <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
+            Overall Status
+          </label>
+          <select
+            value={overallStatus}
+            onChange={(e) => onOverallStatusChange(e.target.value)}
+            className={`w-full py-2 px-2.5 rounded-lg text-xs border bg-white focus:outline-none focus:ring-2 focus:ring-[#0A2047] text-[#172033] transition-colors ${
+              overallStatus !== "ALL"
+                ? "border-[#0A2047] font-semibold bg-[#0A2047]/5 text-[#0A2047]"
+                : "border-[#E2E8F0]"
+            }`}
+          >
+            <option value="ALL">All Registrations</option>
+            <option value="pending">Pending Verification</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+
         {/* Student Verification Status */}
         <div>
           <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
-            Student Status
+            Student Identity
           </label>
           <select
             value={studentStatus}
@@ -192,7 +218,7 @@ export function RegistrationFilterBar({
         </div>
 
         {/* Payment Verification Status */}
-        <div className="col-span-2 sm:col-span-1">
+        <div>
           <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
             Payment Status
           </label>

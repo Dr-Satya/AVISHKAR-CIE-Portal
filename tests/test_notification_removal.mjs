@@ -82,8 +82,8 @@ assert(
 );
 
 assert(
-  paymentStepContent.includes("Scan the QR code to pay the registration fee of ₹500."),
-  "PaymentStep preserves exact instruction: 'Scan the QR code to pay the registration fee of ₹500.'"
+  paymentStepContent.includes("Scan the QR code to pay the registration fee of ₹100."),
+  "PaymentStep preserves exact instruction: 'Scan the QR code to pay the registration fee of ₹100.'"
 );
 
 assert(
@@ -93,7 +93,7 @@ assert(
 
 assert(
   paymentStepContent.includes("₹{paymentConfig.feeAmount}"),
-  "PaymentStep preserves ₹500 fee display"
+  "PaymentStep preserves ₹100 fee display"
 );
 
 assert(

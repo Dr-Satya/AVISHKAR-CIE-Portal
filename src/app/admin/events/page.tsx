@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Calendar,
   PlusCircle,
@@ -27,7 +28,8 @@ import {
 import { AdminRole, AdminUser, EventRecord, EventStatus } from "@/types/admin";
 import { EventApprovalTracker } from "@/components/admin/EventApprovalTracker";
 
-export default function AdminEventsPage() {
+function AdminEventsContent() {
+  const searchParams = useSearchParams();
   const [user, setUser] = useState<AdminUser | null>(null);
   const [events, setEvents] = useState<EventRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,18 +66,20 @@ export default function AdminEventsPage() {
   const [registrationEndDate, setRegistrationEndDate] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Read URL query parameter for tab selection (?tab=tracker vs ?tab=operations)
+  // Read URL query parameter for tab selection (?tab=tracker vs ?tab=operations) and status filter (?status=published)
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const tabParam = params.get("tab");
-      if (tabParam === "operations" || tabParam === "all") {
-        setViewMode("operations");
-      } else if (tabParam === "tracker") {
-        setViewMode("tracker");
-      }
+    const tabParam = searchParams.get("tab");
+    const statusParam = searchParams.get("status");
+
+    if (statusParam) {
+      setViewMode("operations");
+      setFilterStatus(statusParam);
+    } else if (tabParam === "operations" || tabParam === "all") {
+      setViewMode("operations");
+    } else if (tabParam === "tracker") {
+      setViewMode("tracker");
     }
-  }, []);
+  }, [searchParams]);
 
   const pendingApprovalCount = useMemo(() => {
     return events.filter(
@@ -1114,5 +1118,19 @@ export default function AdminEventsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AdminEventsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="w-8 h-8 border-3 border-[#0A2047] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <AdminEventsContent />
+    </Suspense>
   );
 }

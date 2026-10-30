@@ -99,7 +99,7 @@ export function PaymentStep({
         <div className="p-3.5 bg-[#0A2047]/5 rounded-lg border border-[#0A2047]/15 text-[#0A2047] font-semibold text-sm flex items-center justify-center gap-2.5 shadow-xs text-center">
           <QrCode className="w-5 h-5 text-[#D4AF37] shrink-0" />
           <span className="leading-snug">
-            Scan the QR code to pay the registration fee of ₹500.
+            Scan the QR code to pay the registration fee of ₹100.
           </span>
         </div>
 

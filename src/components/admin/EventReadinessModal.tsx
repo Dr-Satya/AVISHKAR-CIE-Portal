@@ -63,7 +63,7 @@ export function EventReadinessModal({
   const [newDesc, setNewDesc] = useState("");
   const [newCat, setNewCat] = useState<ReadinessCategory>("venue_seating");
   const [newMandatory, setNewMandatory] = useState(true);
-  const [newDeadline, setNewDeadline] = useState(
+  const [newDeadline, setNewDeadline] = useState(() =>
     new Date(Date.now() + 86400000 * 5).toISOString().split("T")[0]
   );
   const [newMemberId, setNewMemberId] = useState("");

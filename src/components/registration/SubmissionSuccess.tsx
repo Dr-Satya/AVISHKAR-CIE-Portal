@@ -13,6 +13,7 @@ import {
   ArrowRight,
   FileText,
   RotateCcw,
+  Mail,
 } from "lucide-react";
 
 interface SubmissionSuccessProps {
@@ -133,6 +134,27 @@ export function SubmissionSuccess({
           </p>
         </div>
 
+        {/* Email Notification Dispatch Status */}
+        <div className="p-3.5 rounded-lg bg-blue-50/70 border border-blue-200/80 text-xs text-[#1E3A8A] flex items-start gap-2.5">
+          <Mail className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
+          <div className="space-y-0.5">
+            <span className="font-semibold text-blue-900 block">
+              {result.emailNotification?.status === "sent"
+                ? "Confirmation Email Dispatched"
+                : result.emailNotification?.status === "simulated"
+                ? "Email Notification Generated (Sandbox Mode)"
+                : "Confirmation Email Notice"}
+            </span>
+            <p className="text-blue-800/90 leading-relaxed">
+              {result.emailNotification?.status === "sent"
+                ? `An automated receipt and registration summary email has been sent to ${formData.email}. Please check your inbox (and spam/promotions folder).`
+                : result.emailNotification?.status === "simulated"
+                ? `In sandbox/testing mode, registration notification was simulated for ${formData.email}.`
+                : `A confirmation email containing your Registration ID (${result.registrationNumber}) has been recorded for ${formData.email}.`}
+            </p>
+          </div>
+        </div>
+
         {/* Submitted Data Summary Table */}
         <div className="space-y-3">
           <span className="text-xs font-semibold uppercase tracking-wider text-[#0A2047] block border-b border-[#E2E8F0] pb-2 flex items-center gap-2">
@@ -154,6 +176,28 @@ export function SubmissionSuccess({
                 {result.studentId || formData.studentId}
               </dd>
             </div>
+
+            {formData.admissionNumber && (
+              <div className="min-w-0">
+                <dt className="text-[#64748B] font-medium">Admission Number</dt>
+                <dd className="text-[#0A2047] font-semibold mt-0.5 text-sm font-mono break-words [overflow-wrap:anywhere]">
+                  {formData.admissionNumber}
+                </dd>
+              </div>
+            )}
+
+            {formData.idCardFile && (
+              <div className="min-w-0 sm:col-span-2">
+                <dt className="text-[#64748B] font-medium">Uploaded Student ID Card</dt>
+                <dd className="text-[#0A2047] font-medium mt-0.5 flex items-center gap-1.5 break-words [overflow-wrap:anywhere]">
+                  <FileText className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                  <span className="truncate">{formData.idCardFile.name}</span>
+                  <span className="text-[#64748B] text-[11px] shrink-0">
+                    ({(formData.idCardFile.size / 1024).toFixed(1)} KB)
+                  </span>
+                </dd>
+              </div>
+            )}
 
             <div className="min-w-0">
               <dt className="text-[#64748B] font-medium">Department &amp; School</dt>

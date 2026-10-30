@@ -20,7 +20,8 @@ export async function GET(req: NextRequest) {
   const localMatch = localList.find(
     (r) =>
       r.registration_number?.toLowerCase() === cleanQuery ||
-      r.student_id?.toLowerCase() === cleanQuery
+      r.student_id?.toLowerCase() === cleanQuery ||
+      r.admission_number?.toLowerCase() === cleanQuery
   );
 
   if (localMatch) {
@@ -31,6 +32,7 @@ export async function GET(req: NextRequest) {
         registrationNumber: localMatch.registration_number,
         studentName: localMatch.student_name,
         studentId: localMatch.student_id,
+        admissionNumber: localMatch.admission_number || null,
         school: localMatch.school,
         program: localMatch.program,
         yearOfJoining: localMatch.year_of_joining,
@@ -58,16 +60,30 @@ export async function GET(req: NextRequest) {
   const config = getAdminSupabaseConfig();
   if (config.isConfigured) {
     try {
-      const restUrl = `${config.url}/rest/v1/registrations?or=(registration_number.ilike.${encodeURIComponent(
+      const restUrlWithAdm = `${config.url}/rest/v1/registrations?or=(registration_number.ilike.${encodeURIComponent(
         query
-      )},student_id.ilike.${encodeURIComponent(query)})&select=registration_number,student_name,student_id,school,program,year_of_joining,payment_status,student_verification_status,student_verification_notes,student_verified_at,admin_review_notes,verified_at,transaction_id,payment_date&limit=1`;
+      )},student_id.ilike.${encodeURIComponent(query)},admission_number.ilike.${encodeURIComponent(query)})&select=registration_number,student_name,student_id,admission_number,school,program,year_of_joining,payment_status,student_verification_status,student_verification_notes,student_verified_at,admin_review_notes,verified_at,transaction_id,payment_date&limit=1`;
 
-      const res = await fetch(restUrl, {
+      let res = await fetch(restUrlWithAdm, {
         headers: {
           apikey: config.anonKey,
           Authorization: `Bearer ${config.serviceRoleKey || config.anonKey}`,
         },
       });
+
+      if (!res.ok) {
+        // Fallback if admission_number is not in table yet
+        const restUrlFallback = `${config.url}/rest/v1/registrations?or=(registration_number.ilike.${encodeURIComponent(
+          query
+        )},student_id.ilike.${encodeURIComponent(query)})&select=registration_number,student_name,student_id,school,program,year_of_joining,payment_status,student_verification_status,student_verification_notes,student_verified_at,admin_review_notes,verified_at,transaction_id,payment_date&limit=1`;
+
+        res = await fetch(restUrlFallback, {
+          headers: {
+            apikey: config.anonKey,
+            Authorization: `Bearer ${config.serviceRoleKey || config.anonKey}`,
+          },
+        });
+      }
 
       if (res.ok) {
         const rows = await res.json();
@@ -80,6 +96,7 @@ export async function GET(req: NextRequest) {
               registrationNumber: match.registration_number,
               studentName: match.student_name,
               studentId: match.student_id,
+              admissionNumber: match.admission_number || null,
               school: match.school,
               program: match.program,
               yearOfJoining: match.year_of_joining,

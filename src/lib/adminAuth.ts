@@ -6,6 +6,8 @@ import { authenticateLocalCouncil, readDataStore, saveStoredAuditLog } from "./d
 
 export const ALLOWED_ADMIN_ROLES = ["President", "Vice President", "Admin", "AVISHKAR Member", "admin"] as const;
 
+export { isValidUuid, getSafeUuid, sanitizeDatabaseError } from "./supabaseDbUtils";
+
 interface SupabaseAuthResponse {
   access_token?: string;
   refresh_token?: string;
@@ -327,9 +329,20 @@ export async function authorizeAdminRequest(
 /**
  * Builds authorized headers for Supabase REST and Storage requests.
  */
-export function getAuthorizedSupabaseHeaders(sessionToken: string): Record<string, string> {
+export function getAuthorizedSupabaseHeaders(sessionToken?: string): Record<string, string> {
   const config = getAdminSupabaseConfig();
-  const bearerKey = config.serviceRoleKey || sessionToken;
+
+  // If service role key is configured, prefer it for administrative server-side operations
+  if (config.serviceRoleKey) {
+    return {
+      apikey: config.serviceRoleKey,
+      Authorization: `Bearer ${config.serviceRoleKey}`,
+    };
+  }
+
+  // Check if sessionToken is a valid 3-part Supabase JWT (header.payload.signature)
+  const isJwt = Boolean(sessionToken && sessionToken.split(".").length === 3);
+  const bearerKey = isJwt ? sessionToken! : config.anonKey;
 
   return {
     apikey: config.anonKey,
@@ -379,7 +392,7 @@ export async function logAdminAction(params: {
       },
       body: JSON.stringify({
         action: params.action,
-        actor_id: params.actor.id,
+        actor_id: getSafeUuid(params.actor.id),
         actor_email: params.actor.email,
         actor_role: params.actor.role,
         target_type: params.targetType,

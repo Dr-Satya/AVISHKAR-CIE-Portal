@@ -56,7 +56,7 @@ export default function AdminFormsPage() {
   // Configuration Form State (Preserved)
   const [formTitle, setFormTitle] = useState("");
   const [formDescription, setFormDescription] = useState("");
-  const [feeAmount, setFeeAmount] = useState<string>("500");
+  const [feeAmount, setFeeAmount] = useState<string>("100");
   const [registrationStartDate, setRegistrationStartDate] = useState("");
   const [registrationEndDate, setRegistrationEndDate] = useState("");
   const [isActive, setIsActive] = useState(true);
@@ -117,7 +117,7 @@ export default function AdminFormsPage() {
     setFields(cleanFields);
     setIsActive(match.isActive);
     setIsPublished(match.isPublished ?? true);
-    setFeeAmount(String(match.feeAmount ?? 500));
+    setFeeAmount(String(match.feeAmount ?? 100));
     setRegistrationStartDate(match.registrationStartDate || "");
     setRegistrationEndDate(match.registrationEndDate || "");
     setCurrentVersion(match.version || 1);
@@ -193,7 +193,7 @@ export default function AdminFormsPage() {
     setTeamSizeMin(2);
     setTeamSizeMax(4);
     setPreviewTeamSize(2);
-    setFeeAmount("500");
+    setFeeAmount("100");
     setRegistrationStartDate("");
     setRegistrationEndDate("");
     setIsActive(true);
@@ -715,7 +715,7 @@ export default function AdminFormsPage() {
                         setFieldErrors((prev) => ({ ...prev, feeAmount: undefined }));
                       }
                     }}
-                    placeholder="500"
+                    placeholder="100"
                     className={`w-full pl-7 pr-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-[#0A2047] font-mono font-bold text-[#172033] ${
                       fieldErrors.feeAmount ? "border-rose-400 bg-rose-50/30" : "border-[#E2E8F0] bg-white"
                     }`}
@@ -1840,7 +1840,7 @@ export default function AdminFormsPage() {
                     {snap.teamSizeMin !== undefined && snap.teamSizeMax !== undefined && (
                       <span>Capacity: {snap.teamSizeMin}–{snap.teamSizeMax} members</span>
                     )}
-                    <span>Fee: ₹{snap.feeAmount ?? 500}</span>
+                    <span>Fee: ₹{snap.feeAmount ?? 100}</span>
                     <span>Questions: {snap.fields.length}</span>
                     {snap.updatedBy && <span>Auditor: {snap.updatedBy}</span>}
                   </div>

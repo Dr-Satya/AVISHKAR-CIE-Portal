@@ -51,7 +51,7 @@ export function OperationalBlockerModal({
   const [operationalImpact, setOperationalImpact] = useState("");
   const [evidenceUrl, setEvidenceUrl] = useState("");
   const [assignedToId, setAssignedToId] = useState("");
-  const [resolutionDeadline, setResolutionDeadline] = useState(
+  const [resolutionDeadline, setResolutionDeadline] = useState(() =>
     new Date(Date.now() + 86400000 * 3).toISOString().split("T")[0]
   );
 

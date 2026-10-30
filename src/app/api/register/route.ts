@@ -11,9 +11,16 @@ import {
 } from "@/lib/validations/registration";
 import { getSupabaseConfigStatus } from "@/lib/supabase";
 import { paymentConfig, isOfficialPaymentConfigured } from "@/config/payment";
-import { getStoredRegistrations, saveStoredRegistration, saveStoredNotification } from "@/lib/dataStore";
+import {
+  getStoredRegistrations,
+  saveStoredRegistration,
+  saveStoredNotification,
+  saveStoredDocument,
+} from "@/lib/dataStore";
+import { validateDocumentBuffer } from "@/lib/fileValidation";
 import { RegistrationRecord } from "@/types/admin";
 import { TeamMemberEntry } from "@/types/registration";
+import { sendRegistrationSubmittedEmail } from "@/lib/emailService";
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,6 +51,8 @@ export async function POST(request: NextRequest) {
     const dob = (formData.get("dob") as string) || "";
 
     const studentId = (formData.get("studentId") as string) || "";
+    const admissionNumber = (formData.get("admissionNumber") as string) || "";
+    const idCardFile = formData.get("idCardFile") as File | null;
     const school = (formData.get("school") as string) || "";
     const program = (formData.get("program") as string) || "";
     const yearOfJoining = (formData.get("yearOfJoining") as string) || "";
@@ -114,6 +123,8 @@ export async function POST(request: NextRequest) {
 
     const academicErrors = validateAcademicInfo({
       studentId,
+      admissionNumber,
+      idCardFile,
       school,
       program,
       yearOfJoining,
@@ -175,6 +186,7 @@ export async function POST(request: NextRequest) {
     }
 
     const normalizedStudentId = studentId.trim();
+    const normalizedAdmissionNumber = admissionNumber.trim();
     const normalizedTransactionId = transactionId.trim().toUpperCase();
 
     // Check backend Supabase configuration
@@ -281,12 +293,36 @@ export async function POST(request: NextRequest) {
     const regNumber = `AVISHKAR-2026-${Math.floor(100000 + Math.random() * 900000)}`;
     let receiptFilePath = "";
     let uploadedStorageUrl = "";
+    let receiptDetectedMime = "application/octet-stream";
+    let receiptDetectedExt = "bin";
+    let receiptFileSize = 0;
 
     if (receiptFile) {
-      const fileExt = receiptFile.name.split(".").pop() || "bin";
-      const sanitizedFilename = `${regNumber}_${Date.now()}.${fileExt}`;
-      const fileBuffer = await receiptFile.arrayBuffer();
+      const rawReceiptBuffer = await receiptFile.arrayBuffer();
+      const receiptValidation = validateDocumentBuffer(rawReceiptBuffer, receiptFile.name, {
+        maxBytes: paymentConfig.maxFileSizeMB * 1024 * 1024,
+        minBytes: 64,
+        allowedMimes: ["application/pdf", "image/jpeg", "image/png", "image/webp"],
+      });
 
+      if (!receiptValidation.valid || !receiptValidation.buffer) {
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              receiptValidation.error ||
+              "The uploaded payment receipt is empty, truncated, or malformed. Uploaded file must be a genuine image (JPG, PNG, WebP) or PDF document. Dummy text and fake placeholder files are rejected.",
+          },
+          { status: 400 }
+        );
+      }
+
+      receiptDetectedMime = receiptValidation.mimeType!;
+      receiptDetectedExt = receiptValidation.extension!;
+      const receiptBuffer = receiptValidation.buffer;
+      receiptFileSize = receiptValidation.size!;
+
+      const sanitizedFilename = `${regNumber}_${Date.now()}.${receiptDetectedExt}`;
       uploadedStorageUrl = `${supabaseUrl}/storage/v1/object/payment-receipts/${sanitizedFilename}`;
 
       try {
@@ -295,9 +331,10 @@ export async function POST(request: NextRequest) {
           headers: {
             apikey: supabaseKey,
             Authorization: `Bearer ${supabaseKey}`,
-            "Content-Type": receiptFile.type || "application/octet-stream",
+            "Content-Type": receiptDetectedMime,
+            "x-upsert": "true",
           },
-          body: fileBuffer,
+          body: receiptBuffer,
         });
 
         if (uploadRes.ok) {
@@ -309,7 +346,7 @@ export async function POST(request: NextRequest) {
             fs.mkdirSync(localReceiptsDir, { recursive: true });
           }
           const localFilePath = path.join(localReceiptsDir, sanitizedFilename);
-          fs.writeFileSync(localFilePath, Buffer.from(fileBuffer));
+          fs.writeFileSync(localFilePath, Buffer.from(receiptBuffer));
           receiptFilePath = `local:receipts/${sanitizedFilename}`;
         }
       } catch {
@@ -319,8 +356,111 @@ export async function POST(request: NextRequest) {
           fs.mkdirSync(localReceiptsDir, { recursive: true });
         }
         const localFilePath = path.join(localReceiptsDir, sanitizedFilename);
-        fs.writeFileSync(localFilePath, Buffer.from(fileBuffer));
+        fs.writeFileSync(localFilePath, Buffer.from(receiptBuffer));
         receiptFilePath = `local:receipts/${sanitizedFilename}`;
+      }
+
+      // Persist document to multi-tier resilient data store
+      try {
+        const receiptBase64 = Buffer.from(receiptBuffer).toString("base64");
+        saveStoredDocument({
+          id: receiptFilePath || sanitizedFilename,
+          type: "receipt",
+          fileName: receiptFile.name,
+          mimeType: receiptDetectedMime,
+          dataBase64: receiptBase64,
+          fileSize: receiptFileSize,
+          uploadedAt: new Date().toISOString(),
+        });
+      } catch (docSaveErr) {
+        console.warn("Could not save receipt to memory store:", docSaveErr);
+      }
+    }
+
+    // 2b. Upload Student ID Card to private storage bucket 'student-id-cards' with local fallback
+    let idCardFilePath = "";
+    let uploadedIdCardStorageUrl = "";
+    let idCardDetectedMime = "application/octet-stream";
+    let idCardDetectedExt = "bin";
+    let idCardFileSize = 0;
+
+    if (idCardFile) {
+      const rawIdCardBuffer = await idCardFile.arrayBuffer();
+      const idCardValidation = validateDocumentBuffer(rawIdCardBuffer, idCardFile.name, {
+        maxBytes: 5 * 1024 * 1024,
+        minBytes: 64,
+        allowedMimes: ["application/pdf", "image/jpeg", "image/png", "image/webp"],
+      });
+
+      if (!idCardValidation.valid || !idCardValidation.buffer) {
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              idCardValidation.error ||
+              "Uploaded ID card file content does not match a valid image (JPG, PNG, WebP) or PDF document. Malformed, truncated, or fake files are rejected.",
+          },
+          { status: 400 }
+        );
+      }
+
+      idCardDetectedMime = idCardValidation.mimeType!;
+      idCardDetectedExt = idCardValidation.extension!;
+      const idCardBuffer = idCardValidation.buffer;
+      idCardFileSize = idCardValidation.size!;
+
+      const sanitizedIdCardFilename = `idcard_${regNumber}_${Date.now()}.${idCardDetectedExt}`;
+      uploadedIdCardStorageUrl = `${supabaseUrl}/storage/v1/object/student-id-cards/${sanitizedIdCardFilename}`;
+
+      try {
+        const uploadRes = await fetch(uploadedIdCardStorageUrl, {
+          method: "POST",
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+            "Content-Type": idCardDetectedMime,
+            "x-upsert": "true",
+          },
+          body: idCardBuffer,
+        });
+
+        if (uploadRes.ok) {
+          idCardFilePath = `student-id-cards/${sanitizedIdCardFilename}`;
+        } else {
+          // Fallback to local storage
+          const localIdCardsDir = path.join(process.cwd(), ".data", "id_cards");
+          if (!fs.existsSync(localIdCardsDir)) {
+            fs.mkdirSync(localIdCardsDir, { recursive: true });
+          }
+          const localFilePath = path.join(localIdCardsDir, sanitizedIdCardFilename);
+          fs.writeFileSync(localFilePath, Buffer.from(idCardBuffer));
+          idCardFilePath = `local:id_cards/${sanitizedIdCardFilename}`;
+        }
+      } catch {
+        // Fallback to local storage
+        const localIdCardsDir = path.join(process.cwd(), ".data", "id_cards");
+        if (!fs.existsSync(localIdCardsDir)) {
+          fs.mkdirSync(localIdCardsDir, { recursive: true });
+        }
+        const localFilePath = path.join(localIdCardsDir, sanitizedIdCardFilename);
+        fs.writeFileSync(localFilePath, Buffer.from(idCardBuffer));
+        idCardFilePath = `local:id_cards/${sanitizedIdCardFilename}`;
+      }
+
+      // Persist document to multi-tier resilient data store
+      try {
+        const idCardBase64 = Buffer.from(idCardBuffer).toString("base64");
+        saveStoredDocument({
+          id: idCardFilePath || sanitizedIdCardFilename,
+          type: "id_card",
+          fileName: idCardFile.name,
+          mimeType: idCardDetectedMime,
+          dataBase64: idCardBase64,
+          fileSize: idCardFileSize,
+          uploadedAt: new Date().toISOString(),
+        });
+      } catch (docSaveErr) {
+        console.warn("Could not save ID card to memory store:", docSaveErr);
       }
     }
 
@@ -333,6 +473,11 @@ export async function POST(request: NextRequest) {
       gender: gender.trim() || null,
       dob: dob.trim() || null,
       student_id: normalizedStudentId,
+      admission_number: normalizedAdmissionNumber || null,
+      id_card_file_path: idCardFilePath || null,
+      id_card_file_name: idCardFile?.name || null,
+      id_card_file_size: idCardFileSize || null,
+      id_card_mime_type: idCardFile ? idCardDetectedMime : null,
       school: school.trim(),
       program: program.trim(),
       year_of_joining: yearOfJoining.trim(),
@@ -367,11 +512,11 @@ export async function POST(request: NextRequest) {
       form_version: "v2-official",
       transaction_id: normalizedTransactionId,
       payment_date: paymentDate.trim(),
-      fee_amount: paymentConfig.feeAmount ?? 500,
+      fee_amount: paymentConfig.feeAmount ?? 100,
       receipt_file_path: receiptFilePath,
       receipt_file_name: receiptFile?.name || "receipt",
-      receipt_file_size: receiptFile?.size || 0,
-      receipt_mime_type: receiptFile?.type || "application/octet-stream",
+      receipt_file_size: receiptFileSize,
+      receipt_mime_type: receiptDetectedMime,
       remarks: remarks.trim() || null,
       payment_status: "pending_verification",
       admin_review_notes: null,
@@ -410,6 +555,11 @@ export async function POST(request: NextRequest) {
       gender: gender.trim() || null,
       dob: dob.trim() || null,
       student_id: normalizedStudentId,
+      admission_number: normalizedAdmissionNumber || null,
+      id_card_file_path: idCardFilePath || null,
+      id_card_file_name: idCardFile?.name || null,
+      id_card_file_size: idCardFileSize || null,
+      id_card_mime_type: idCardFile ? idCardDetectedMime : null,
 
       // Official Academic Taxonomy
       school: school.trim(),
@@ -453,13 +603,14 @@ export async function POST(request: NextRequest) {
       // Payment info
       transaction_id: normalizedTransactionId,
       payment_date: paymentDate.trim(),
-      fee_amount: paymentConfig.feeAmount ?? 500,
+      fee_amount: paymentConfig.feeAmount ?? 100,
       receipt_file_path: receiptFilePath,
       receipt_file_name: receiptFile?.name || "receipt",
-      receipt_file_size: receiptFile?.size || 0,
-      receipt_mime_type: receiptFile?.type || "application/octet-stream",
+      receipt_file_size: receiptFileSize,
+      receipt_mime_type: receiptDetectedMime,
       remarks: remarks.trim() || null,
       payment_status: "pending_verification",
+      student_verification_status: "pending",
     };
 
     let insertRes = await fetch(insertUrl, {
@@ -474,23 +625,72 @@ export async function POST(request: NextRequest) {
     });
 
     if (!insertRes.ok) {
-      const errorText = await insertRes.text();
-      console.error("Database insert error:", errorText);
+      let errorText = await insertRes.text();
 
-      // Attempt cleanup of uploaded receipt file if database insert fails
-      if (uploadedStorageUrl) {
-        try {
-          await fetch(uploadedStorageUrl, {
-            method: "DELETE",
-            headers: {
-              apikey: supabaseKey,
-              Authorization: `Bearer ${supabaseKey}`,
-            },
-          });
-        } catch (cleanupErr) {
-          console.error("Receipt cleanup error after failed insert:", cleanupErr);
+      // Graceful fallback: If remote Supabase schema has not yet migrated admission_number or id_card columns
+      const hasAdmError = errorText.includes("admission_number") && "admission_number" in basePayload;
+      const hasIdCardError = errorText.includes("id_card") && "id_card_file_path" in basePayload;
+
+      if (hasAdmError || hasIdCardError) {
+        const retryPayload = { ...basePayload };
+        if (hasAdmError) {
+          delete (retryPayload as any).admission_number;
+        }
+        if (hasIdCardError) {
+          delete (retryPayload as any).id_card_file_path;
+          delete (retryPayload as any).id_card_file_name;
+          delete (retryPayload as any).id_card_file_size;
+          delete (retryPayload as any).id_card_mime_type;
+        }
+        const retryRes = await fetch(insertUrl, {
+          method: "POST",
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+            "Content-Type": "application/json",
+            Prefer: "return=minimal",
+          },
+          body: JSON.stringify(retryPayload),
+        });
+        if (retryRes.ok) {
+          insertRes = retryRes;
+        } else {
+          errorText = await retryRes.text();
         }
       }
+
+      if (!insertRes.ok) {
+        console.error("Database insert error:", errorText);
+
+        // Attempt cleanup of uploaded receipt file if database insert fails
+        if (uploadedStorageUrl) {
+          try {
+            await fetch(uploadedStorageUrl, {
+              method: "DELETE",
+              headers: {
+                apikey: supabaseKey,
+                Authorization: `Bearer ${supabaseKey}`,
+              },
+            });
+          } catch (cleanupErr) {
+            console.error("Receipt cleanup error after failed insert:", cleanupErr);
+          }
+        }
+
+        // Attempt cleanup of uploaded student ID card file if database insert fails
+        if (uploadedIdCardStorageUrl) {
+          try {
+            await fetch(uploadedIdCardStorageUrl, {
+              method: "DELETE",
+              headers: {
+                apikey: supabaseKey,
+                Authorization: `Bearer ${supabaseKey}`,
+              },
+            });
+          } catch (cleanupErr) {
+            console.error("ID card cleanup error after failed insert:", cleanupErr);
+          }
+        }
 
       // Check for unique constraint violations (HTTP 409 or Postgres code 23505)
       const isUniqueConflict =
@@ -523,6 +723,34 @@ export async function POST(request: NextRequest) {
       }
 
       console.warn("Supabase insert had error, retained in local persistent store:", errorText);
+
+      // Automated Student Email Notification (Decoupled & Non-blocking)
+      let emailStatusInfo: { status: "sent" | "simulated" | "failed" | "skipped"; message?: string; recipient?: string } | undefined;
+      try {
+        const emailResult = await sendRegistrationSubmittedEmail({
+          registrationId: regRecord.id,
+          registrationNumber: regNumber,
+          recipientEmail: email.trim().toLowerCase(),
+          recipientName: studentName.trim(),
+          studentId: normalizedStudentId,
+          admissionNumber: normalizedAdmissionNumber || null,
+          school: school.trim(),
+          program: program.trim(),
+          transactionId: normalizedTransactionId,
+        });
+        emailStatusInfo = {
+          status: emailResult.status || (emailResult.simulated ? "simulated" : emailResult.success ? "sent" : "failed"),
+          recipient: email.trim().toLowerCase(),
+        };
+      } catch (emailErr) {
+        console.warn("[Register Route] Non-blocking email dispatch error:", emailErr);
+        emailStatusInfo = {
+          status: "failed",
+          message: "Failed to dispatch email",
+          recipient: email.trim().toLowerCase(),
+        };
+      }
+
       return NextResponse.json({
         success: true,
         mode: "persisted_store",
@@ -532,9 +760,38 @@ export async function POST(request: NextRequest) {
         transactionId: normalizedTransactionId,
         paymentStatus: "pending_verification",
         submittedAt: new Date().toISOString(),
+        emailNotification: emailStatusInfo,
         message:
           "Your AVISHKAR 2026 registration has been successfully submitted and is pending verification.",
       });
+    }
+  }
+
+    // Automated Student Email Notification (Decoupled & Non-blocking)
+    let emailStatusInfo: { status: "sent" | "simulated" | "failed" | "skipped"; message?: string; recipient?: string } | undefined;
+    try {
+      const emailResult = await sendRegistrationSubmittedEmail({
+        registrationId: regRecord.id,
+        registrationNumber: regNumber,
+        recipientEmail: email.trim().toLowerCase(),
+        recipientName: studentName.trim(),
+        studentId: normalizedStudentId,
+        admissionNumber: normalizedAdmissionNumber || null,
+        school: school.trim(),
+        program: program.trim(),
+        transactionId: normalizedTransactionId,
+      });
+      emailStatusInfo = {
+        status: emailResult.status || (emailResult.simulated ? "simulated" : emailResult.success ? "sent" : "failed"),
+        recipient: email.trim().toLowerCase(),
+      };
+    } catch (emailErr) {
+      console.warn("[Register Route] Non-blocking email dispatch error:", emailErr);
+      emailStatusInfo = {
+        status: "failed",
+        message: "Failed to dispatch email",
+        recipient: email.trim().toLowerCase(),
+      };
     }
 
     // 4. Return success response with confirmed registration number
@@ -547,6 +804,7 @@ export async function POST(request: NextRequest) {
       transactionId: normalizedTransactionId,
       paymentStatus: "pending_verification",
       submittedAt: new Date().toISOString(),
+      emailNotification: emailStatusInfo,
       message:
         "Your AVISHKAR 2026 registration has been successfully submitted and is pending verification.",
     });

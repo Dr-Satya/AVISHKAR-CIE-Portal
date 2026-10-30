@@ -88,6 +88,11 @@ export interface StudentRegistrationInput {
 
   // Step 2: Academic Information (GD Goenka University)
   studentId: string;
+  admissionNumber: string;
+  idCardFile?: File | null;
+  idCardFileName?: string;
+  idCardFileSize?: number;
+  idCardMimeType?: string;
   school: string;
   program: string;
   yearOfJoining: string;
@@ -147,6 +152,8 @@ export interface RegistrationValidationErrors {
   gender?: string;
   dob?: string;
   studentId?: string;
+  admissionNumber?: string;
+  idCardFile?: string;
   school?: string;
   program?: string;
   yearOfJoining?: string;
@@ -195,7 +202,7 @@ export type SubmissionStatus =
 
 export interface RegistrationSubmissionResult {
   success: boolean;
-  mode: "persisted" | "unconfigured_backend" | "validation_error";
+  mode: "persisted" | "unconfigured_backend" | "validation_error" | "persisted_store";
   registrationNumber?: string | null;
   provisionalReference?: string | null;
   isProvisional?: boolean;
@@ -206,4 +213,9 @@ export interface RegistrationSubmissionResult {
   submittedAt: string;
   message: string;
   missingRequirements?: string[];
+  emailNotification?: {
+    status: "sent" | "simulated" | "failed" | "skipped";
+    message?: string;
+    recipient?: string;
+  };
 }
