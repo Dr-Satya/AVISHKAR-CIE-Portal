@@ -3,7 +3,10 @@
 
 import fs from "fs";
 import path from "path";
-import {
+import { createJiti } from "jiti";
+
+const jiti = createJiti(import.meta.url);
+const {
   authenticateLocalCouncil,
   getStoredRegistrations,
   saveStoredRegistration,
@@ -12,7 +15,7 @@ import {
   saveStoredEvent,
   getStoredTasks,
   saveStoredTask,
-} from "../src/lib/dataStore.ts";
+} = jiti("../src/lib/dataStore.ts");
 
 function assert(condition, message) {
   if (!condition) {
