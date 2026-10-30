@@ -10,12 +10,12 @@ Ensure your development environment meets the following software requirements:
 
 | Tool | Minimum Version | Recommended Version | Verification Command |
 | :--- | :--- | :--- | :--- |
-| **Node.js** | `v20.x` | `v20.18.0` LTS or later | `node --version` |
-| **npm** | `v9.x` | `v10.x` | `npm --version` |
+| **Node.js** | `v22.x` | `v22.12.0` LTS or later | `node --version` |
+| **npm** | `v10.x` | Latest | `npm --version` |
 | **Git** | `v2.30+` | Latest | `git --version` |
 | **Operating System** | Any | Windows 10/11, macOS 12+, or Ubuntu 22.04+ | — |
 
-> **Note:** Node.js 20+ LTS is strictly required due to modern ES module support, Web Streams API, and compatibility with the Cloudflare Workers edge runtime simulator.
+> **Note:** Node.js 22+ (Active LTS) is strictly required by Vinext (`>=22.0.0`), `@vinext/cloudflare`, and Cloudflare `cf` deployment tooling due to `node:fs/promises.glob` support, modern ES module architecture, and edge runtime simulation.
 
 ---
 
