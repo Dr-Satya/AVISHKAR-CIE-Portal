@@ -5,9 +5,29 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createJiti } from "jiti";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
+
+const jiti = createJiti(import.meta.url);
+const {
+  getEmailContent,
+  escapeHtml,
+  DEFAULT_REJECTION_REASON,
+  sendStudentNotification,
+  retryEmailNotification,
+  sendTestEmailNotification,
+  RESEND_TESTING_SENDER,
+  getEmailSenderAddress,
+  isResendTestingMode,
+} = jiti("../src/lib/emailService.ts");
+
+const {
+  getStoredEmailNotificationById,
+  getStoredEmailNotifications,
+  getStoredRegistrations,
+} = jiti("../src/lib/dataStore.ts");
 
 console.log("================================================================================");
 console.log("🧪 AVISHKAR-v2: Automated Student Registration Email Notifications Test Suite");
@@ -33,8 +53,6 @@ async function runTest(name, fn) {
 // Test 1: Template Structure & Exact Subject Verification
 // -----------------------------------------------------------------------------
 await runTest("Exact subject lines match specification across all 3 lifecycle stages", async () => {
-  const { getEmailContent } = await import("../src/lib/emailService.ts");
-
   const mockStudent = {
     registrationId: "reg-test-001",
     registrationNumber: "AVISHKAR-2026-999001",
@@ -88,8 +106,6 @@ await runTest("Exact subject lines match specification across all 3 lifecycle st
 // Test 2: HTML Injection Prevention & XSS Escaping
 // -----------------------------------------------------------------------------
 await runTest("Dynamic inputs are HTML-escaped to prevent email client script injection", async () => {
-  const { getEmailContent, escapeHtml } = await import("../src/lib/emailService.ts");
-
   assert.strictEqual(
     escapeHtml('<script>alert("xss")</script>'),
     "&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;",
@@ -115,8 +131,6 @@ await runTest("Dynamic inputs are HTML-escaped to prevent email client script in
 // Test 3: Rejection Reason Fallback Logic
 // -----------------------------------------------------------------------------
 await runTest("Rejection email replaces null, undefined, or empty reason with neutral fallback", async () => {
-  const { getEmailContent, DEFAULT_REJECTION_REASON } = await import("../src/lib/emailService.ts");
-
   const baseStudent = {
     registrationId: "reg-fallback-001",
     registrationNumber: "AVISHKAR-2026-777",
@@ -147,8 +161,6 @@ await runTest("Rejection email replaces null, undefined, or empty reason with ne
 // Test 4: Sandbox / Simulated Mode Execution
 // -----------------------------------------------------------------------------
 await runTest("Sends in simulated mode when RESEND_API_KEY is not configured", async () => {
-  const { sendStudentNotification } = await import("../src/lib/emailService.ts");
-
   // Temporarily ensure no live key
   const originalKey = process.env.RESEND_API_KEY;
   delete process.env.RESEND_API_KEY;
@@ -177,8 +189,6 @@ await runTest("Sends in simulated mode when RESEND_API_KEY is not configured", a
 // Test 5: Idempotency & Deduplication Guard
 // -----------------------------------------------------------------------------
 await runTest("Idempotency guard prevents duplicate email dispatches for the same event", async () => {
-  const { sendStudentNotification } = await import("../src/lib/emailService.ts");
-
   const regNum = `AVISHKAR-2026-IDEM-${Date.now()}`;
   const testStudent = {
     registrationId: `reg-${Date.now()}`,
@@ -209,9 +219,6 @@ await runTest("Idempotency guard prevents duplicate email dispatches for the sam
 // Test 6: Retry Mechanism Updates Delivery State
 // -----------------------------------------------------------------------------
 await runTest("retryEmailNotification forces re-dispatch and increments attempts count", async () => {
-  const { sendStudentNotification, retryEmailNotification } = await import("../src/lib/emailService.ts");
-  const { getStoredEmailNotificationById } = await import("../src/lib/dataStore.ts");
-
   const uniqueReg = `AVISHKAR-2026-RETRY-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   const testStudent = {
     registrationId: `reg-${Date.now()}`,
@@ -243,8 +250,6 @@ await runTest("retryEmailNotification forces re-dispatch and increments attempts
 // Test 7: Non-blocking Resilience / Decoupling Guarantee
 // -----------------------------------------------------------------------------
 await runTest("sendStudentNotification handles invalid email gracefully without throwing", async () => {
-  const { sendStudentNotification } = await import("../src/lib/emailService.ts");
-
   // Pass invalid email
   const result = await sendStudentNotification({
     eventType: "registration_submitted",
@@ -265,8 +270,6 @@ await runTest("sendStudentNotification handles invalid email gracefully without 
 // Test 8: Admin Notification History Retrieval & Querying
 // -----------------------------------------------------------------------------
 await runTest("getStoredEmailNotifications filters correctly by registration number", async () => {
-  const { getStoredEmailNotifications } = await import("../src/lib/dataStore.ts");
-
   const notifications = getStoredEmailNotifications("AVISHKAR-2026-SIM001");
   assert.ok(Array.isArray(notifications), "Must return an array of notifications");
   assert.ok(notifications.length > 0, "Must find notifications for AVISHKAR-2026-SIM001");
@@ -342,12 +345,6 @@ await runTest("Supabase migration defines email_notifications table with RLS", a
 // Test 15: Resend Testing Mode Sender & Configuration Detection
 // -----------------------------------------------------------------------------
 await runTest("Resolves onboarding@resend.dev sender and detects testing mode", async () => {
-  const {
-    RESEND_TESTING_SENDER,
-    getEmailSenderAddress,
-    isResendTestingMode,
-  } = await import("../src/lib/emailService.ts");
-
   assert.strictEqual(RESEND_TESTING_SENDER, "onboarding@resend.dev", "Sender must be onboarding@resend.dev");
 
   // In default testing mode, sender resolves to onboarding@resend.dev
@@ -363,8 +360,6 @@ await runTest("Resolves onboarding@resend.dev sender and detects testing mode", 
 // Test 16: Testing Mode Recipient Restriction (Arbitrary Students Protected)
 // -----------------------------------------------------------------------------
 await runTest("Testing mode blocks live sends to arbitrary student addresses", async () => {
-  const { sendStudentNotification } = await import("../src/lib/emailService.ts");
-
   const originalTestRecipient = process.env.RESEND_TEST_RECIPIENT_EMAIL;
   process.env.RESEND_TEST_RECIPIENT_EMAIL = "resend.owner@test.com";
 
@@ -397,9 +392,6 @@ await runTest("Testing mode blocks live sends to arbitrary student addresses", a
 // Test 17: Safe Test-Only Mechanism (Zero Fake DB Registrations)
 // -----------------------------------------------------------------------------
 await runTest("sendTestEmailNotification executes all 3 templates without altering registrations", async () => {
-  const { sendTestEmailNotification } = await import("../src/lib/emailService.ts");
-  const { getStoredRegistrations } = await import("../src/lib/dataStore.ts");
-
   const regCountBefore = getStoredRegistrations().length;
 
   const testEmail = "resend.account@domain.com";

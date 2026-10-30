@@ -196,8 +196,12 @@ export function resolvePhotoDiskPath(storagePath: string): string | null {
   if (!filename) return null;
 
   const fullPath = path.join(PHOTOS_DATA_DIR, filename);
-  if (fs.existsSync(fullPath)) {
-    return fullPath;
+  try {
+    if (fs.existsSync(fullPath)) {
+      return fullPath;
+    }
+  } catch {
+    // Read-only filesystem in Cloudflare Workers / workerd environment
   }
   return null;
 }
@@ -215,9 +219,11 @@ export function getPhotoBuffer(storagePath?: string, photoId?: string): Buffer |
     return globalThis.__avishkar_photo_buffer_cache.get(filename)!;
   }
   const diskPath = resolvePhotoDiskPath(storagePath);
-  if (diskPath && fs.existsSync(diskPath)) {
+  if (diskPath) {
     try {
-      return fs.readFileSync(diskPath);
+      if (fs.existsSync(diskPath)) {
+        return fs.readFileSync(diskPath);
+      }
     } catch {
       return null;
     }
@@ -239,12 +245,14 @@ export async function deletePhotoFromStorage(storagePath: string): Promise<boole
   }
 
   const diskPath = resolvePhotoDiskPath(storagePath);
-  if (diskPath && fs.existsSync(diskPath)) {
+  if (diskPath) {
     try {
-      fs.unlinkSync(diskPath);
-      deleted = true;
+      if (fs.existsSync(diskPath)) {
+        fs.unlinkSync(diskPath);
+        deleted = true;
+      }
     } catch (err) {
-      console.error("Error unlinking photo from disk:", err);
+      console.warn("Read-only filesystem in Cloudflare Workers / workerd environment:", err);
     }
   }
 

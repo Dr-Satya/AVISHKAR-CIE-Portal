@@ -53,9 +53,7 @@ export function detectBufferMimeType(
   const u8 =
     rawBuffer instanceof Uint8Array
       ? rawBuffer
-      : rawBuffer instanceof ArrayBuffer
-      ? new Uint8Array(rawBuffer)
-      : new Uint8Array(rawBuffer.buffer, rawBuffer.byteOffset, rawBuffer.byteLength);
+      : new Uint8Array(rawBuffer);
 
   const len = u8.byteLength;
 

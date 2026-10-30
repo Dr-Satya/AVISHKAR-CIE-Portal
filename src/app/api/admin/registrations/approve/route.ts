@@ -131,9 +131,14 @@ export async function POST(req: NextRequest) {
     const idCardBasename = path.basename(
       idCardPath.replace(/^(local:(id_cards|receipts)\/|student-id-cards\/|\/)+/, "")
     );
-    const localIdCardDisk = fs.existsSync(
-      path.join(process.cwd(), ".data", "id_cards", idCardBasename)
-    );
+    let localIdCardDisk = false;
+    try {
+      localIdCardDisk = fs.existsSync(
+        path.join(process.cwd(), ".data", "id_cards", idCardBasename)
+      );
+    } catch {
+      localIdCardDisk = false;
+    }
     const isDemoIdCard =
       idCardPath.toLowerCase().includes("demo") ||
       idCardPath.toLowerCase().includes("sample") ||
@@ -170,9 +175,14 @@ export async function POST(req: NextRequest) {
     const receiptBasename = path.basename(
       receiptPath.replace(/^(local:(id_cards|receipts)\/|payment-receipts\/|\/)+/, "")
     );
-    const localReceiptDisk = fs.existsSync(
-      path.join(process.cwd(), ".data", "receipts", receiptBasename)
-    );
+    let localReceiptDisk = false;
+    try {
+      localReceiptDisk = fs.existsSync(
+        path.join(process.cwd(), ".data", "receipts", receiptBasename)
+      );
+    } catch {
+      localReceiptDisk = false;
+    }
     const isDemoReceipt =
       receiptPath.toLowerCase().includes("demo") ||
       receiptPath.toLowerCase().includes("sample") ||
@@ -329,7 +339,7 @@ export async function POST(req: NextRequest) {
     });
 
     // 9. Automated Student Email Notification (Decoupled & Non-blocking)
-    let emailStatusInfo: { status: "sent" | "simulated" | "failed" | "skipped"; recipient?: string } | undefined;
+    let emailStatusInfo: { status: "pending" | "sent" | "simulated" | "failed" | "skipped"; recipient?: string } | undefined;
     try {
       const emailResult = await sendRegistrationApprovedEmail({
         registrationId: currentRecord.id || registrationId,

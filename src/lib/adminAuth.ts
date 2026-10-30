@@ -7,6 +7,7 @@ import { authenticateLocalCouncil, readDataStore, saveStoredAuditLog } from "./d
 export const ALLOWED_ADMIN_ROLES = ["President", "Vice President", "Admin", "AVISHKAR Member", "admin"] as const;
 
 export { isValidUuid, getSafeUuid, sanitizeDatabaseError } from "./supabaseDbUtils";
+import { getSafeUuid } from "./supabaseDbUtils";
 
 interface SupabaseAuthResponse {
   access_token?: string;

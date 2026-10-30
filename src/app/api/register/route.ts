@@ -334,29 +334,37 @@ export async function POST(request: NextRequest) {
             "Content-Type": receiptDetectedMime,
             "x-upsert": "true",
           },
-          body: receiptBuffer,
+          body: receiptBuffer as unknown as BodyInit,
         });
 
         if (uploadRes.ok) {
           receiptFilePath = `payment-receipts/${sanitizedFilename}`;
         } else {
-          // Fallback to local storage
+          // Fallback to local storage (safe on edge runtimes)
+          try {
+            const localReceiptsDir = path.join(process.cwd(), ".data", "receipts");
+            if (!fs.existsSync(localReceiptsDir)) {
+              fs.mkdirSync(localReceiptsDir, { recursive: true });
+            }
+            const localFilePath = path.join(localReceiptsDir, sanitizedFilename);
+            fs.writeFileSync(localFilePath, Buffer.from(receiptBuffer));
+          } catch {
+            // Local disk write ignored on read-only edge runtimes; in-memory store persists
+          }
+          receiptFilePath = `local:receipts/${sanitizedFilename}`;
+        }
+      } catch {
+        // Fallback to local storage (safe on edge runtimes)
+        try {
           const localReceiptsDir = path.join(process.cwd(), ".data", "receipts");
           if (!fs.existsSync(localReceiptsDir)) {
             fs.mkdirSync(localReceiptsDir, { recursive: true });
           }
           const localFilePath = path.join(localReceiptsDir, sanitizedFilename);
           fs.writeFileSync(localFilePath, Buffer.from(receiptBuffer));
-          receiptFilePath = `local:receipts/${sanitizedFilename}`;
+        } catch {
+          // Local disk write ignored on read-only edge runtimes; in-memory store persists
         }
-      } catch {
-        // Fallback to local storage
-        const localReceiptsDir = path.join(process.cwd(), ".data", "receipts");
-        if (!fs.existsSync(localReceiptsDir)) {
-          fs.mkdirSync(localReceiptsDir, { recursive: true });
-        }
-        const localFilePath = path.join(localReceiptsDir, sanitizedFilename);
-        fs.writeFileSync(localFilePath, Buffer.from(receiptBuffer));
         receiptFilePath = `local:receipts/${sanitizedFilename}`;
       }
 
@@ -421,29 +429,37 @@ export async function POST(request: NextRequest) {
             "Content-Type": idCardDetectedMime,
             "x-upsert": "true",
           },
-          body: idCardBuffer,
+          body: idCardBuffer as unknown as BodyInit,
         });
 
         if (uploadRes.ok) {
           idCardFilePath = `student-id-cards/${sanitizedIdCardFilename}`;
         } else {
-          // Fallback to local storage
+          // Fallback to local storage (safe on edge runtimes)
+          try {
+            const localIdCardsDir = path.join(process.cwd(), ".data", "id_cards");
+            if (!fs.existsSync(localIdCardsDir)) {
+              fs.mkdirSync(localIdCardsDir, { recursive: true });
+            }
+            const localFilePath = path.join(localIdCardsDir, sanitizedIdCardFilename);
+            fs.writeFileSync(localFilePath, Buffer.from(idCardBuffer));
+          } catch {
+            // Local disk write ignored on read-only edge runtimes; in-memory store persists
+          }
+          idCardFilePath = `local:id_cards/${sanitizedIdCardFilename}`;
+        }
+      } catch {
+        // Fallback to local storage (safe on edge runtimes)
+        try {
           const localIdCardsDir = path.join(process.cwd(), ".data", "id_cards");
           if (!fs.existsSync(localIdCardsDir)) {
             fs.mkdirSync(localIdCardsDir, { recursive: true });
           }
           const localFilePath = path.join(localIdCardsDir, sanitizedIdCardFilename);
           fs.writeFileSync(localFilePath, Buffer.from(idCardBuffer));
-          idCardFilePath = `local:id_cards/${sanitizedIdCardFilename}`;
+        } catch {
+          // Local disk write ignored on read-only edge runtimes; in-memory store persists
         }
-      } catch {
-        // Fallback to local storage
-        const localIdCardsDir = path.join(process.cwd(), ".data", "id_cards");
-        if (!fs.existsSync(localIdCardsDir)) {
-          fs.mkdirSync(localIdCardsDir, { recursive: true });
-        }
-        const localFilePath = path.join(localIdCardsDir, sanitizedIdCardFilename);
-        fs.writeFileSync(localFilePath, Buffer.from(idCardBuffer));
         idCardFilePath = `local:id_cards/${sanitizedIdCardFilename}`;
       }
 
@@ -725,7 +741,7 @@ export async function POST(request: NextRequest) {
       console.warn("Supabase insert had error, retained in local persistent store:", errorText);
 
       // Automated Student Email Notification (Decoupled & Non-blocking)
-      let emailStatusInfo: { status: "sent" | "simulated" | "failed" | "skipped"; message?: string; recipient?: string } | undefined;
+      let emailStatusInfo: { status: "pending" | "sent" | "simulated" | "failed" | "skipped"; message?: string; recipient?: string } | undefined;
       try {
         const emailResult = await sendRegistrationSubmittedEmail({
           registrationId: regRecord.id,
@@ -768,7 +784,7 @@ export async function POST(request: NextRequest) {
   }
 
     // Automated Student Email Notification (Decoupled & Non-blocking)
-    let emailStatusInfo: { status: "sent" | "simulated" | "failed" | "skipped"; message?: string; recipient?: string } | undefined;
+    let emailStatusInfo: { status: "pending" | "sent" | "simulated" | "failed" | "skipped"; message?: string; recipient?: string } | undefined;
     try {
       const emailResult = await sendRegistrationSubmittedEmail({
         registrationId: regRecord.id,

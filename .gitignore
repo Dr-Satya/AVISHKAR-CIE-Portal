@@ -55,3 +55,4 @@ reference-files/
 .vinext/
 .cloudflare/
 scratch/
+.agent/

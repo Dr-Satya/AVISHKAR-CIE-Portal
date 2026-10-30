@@ -2,10 +2,13 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 
+const reactHooksPlugin = nextVitals[0]?.plugins?.["react-hooks"];
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
+    ...(reactHooksPlugin ? { plugins: { "react-hooks": reactHooksPlugin } } : {}),
     rules: {
       "@typescript-eslint/no-explicit-any": "warn",
       "react-hooks/set-state-in-effect": "warn",
@@ -24,6 +27,7 @@ const eslintConfig = defineConfig([
     "tests/**",
     "scratch/**",
     "scripts/**",
+    ".agent/**",
   ]),
 ]);
 

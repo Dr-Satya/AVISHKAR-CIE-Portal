@@ -1,0 +1,29 @@
+# ==============================================================================
+# AVISHKAR-v2 Code Ownership & Governance
+# ==============================================================================
+# All pull requests require review and approval from repository maintainers.
+# Documentation: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global Default Owner
+* @Dr-Satya
+
+# Cloudflare Workers & Vinext Edge Deployment Infrastructure
+/cloudflare.config.ts @Dr-Satya
+/vinext.config.ts @Dr-Satya
+/wrangler.toml @Dr-Satya
+
+# Database Schemas & PostgreSQL Migrations
+/supabase/migrations/ @Dr-Satya
+/src/lib/database/ @Dr-Satya
+/src/lib/dataStore.ts @Dr-Satya
+
+# Administrative Authentication, Security & Storage
+/src/lib/auth/ @Dr-Satya
+/src/lib/storage/ @Dr-Satya
+/src/lib/email/ @Dr-Satya
+/src/lib/adminAuth.ts @Dr-Satya
+
+# GitHub CI/CD Workflows & Repository Policies
+/.github/workflows/ @Dr-Satya
+/SECURITY.md @Dr-Satya
+/LICENSE_NOTICE.md @Dr-Satya

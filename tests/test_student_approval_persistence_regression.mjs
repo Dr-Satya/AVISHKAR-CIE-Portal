@@ -5,9 +5,13 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createJiti } from "jiti";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
+
+const jiti = createJiti(import.meta.url);
+const { isValidUuid, getSafeUuid, sanitizeDatabaseError } = jiti("../src/lib/supabaseDbUtils.ts");
 
 console.log("================================================================================");
 console.log("🧪 AVISHKAR-v2: Student Approval & Database Persistence Regression Suite");
@@ -19,7 +23,21 @@ let totalTests = 0;
 function runTest(name, fn) {
   totalTests++;
   try {
-    fn();
+    const res = fn();
+    if (res && typeof res.then === "function") {
+      res.then(
+        () => {
+          console.log(`  ✅ [PASS] ${name}`);
+          passedTests++;
+        },
+        (err) => {
+          console.error(`  ❌ [FAIL] ${name}`);
+          console.error(`     Error: ${err.message}`);
+          process.exitCode = 1;
+        }
+      );
+      return res;
+    }
     console.log(`  ✅ [PASS] ${name}`);
     passedTests++;
   } catch (err) {
@@ -30,8 +48,7 @@ function runTest(name, fn) {
 }
 
 // 1. UUID Validation & Non-UUID Guard Tests
-runTest("UUID validation distinguishes RFC-4122 UUIDs from council IDs, emails, and reg numbers", async () => {
-  const { isValidUuid, getSafeUuid } = await import("../src/lib/supabaseDbUtils.ts");
+runTest("UUID validation distinguishes RFC-4122 UUIDs from council IDs, emails, and reg numbers", () => {
 
   const validUuid1 = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
   const validUuid2 = "550e8400-e29b-41d4-a716-446655440000";
@@ -59,8 +76,7 @@ runTest("UUID validation distinguishes RFC-4122 UUIDs from council IDs, emails, 
 });
 
 // 2. Database Error Sanitization & PII/Secret Masking
-runTest("sanitizeDatabaseError strips secrets and PII while delivering clear diagnostics", async () => {
-  const { sanitizeDatabaseError } = await import("../src/lib/supabaseDbUtils.ts");
+runTest("sanitizeDatabaseError strips secrets and PII while delivering clear diagnostics", () => {
 
   // Case A: PostgreSQL 22P02 invalid UUID error
   const rawUuidErr = JSON.stringify({

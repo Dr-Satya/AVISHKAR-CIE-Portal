@@ -142,12 +142,14 @@ export async function POST(req: NextRequest) {
       ? registrationId
       : null;
     const targetRegNum = currentRecord?.registration_number || registrationId;
+    const targetDbId = currentRecord?.id || registrationId;
     const patchUrl = targetByUuid
       ? `${config.url}/rest/v1/registrations?id=eq.${encodeURIComponent(targetByUuid)}`
       : `${config.url}/rest/v1/registrations?registration_number=eq.${encodeURIComponent(targetRegNum)}`;
 
     let supabasePersisted = false;
     let updatedRecord = currentRecord;
+    let patchErrText: string | undefined;
 
     // 1. Update Supabase registrations table if configured
     if (config.isConfigured) {
@@ -162,7 +164,6 @@ export async function POST(req: NextRequest) {
           body: JSON.stringify(updatePayload),
         });
 
-        let patchErrText: string | undefined;
         if (patchRes.ok) {
           const updatedRows = await patchRes.json();
           if (Array.isArray(updatedRows) && updatedRows.length > 0) {
